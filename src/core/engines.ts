@@ -35,7 +35,15 @@ registerEngine({
     const index = JSON.parse(new TextDecoder().decode(packed.subarray(4, 4 + hlen))) as Record<string, [number, number]>;
     for (const [k, [o, l]] of Object.entries(index)) pdfjsData.set(k, packed.subarray(4 + hlen + o, 4 + hlen + o + l));
     pdfjs = mod;
-    pdfWorker = new mod.PDFWorker({ port: new Worker(scriptUrl(pdfWorkerUrl), { type: "module" }) } as never);
+    const port = new Worker(scriptUrl(pdfWorkerUrl), { type: "module" });
+    // Firefox loads a worker's script (and checks worker-src) after `new Worker()` returns. pdf.js posts "ready" as soon as its worker runs;
+    // wait for it so the script has been fetched before the seal lands (D14).
+    const running = new Promise<void>((ok, fail) => {
+      port.addEventListener("message", () => ok(), { once: true });
+      port.addEventListener("error", () => fail(new Error("The PDF worker did not start.")), { once: true });
+    });
+    pdfWorker = new mod.PDFWorker({ port } as never);
+    await running;
   },
 });
 

@@ -1,7 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
 // BASE_URL set => test that deployment and skip the local server. Port avoids 4397 (unknown process on the owner's machine).
-const PORT = 4811;
+const PORT = Number(process.env.PH_PORT ?? 4811); // PH_PORT lets parallel worktrees run side by side
 const BASE_URL = process.env.BASE_URL ?? `http://127.0.0.1:${PORT}`;
 
 export default defineConfig({
