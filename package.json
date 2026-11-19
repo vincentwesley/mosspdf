@@ -23,7 +23,8 @@
     "test:e2e": "playwright test",
     "check": "npm run typecheck && npm run lint && npm test && npm run build",
     "check:budgets": "node scripts/check-budgets.mjs",
-    "knip": "knip"
+    "knip": "knip",
+    "deploy": "npm run build && npx --yes wrangler@4.165.0 deploy"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",
