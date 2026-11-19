@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "paper-desk",
+  "name": "pagehold",
   "compatibility_date": "2026-11-19",
   // Pure static site (Workers static assets), no Worker script. Deploy locally: `npm run build && npx wrangler deploy`.
   // dist/_headers (copied from public/) applies to assets.

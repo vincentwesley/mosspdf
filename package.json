@@ -1,5 +1,5 @@
 {
-  "name": "paper-desk",
+  "name": "pagehold",
   "version": "0.1.0",
   "private": true,
   "description": "Private PDF tools that run entirely in the browser.",
@@ -8,7 +8,7 @@
   "author": "Vin, Vin's Atelier (https://vwesley.dev)",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vincentwesley/paper-desk.git"
+    "url": "git+https://github.com/vincentwesley/pagehold.git"
   },
   "engines": {
     "node": ">=24"

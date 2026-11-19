@@ -1,6 +1,6 @@
-# paper-desk
+# pagehold
 
-Paper Desk: Vite + TypeScript app, house style kit, runs entirely in the browser.
+Pagehold: Vite + TypeScript app, house style kit, runs entirely in the browser.
 
 ## Rules
 - Read `docs/next-session.md` first; update it when state changes.
