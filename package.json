@@ -1,0 +1,40 @@
+{
+  "name": "paper-desk",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Private PDF tools that run entirely in the browser.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Vin, Vin's Atelier (https://vwesley.dev)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vincentwesley/paper-desk.git"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "check": "npm run typecheck && npm run lint && npm test && npm run build",
+    "check:budgets": "node scripts/check-budgets.mjs",
+    "knip": "knip"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.65.0",
+    "@types/node": "^24.19.2",
+    "eslint": "^10.14.0",
+    "knip": "^6.45.1",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.72.2",
+    "vite": "^8.3.8",
+    "vitest": "^5.1.0"
+  }
+}
