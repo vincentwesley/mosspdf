@@ -3,7 +3,7 @@ import { announce, fmtSize, h, plural } from "./dom";
 import { icon } from "./icons";
 import { sortable } from "./sortable";
 
-export function fileList(o: { reorder: boolean; activeId?: () => number | undefined; onPick?: (id: number) => void }): { el: HTMLElement; render: () => void } {
+export function fileList(o: { reorder: boolean; visible?: () => LoadedFile[] }): { el: HTMLElement; render: () => void } {
   const ul = h("ul", { class: "files", attrs: { role: "list", "data-testid": "file-list", "aria-label": "Your files" } });
 
   const iconBtn = (name: "up" | "down" | "close" | "grip", label: string, fn: (() => void) | null, testid: string, disabled = false) =>
@@ -11,8 +11,7 @@ export function fileList(o: { reorder: boolean; activeId?: () => number | undefi
 
   function row(f: LoadedFile, i: number, n: number): HTMLElement {
     const meta = f.status === "ready" && f.info ? `${plural(f.info.pageCount, "page")} · ${fmtSize(f.size)}` : f.status === "loading" ? "Reading…" : fmtSize(f.size);
-    const active = o.activeId?.() === f.id;
-    const li = h("li", { class: `file${active ? " is-active" : ""}`, attrs: { "data-testid": "file-row", "data-file-id": f.id, "data-status": f.status } },
+    const li = h("li", { class: "file", attrs: { "data-testid": "file-row", "data-file-id": f.id, "data-status": f.status } },
       h("span", { class: "file__icon" }, icon(f.status === "locked" ? "lock" : "file")),
       h("div", { class: "file__main" },
         h("p", { class: "file__name", text: f.name }),
@@ -20,7 +19,6 @@ export function fileList(o: { reorder: boolean; activeId?: () => number | undefi
         f.status === "error" && f.error && h("p", { class: "file__err", text: f.error, attrs: { role: "alert" } }),
         f.status === "locked" && passwordForm(f)),
       h("div", { class: "file__acts" },
-        o.onPick && f.status === "ready" && !active && h("button", { class: "hs-btn hs-btn--secondary hs-btn--sm", type: "button", text: "Use this one", on: { click: () => o.onPick!(f.id) } }),
         o.reorder && iconBtn("grip", `Drag ${f.name} to reorder`, null, "file-grip"),
         o.reorder && iconBtn("up", `Move ${f.name} up`, () => { store.move(f.id, i - 1); announce(`${f.name} moved to position ${i}.`); focusRow(f.id, "file-up"); }, "file-up", i === 0),
         o.reorder && iconBtn("down", `Move ${f.name} down`, () => { store.move(f.id, i + 1); announce(`${f.name} moved to position ${i + 2}.`); focusRow(f.id, "file-down"); }, "file-down", i === n - 1),
@@ -49,7 +47,8 @@ export function fileList(o: { reorder: boolean; activeId?: () => number | undefi
 
   function render() {
     const refocus = (document.activeElement as HTMLElement | null)?.dataset.testid === "file-password";
-    ul.replaceChildren(...store.files.map((f, i) => row(f, i, store.files.length)));
+    const files = o.visible ? o.visible() : store.files;
+    ul.replaceChildren(...files.map((f, i) => row(f, i, files.length)));
     if (refocus) ul.querySelector<HTMLElement>("[data-testid=file-password]")?.focus();
   }
   render();

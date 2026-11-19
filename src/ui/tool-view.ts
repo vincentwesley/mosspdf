@@ -4,6 +4,7 @@ import type { CallOptions } from "../core/rpc";
 import { parseRanges as parse0 } from "../ops/ranges";
 import { PdfError, type OpResult, type PageSpec, type SplitMode } from "../ops/types";
 import { announce, fmtSize, h, plural } from "./dom";
+import { toast } from "./toast";
 import { dropzone, setFilesHandler } from "./dropzone";
 import { fileList } from "./filelist";
 import { newItem, pageGrid, type PageItem } from "./pagegrid";
@@ -32,7 +33,6 @@ export function toolView(id: string): { el: HTMLElement; destroy: () => void } {
   const hasGrid = id === "organize" || id === "extract" || id === "merge";
 
   // ---- state ----
-  let activeId: number | undefined;
   let items: PageItem[] = [];
   let itemsKey = "";
   let dirty = false;
@@ -41,9 +41,10 @@ export function toolView(id: string): { el: HTMLElement; destroy: () => void } {
   let results: OpResult[] = [];
   let abort: AbortController | null = null;
   let jobNote = "";
+  /** Single-PDF tools work on the newest file. */
   const active = (): LoadedFile | undefined => {
-    const r = store.ready();
-    return r.find((f) => f.id === activeId) ?? r[0];
+    const l = store.files.at(-1);
+    return l?.status === "ready" ? l : undefined;
   };
 
   // ---- skeleton ----
@@ -55,10 +56,19 @@ export function toolView(id: string): { el: HTMLElement; destroy: () => void } {
     extract: "Pick the pages you want to keep. Your original is never changed.",
   }[id] ?? "";
   const h1 = h("h1", { text: title, attrs: { tabindex: -1, "data-testid": "view-heading" } });
-  setFilesHandler((f) => { void store.add(f); });
+  setFilesHandler((list) => {
+    if (multi) return void store.add(list);
+    // One PDF at a time: a new one replaces the current one, with an undo.
+    const pick = list.find((f) => f.type === "application/pdf" || /.pdf$/i.test(f.name));
+    const old = store.files.slice();
+    if (!pick || !old.length) return void store.add(list);
+    old.forEach((f) => store.remove(f.id));
+    void store.add([pick]).then((added) => toast(`Replaced ${old.at(-1)!.name}.`, { label: "Undo", run: () => { added.forEach((f) => store.remove(f.id)); store.restore(old); } }));
+  });
   const dz = dropzone({ title: multi ? "Drop PDFs to merge" : "Drop a PDF here" });
   const notice = h("p", { class: "hs-banner hs-banner--info", attrs: { role: "status", "data-testid": "notice" }, hidden: true });
-  const fl = fileList({ reorder: multi, activeId: multi ? undefined : () => active()?.id, onPick: multi ? undefined : (i) => { activeId = i; update(); } });
+  const fl = fileList({ reorder: multi, visible: multi ? undefined : () => store.files.slice(-1) });
+  const tip = h("p", { class: "tip", hidden: multi }, "Want to combine files? ", h("a", { href: "#/merge", text: "Use Merge", attrs: { "data-testid": "tip-merge" } }));
   const warnBox = h("div", { class: "warns", attrs: { "data-testid": "warnings" } });
   const optBox = h("section", { class: "opts hs-card", attrs: { "aria-label": "Options" } });
   const gridBox = h("section", { class: "gridbox", attrs: { "aria-label": "Pages" } });
@@ -291,7 +301,7 @@ export function toolView(id: string): { el: HTMLElement; destroy: () => void } {
 
   const el = h("div", { class: "view tool" },
     h("header", { class: "view__head" }, h1, h("p", { class: "view__lede", text: lede })),
-    dz, notice, fl.el, warnBox, optBox, gridBox, settings, resultBox, bar);
+    dz, notice, fl.el, tip, warnBox, optBox, gridBox, settings, resultBox, bar);
   update();
   return { el, destroy: () => { unsub(); grid?.destroy(); abort?.abort(); } };
 }

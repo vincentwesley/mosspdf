@@ -11,5 +11,5 @@
     "strict-transport-security": "max-age=31536000; includeSubDomains"
   },
   "assets": { "cache-control": "public, max-age=31536000, immutable" },
-  "workers": { "content-security-policy": "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; font-src 'self'; img-src 'self' blob: data:; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; require-trusted-types-for 'script'; trusted-types pagehold, default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'none'" }
+  "workers": { "content-security-policy": "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; font-src 'self'; img-src 'self' blob: data:; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; require-trusted-types-for 'script'; trusted-types pagehold,default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'none'" }
 }

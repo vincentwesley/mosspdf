@@ -125,13 +125,23 @@ a.tile__in:focus-visible { box-shadow: var(--fx-card-shadow); }
 /* page grid */
 .pg-grid { list-style: none; margin: 0; padding: var(--s2); display: grid; gap: var(--s4); grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr)); }
 @media (max-width: 40rem) { .pg-grid { grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr)); gap: var(--s3); padding: var(--s1); } }
-.pg { content-visibility: auto; contain-intrinsic-size: auto 17rem; display: grid; gap: 0.25rem; align-content: start; padding: var(--s1); background: var(--bg-elev); box-shadow: var(--pix); min-width: 0; }
+.pg { display: grid; gap: 0.25rem; align-content: start; padding: var(--s1); background: var(--bg-elev); box-shadow: var(--pix); min-width: 0; }
 .pg.is-selected { box-shadow: 0 -3px var(--accent), 0 3px var(--accent), -3px 0 var(--accent), 3px 3px 0 3px var(--fx-2); }
 .pg__thumb { all: unset; box-sizing: border-box; display: grid; place-items: center; aspect-ratio: 3 / 4; width: 100%; cursor: pointer; background: var(--bg); outline: 1px solid var(--border-soft); outline-offset: -1px; overflow: hidden; }
 div.pg__thumb { cursor: default; }
 .pg__thumb:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 .pg__canvas { max-width: 100%; max-height: 100%; width: auto; height: auto; background: #fff; box-shadow: 0 1px 6px rgb(0 0 0 / 0.35); }
 .pg__canvas[width="0"] { display: none; }
+.pg__thumb { position: relative; touch-action: manipulation; -webkit-touch-callout: none; user-select: none; }
+.pg__canvas { position: relative; }
+/* light page-shaped placeholder until the thumbnail is drawn (house skeleton inside) */
+.pg__skel { position: absolute; inset: 0; margin: auto; aspect-ratio: var(--ar, 3 / 4); height: 100%; max-width: 100%; display: grid; align-content: center; gap: 0.5rem; padding: 12%; background: #f1f3ea; box-shadow: 0 1px 6px rgb(0 0 0 / 0.25); overflow: hidden; }
+.pg__skel--wide { height: auto; width: 100%; }
+.pg__skel .hs-skel { min-height: 0; gap: 0.4rem; }
+.pg__skel .hs-skel > * { height: 0.5rem; background: #d9ddcd; }
+.pg__skelnum { position: absolute; right: 8%; bottom: 6%; font: 700 1.5rem var(--font-head); color: #4a5040; }
+.pg.is-drawn .pg__skel { display: none; }
+.pg.is-dragging { touch-action: none; }
 .pg__meta { display: flex; flex-direction: column; font-size: 0.85rem; min-height: 1.4rem; padding: 0 var(--s1); min-width: 0; }
 .pg__label { font-weight: 600; }
 .pg__src { color: var(--fg-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -176,3 +186,18 @@ div.pg__thumb { cursor: default; }
   ::view-transition-old(root), ::view-transition-new(root) { animation-duration: 0.18s; }
 }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+
+/* skip link: invisible unless focused (clip as well as offset, so no screenshot or engine can show it) */
+.hs-skip:not(:focus):not(:focus-visible) { clip-path: inset(50%); pointer-events: none; }
+.tip { margin: 0; color: var(--fg-muted); }
+.tip a { display: inline-flex; align-items: center; min-height: 48px; }
+.toast { display: flex; align-items: center; gap: var(--s3); }
+.toast__msg { flex: 1; }
+.toast .dlg__x { margin: -0.5rem -0.5rem -0.5rem 0; }
+@media (max-width: 30rem) {
+  /* phones: rotate + delete in one row, move earlier/later in a second row, no grip (long-press the thumbnail to drag) */
+  .pg__bar { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .pg__bar > * { grid-column: span 2; }
+  .pg__bar > .pg__grip { display: none; }
+  .pg__bar > [data-testid="page-move-earlier"], .pg__bar > [data-testid="page-move-later"] { grid-column: span 3; }
+}

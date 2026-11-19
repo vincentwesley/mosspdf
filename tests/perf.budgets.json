@@ -1,0 +1,9 @@
+{
+  "A-E2E-7": {
+    "thumbs1000": {
+      "firstThumbMs": 8000,
+      "scrollToEndThumbMs": 12000,
+      "maxMainThreadStallMs": 1500
+    }
+  }
+}

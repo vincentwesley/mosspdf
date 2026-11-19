@@ -23,7 +23,7 @@ export const store = {
   subscribe(f: () => void) { subs.add(f); return () => subs.delete(f); },
   setBusy(b: boolean) { store.busy = b; notify(); },
 
-  async add(list: File[]): Promise<void> {
+  async add(list: File[]): Promise<LoadedFile[]> {
     const skipped: string[] = [];
     const added: LoadedFile[] = [];
     for (const f of list) {
@@ -38,7 +38,10 @@ export const store = {
       : "";
     notify();
     await Promise.all(added.map((f) => store.check(f)));
+    return added;
   },
+  /** Puts back files taken out with remove() (undo). */
+  restore(files: LoadedFile[]) { store.files.splice(0, store.files.length, ...files); notify(); },
 
   /** (Re)inspects a file; sets locked when it needs a password. */
   async check(f: LoadedFile): Promise<void> {
@@ -75,6 +78,7 @@ export const store = {
     const i = store.files.findIndex((f) => f.id === id);
     if (i < 0) return;
     void store.files[i].doc?.then((d) => d.loadingTask.destroy()).catch(() => undefined);
+    store.files[i].doc = undefined;
     store.files.splice(i, 1);
     notify();
   },

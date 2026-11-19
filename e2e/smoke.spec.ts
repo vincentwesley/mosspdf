@@ -9,7 +9,6 @@ test("A-REL-1: the app loads, has a title and heading", async ({ page }) => {
 });
 
 test("A-E2E-5: no horizontal overflow", async ({ page }) => {
-  test.fixme(test.info().project.name === "mobile-safari", "iPhone 14 WebKit: scrollWidth 391 vs innerWidth 312 on the placeholder shell");
   await page.goto("/");
   await expectNoOverflow(page);
 });

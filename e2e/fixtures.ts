@@ -4,9 +4,10 @@
 import { test as base, expect, type BrowserContext, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join, resolve } from "node:path";
+import { join, resolve } from "node:path";
+import { qpdfBin } from "../scripts/qpdf-bin.mjs";
 
 export { expect };
 export type Theme = "dark" | "light";
@@ -28,10 +29,12 @@ export const test = base.extend<{ allowedErrors: RegExp[] }>({
 
     await context.exposeBinding("__phReport", ({ page }, kind: string, msg: string) => {
       if (kind === "sealed") state.sealed.add(page);
+      else if (kind === "doc-start") state.sealed.delete(page); // every new document (also ones a service worker answers) starts unsealed
       else issue(`${kind}: ${msg}`);
     });
     await context.addInitScript(() => {
       const w = window as unknown as Win;
+      if (window.top === window) w.__phReport("doc-start", "");
       document.addEventListener("securitypolicyviolation", (e) => w.__phReport("csp-violation", `${e.violatedDirective} ${e.blockedURI}`), true);
       window.addEventListener("unhandledrejection", (e) => w.__phReport("unhandled-rejection", String(e.reason)));
       window.addEventListener("pagehold:sealed", () => {
@@ -41,7 +44,6 @@ export const test = base.extend<{ allowedErrors: RegExp[] }>({
     });
     context.on("console", (m) => m.type() === "error" && issue(`console.error: ${m.text()}`));
     context.on("weberror", (e) => issue(`pageerror: ${e.error().message}`));
-    context.on("page", (p) => p.on("framenavigated", (f) => f === p.mainFrame() && state.sealed.delete(p)));
 
     await context.route("**/*", async (route) => {
       const req = route.request();
@@ -53,10 +55,12 @@ export const test = base.extend<{ allowedErrors: RegExp[] }>({
         /* worker request: no frame */
       }
       const leavingApp = req.isNavigationRequest() && page && req.frame() === page.mainFrame();
-      if (!leavingApp) {
+      if (leavingApp) state.sealed.delete(page!); // a new document is unsealed until it fires the event again (hash navigation keeps the seal)
+      else {
         if (new URL(url).origin !== origin) issue(`cross-origin request: ${url}`);
         const sealed = page ? state.sealed.has(page) : context.pages().some((p) => state.sealed.has(p));
-        if (sealed) issue(`request after seal: ${req.method()} ${url}`);
+        // the service worker's own fetches (precache, network-first navigation) are not page traffic; ops/pdf.js workers still are
+        if (sealed && !req.serviceWorker()) issue(`request after seal: ${req.method()} ${url}`);
       }
       await route.continue();
     });
@@ -70,6 +74,12 @@ export const test = base.extend<{ allowedErrors: RegExp[] }>({
 export async function waitForSeal(page: Page, timeout = 15_000): Promise<void> {
   await page.waitForFunction(() => (window as unknown as Win).__phSealed === true, undefined, { timeout });
   await expect.poll(() => states.get(page.context())!.sealed.has(page), { timeout }).toBe(true);
+}
+
+/** Opens an app route and waits for the seal: every flow test starts here, so the fixture polices all traffic after it. */
+export async function loadApp(page: Page, route = "/"): Promise<void> {
+  await page.goto(route);
+  await waitForSeal(page);
 }
 
 /** No horizontal overflow at the current viewport. */
@@ -101,7 +111,10 @@ export async function shot(page: Page, name: string): Promise<string> {
   const dir = resolve("qa-output", "screens");
   mkdirSync(dir, { recursive: true });
   const path = join(dir, `${test.info().project.name}-${theme}-${name}.png`);
+  // The sticky action bar and skip link would be stamped over a full-page capture: neutralise them for the shot (CSSOM, allowed by the CSP).
+  await page.evaluate(() => document.querySelectorAll<HTMLElement>(".actionbar").forEach((e) => (e.style.position = "static")));
   await page.screenshot({ path, fullPage: true });
+  await page.evaluate(() => document.querySelectorAll<HTMLElement>(".actionbar").forEach((e) => (e.style.position = "")));
   return path;
 }
 
@@ -111,16 +124,6 @@ export async function downloadAndCheck(page: Page, trigger: () => Promise<unknow
   const path = join(mkdtempSync(join(tmpdir(), "pagehold-dl-")), dl.suggestedFilename());
   await dl.saveAs(path);
   return { path, bytes: readFileSync(path), name: dl.suggestedFilename() };
-}
-
-function qpdfBin(): string {
-  if (process.env.QPDF_BIN) return process.env.QPDF_BIN;
-  const git = spawnSync("git", ["rev-parse", "--path-format=absolute", "--git-common-dir"], { encoding: "utf8" });
-  if (git.status === 0) {
-    const bundled = join(dirname(git.stdout.trim()), "tools", "qpdf", "bin", process.platform === "win32" ? "qpdf.exe" : "qpdf");
-    if (existsSync(bundled)) return bundled;
-  }
-  return "qpdf";
 }
 
 /** `qpdf --check`; ok only on exit 0 (warnings, exit 3, count as not ok). */

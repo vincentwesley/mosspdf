@@ -6,7 +6,7 @@ import { icon, type IconName } from "./icons";
 import { sortable } from "./sortable";
 
 export interface PageItem { id: number; file: LoadedFile; page: number; rotate: number; selected: boolean }
-interface Card { li: HTMLLIElement; canvas: HTMLCanvasElement; key: string; cancel?: () => void; label: HTMLElement; thumb: HTMLElement; src: HTMLElement }
+interface Card { li: HTMLLIElement; canvas: HTMLCanvasElement; skel: HTMLElement; key: string; cancel?: () => void; label: HTMLElement; thumb: HTMLElement; src: HTMLElement }
 
 let uid = 1;
 export const newItem = (file: LoadedFile, page: number): PageItem => ({ id: uid++, file, page, rotate: 0, selected: false });
@@ -32,12 +32,13 @@ export function pageGrid(o: { items: () => PageItem[]; set: (p: PageItem[]) => v
     store.doc(item.file).then((doc) => {
       const r = renderThumb(doc, item.page, item.rotate, c.canvas, 220);
       c.cancel = r.cancel;
-      return r.done;
+      return r.done.then(() => { if (c.key === key) c.li.classList.add("is-drawn"); });
     }).catch((e) => { console.warn("thumbnail failed", e); c.key = ""; });
   }
   function release(c: Card) { // free offscreen canvases
     c.cancel?.();
     c.key = "";
+    c.li.classList.remove("is-drawn");
     c.canvas.width = c.canvas.height = 0;
   }
 
@@ -74,9 +75,11 @@ export function pageGrid(o: { items: () => PageItem[]; set: (p: PageItem[]) => v
 
   function build(item: PageItem): Card {
     const canvas = h("canvas", { class: "pg__canvas", attrs: { "aria-hidden": "true" } });
+    const skel = h("div", { class: "pg__skel", attrs: { "aria-hidden": "true" } },
+      h("div", { class: "hs-skel" }, h("i"), h("i"), h("i")), h("span", { class: "pg__skelnum" }));
     const thumb = o.selectable
-      ? h("button", { class: "pg__thumb", type: "button", attrs: { "data-focus": true, "data-testid": "page-select" } }, canvas)
-      : h("div", { class: "pg__thumb", attrs: { tabindex: 0, "data-focus": true, role: "group" } }, canvas);
+      ? h("button", { class: "pg__thumb", type: "button", attrs: { "data-focus": true, "data-testid": "page-select" } }, skel, canvas)
+      : h("div", { class: "pg__thumb", attrs: { tabindex: 0, "data-focus": true, role: "group" } }, skel, canvas);
     const label = h("span", { class: "pg__label" });
     const src = h("span", { class: "pg__src" });
     const li = h("li", { class: "pg", attrs: { "data-testid": "page-card", "data-page-id": item.id } }, thumb, h("div", { class: "pg__meta" }, label, src), h("div", { class: "pg__bar" }));
@@ -88,7 +91,7 @@ export function pageGrid(o: { items: () => PageItem[]; set: (p: PageItem[]) => v
       else if (e.key === "Delete") { e.preventDefault(); remove(item); }
     });
     io.observe(li);
-    return { li, canvas, key: "", label, thumb, src };
+    return { li, canvas, skel, key: "", label, thumb, src };
   }
 
   function sync() {
@@ -112,6 +115,12 @@ export function pageGrid(o: { items: () => PageItem[]; set: (p: PageItem[]) => v
       }
       if (ul.children[i] !== c.li) ul.insertBefore(c.li, ul.children[i] ?? null);
       c.label.textContent = `Page ${i + 1}`;
+      const sz = item.file.info?.pageSizes[item.page - 1];
+      const turned = (((sz?.rotate ?? 0) + item.rotate) / 90) % 2 === 1;
+      const [w, hh] = sz ? (turned ? [sz.h, sz.w] : [sz.w, sz.h]) : [3, 4];
+      c.skel.style.setProperty("--ar", `${w} / ${hh}`);
+      c.skel.classList.toggle("pg__skel--wide", w / hh > 0.75);
+      c.skel.lastElementChild!.textContent = String(i + 1);
       c.src.textContent = o.showFile ? `${item.file.name}, p. ${item.page}` : item.page !== i + 1 ? `was ${item.page}` : "";
       const t = c.thumb;
       const desc = `Page ${i + 1} of ${items.length}${item.rotate ? `, rotated ${item.rotate} degrees` : ""}${o.selectable ? (item.selected ? ", selected" : ", not selected") : ""}. Alt plus arrow keys move it.`;
@@ -126,7 +135,7 @@ export function pageGrid(o: { items: () => PageItem[]; set: (p: PageItem[]) => v
   }
 
   sortable(ul, {
-    item: ".pg", handle: ".pg__grip",
+    item: ".pg", handle: ".pg__grip", longPress: ".pg__thumb",
     onCommit: () => {
       const byId = new Map(o.items().map((i) => [i.id, i]));
       const order = [...ul.children].map((li) => byId.get(Number((li as HTMLElement).dataset.pageId))!).filter(Boolean);

@@ -1,11 +1,12 @@
 // Pointer-event drag reordering (mouse, touch, pen). Buttons/keys are provided by callers (WCAG 2.5.7).
-export function sortable(list: HTMLElement, o: { item: string; handle: string; onCommit: () => void }): void {
-  list.addEventListener("pointerdown", (e) => {
-    const handle = (e.target as Element).closest<HTMLElement>(o.handle);
-    const item = handle?.closest<HTMLElement>(o.item);
-    if (!handle || !item || (e.pointerType === "mouse" && e.button !== 0)) return;
-    e.preventDefault();
-    handle.setPointerCapture(e.pointerId);
+// `longPress`: on touch, holding this selector's element (the thumbnail) for 450 ms also starts a drag.
+export function sortable(list: HTMLElement, o: { item: string; handle: string; longPress?: string; onCommit: () => void }): void {
+  let dragging = false;
+  list.addEventListener("touchmove", (e) => { if (dragging) e.preventDefault(); }, { passive: false });
+
+  function drag(handle: HTMLElement, item: HTMLElement, id: number) {
+    dragging = true;
+    handle.setPointerCapture(id);
     item.classList.add("is-dragging");
     const move = (m: PointerEvent) => {
       if (m.clientY < 70) window.scrollBy(0, -14);
@@ -18,6 +19,7 @@ export function sortable(list: HTMLElement, o: { item: string; handle: string; o
       if (ref !== item && ref !== item.nextElementSibling) list.insertBefore(item, ref);
     };
     const end = () => {
+      dragging = false;
       handle.removeEventListener("pointermove", move);
       handle.removeEventListener("pointerup", end);
       handle.removeEventListener("pointercancel", end);
@@ -27,5 +29,22 @@ export function sortable(list: HTMLElement, o: { item: string; handle: string; o
     handle.addEventListener("pointermove", move);
     handle.addEventListener("pointerup", end);
     handle.addEventListener("pointercancel", end);
+  }
+
+  list.addEventListener("pointerdown", (e) => {
+    const target = e.target as Element;
+    const handle = target.closest<HTMLElement>(o.handle);
+    const item = (handle ?? target).closest<HTMLElement>(o.item);
+    if (handle && item && (e.pointerType !== "mouse" || e.button === 0)) {
+      e.preventDefault();
+      return drag(handle, item, e.pointerId);
+    }
+    const pressed = o.longPress && e.pointerType === "touch" ? target.closest<HTMLElement>(o.longPress) : null;
+    if (!pressed || !item) return;
+    const x0 = e.clientX, y0 = e.clientY, id = e.pointerId;
+    const timer = setTimeout(() => { off(); navigator.vibrate?.(15); drag(pressed, item, id); }, 450);
+    const cancel = (m: PointerEvent) => { if (m.type !== "pointermove" || Math.hypot(m.clientX - x0, m.clientY - y0) > 10) { clearTimeout(timer); off(); } };
+    const off = () => ["pointermove", "pointerup", "pointercancel"].forEach((t) => pressed.removeEventListener(t, cancel as EventListener));
+    ["pointermove", "pointerup", "pointercancel"].forEach((t) => pressed.addEventListener(t, cancel as EventListener));
   });
 }

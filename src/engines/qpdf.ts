@@ -18,10 +18,24 @@ interface FsLike {
   readFile: (p: string) => Bytes;
 }
 
+// This qpdf-wasm build ignores `wasmBinary` and fetches "qpdf.wasm" itself (Node reads it from disk). In a worker we answer that
+// one fetch from memory, so nothing touches the network (the worker has connect-src 'none') and nothing is fetched after the seal.
+const MEM_WASM = "/__qpdf-wasm-in-memory";
+const inWorker = typeof (globalThis as { WorkerGlobalScope?: unknown }).WorkerGlobalScope !== "undefined";
+
 export function createQpdf(wasmBinary: Bytes): Qpdf {
   let queue: Promise<unknown> = Promise.resolve();
+  if (inWorker) {
+    const realFetch = globalThis.fetch.bind(globalThis);
+    globalThis.fetch = (input, init) =>
+      String(input).endsWith(MEM_WASM) ? Promise.resolve(new Response(wasmBinary as BodyInit, { headers: { "content-type": "application/wasm" } })) : realFetch(input, init);
+  }
   const run = async (args: string[], inputs: Record<string, Bytes> = {}, outputs: string[] = []): Promise<QpdfRun> => {
-    const q = await (qpdfModule as unknown as (o: object) => Promise<{ callMain: (a: string[]) => number; FS: FsLike }>)({ wasmBinary, noFSInit: true });
+    const q = await (qpdfModule as unknown as (o: object) => Promise<{ callMain: (a: string[]) => number; FS: FsLike }>)({
+      wasmBinary,
+      noFSInit: true,
+      ...(inWorker ? { locateFile: () => MEM_WASM } : {}),
+    });
     const out: number[] = [];
     const err: number[] = [];
     // The package ignores print/printErr, so hook the stdio devices directly (Module.noFSInit + FS.init).

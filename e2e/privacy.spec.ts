@@ -21,9 +21,9 @@ test("A-NET-2: a full load makes no cross-origin request (enforced by the fixtur
   expect([...origins]).toEqual([new URL(baseURL!).origin]);
 });
 
-test("A-NET-1: no request reaches the network after the seal", async ({ page }) => {
-  test.fixme(true, "the placeholder page does not seal yet (M1 UI fires pagehold:sealed); the fixture already enforces it once it does");
+test("A-NET-1: the page seals itself, and the fixture then fails any request (flows are in tools.spec.ts)", async ({ page }) => {
   await page.goto("/");
   await waitForSeal(page);
-  await page.evaluate(() => fetch("/").catch(() => {})); // negative control belongs in the real flow specs
+  await expect(page.locator("html")).toHaveAttribute("data-sealed", "true");
+  await page.waitForTimeout(1000); // nothing may leave while idle either
 });
