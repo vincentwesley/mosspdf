@@ -30,3 +30,8 @@ Continue work on **Pagehold** (repo `vincentwesley/pagehold`). Branch `m1` holds
 - Worktrees `.worktrees/m2-ops`, `m3-ops`, `ui-shell` can be removed once `m2` is verified.
 
 - m3-ui (local branch, not pushed): protect, unprotect, safety-scan, repair wired to the ops (`src/tools/*.ts`, `passwordField` in fields.ts, `ToolDef.onError`), `e2e/tools-m3.spec.ts`. Passwords reach qpdf as named options (`--user-password=`, `--owner-password=`, `--bits=256`). Safety scan runs on add; "Download cleaned copy" cleans and downloads in one click.
+
+## Resume point (2026-11-19, end of session)
+- PR #3 (`m2` → main: M2 + M3 tools, fixes) is open; CI split into `test` + 5 parallel `e2e (<project>)` jobs. `test` passed; e2e jobs were still running at session end. Check `gh pr checks 3`; if green: merge, `npm run deploy`, `npm run smoke:prod`, update HANDOVER/CHANGELOG. If red: fix, push to `m2`.
+- Local full e2e is unreliable on this 16 GB machine (wrangler dev truncates assets under 3 browsers; memory kills runs); prefer CI or `--project=<one>` runs.
+- Next after merge: M4 (forms + signatures).
