@@ -20,10 +20,10 @@ Continue work on **Pagehold** (repo `vincentwesley/pagehold`). Branch `m1` holds
 ## Known gaps
 - Firefox offline test skipped (setOffline broken with service workers, docs/spikes/csp.md); keyboard-only tests skip on touch projects.
 - Liberation Sans (GPL-2 + font exception) ships in the pdf.js data pack; owner may prefer to drop it (D11).
-- Not yet: M2+ tools, update-prompt e2e (reload prompt exists, no spec), release zip.
+- Not yet: M2+ tools, release zip.
 
 ## Resume point (2026-11-19, usage limit)
 - M1 merged (PR #2) and live. Branch `m2` (local, not pushed) = main + m2-ops + m3-ops + ui-shell merged; unit checks passed before the ui-shell merge; re-run `npm ci --ignore-scripts && npm run check && npm run check:budgets && npm run licences && npm run test:e2e` on `m2` first.
 - Next: wire the M2/M3 ops into the `src/tools/<id>.ts` stubs (images-to-pdf, pdf-to-images, compress, page-numbers, watermark, metadata, protect, unprotect, safety-scan, repair) with e2e per tool; then PR, CI, merge, deploy, smoke.
-- To fix: Firefox intermittent worker-src CSP error on page load (seen twice in ui-shell e2e); home at 375px is ~4,200px tall with 16 placeholder tiles (make tiles compact / 2 columns on phones); qpdf passwords via `--user-password=`/`--owner-password=` (leading `-`); live smoke should run the merge flow.
+- Fixed on branch `fixes` (2026-11-19, local): Firefox worker-src race (D14), compact phone home, live smoke merge flow, update-prompt e2e. Still open: qpdf passwords via `--user-password=`/`--owner-password=`. Parallel worktrees: set `PH_PORT` (and never run two e2e runs on one worktree: both rebuild `dist/`).
 - Worktrees `.worktrees/m2-ops`, `m3-ops`, `ui-shell` can be removed once `m2` is verified.
