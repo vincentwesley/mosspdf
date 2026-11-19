@@ -17,3 +17,12 @@ Every permissive-looking HEIC decoder bundles LGPL libheif. Pagehold accepts HEI
 
 ## D6. NRIC/FIN M-series: format match only
 The M-series check-letter rule isn't published; S/T/F/G use the documented checksum. Unverified M numbers are still flagged for review (better a false positive the user unticks than a missed ID).
+
+## D7. Seal after preload
+The header CSP allows only same-origin requests, so no third party can ever be reached. On top of that, the app preloads all engines (served from the service-worker cache after the first visit) and then seals itself with a meta CSP that blocks fetch, scripts and new workers (`docs/spikes/csp.md`). Workers that exist before the seal are not covered by the meta, so they are either created after the seal (blob URLs, WASM bytes passed in by message) or served with a `connect-src 'none'` header. Files can be opened before the seal finishes; until then the header CSP is the guarantee, and the panel says so honestly. Rejected: sealing before any engine loads (every tool would need a reload), and loading packs lazily after sealing (impossible by design).
+
+## D8. Face detection is not decided yet
+MediaPipe's WASM is about 29 MB raw. That is too heavy to preload for one tool. In M6 a lighter, permissive detector will be evaluated. If none is reliable, photo mode ships EXIF/GPS stripping plus manual blur boxes and says auto-detection is not included.
+
+## D9. Engine split (from the spike)
+Redaction and text search use PDFium (`EPDFText_RedactInRect` + `FPDFPage_GenerateContent`). Metadata and XMP scrubbing use pdf-lib (PDFium has no XMP API). Encryption and decryption use qpdf WASM, which writes R6 AES-256. Every redacted export is checked with a `qpdf --qdf` needle scan before it is offered for download. The qpdf WASM package bundles qpdf 12.2.0.
