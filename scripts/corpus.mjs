@@ -1,8 +1,8 @@
 ﻿// Deterministic test corpus -> tests/corpus/generated/ (gitignored). `node scripts/corpus.mjs [--force] [--external]`.
 // Everything is self-generated with pdf-lib + the qpdf CLI; all names/data are made up (CC0, see tests/corpus/README.md).
 // --external also downloads openly licensed real-world files into tests/corpus/external/ (sha256-pinned, optional).
-import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { createRequire } from "node:module";
@@ -328,8 +328,11 @@ async function buildSafety(w) {
   qpdf(["--encrypt", "user-pass", "owner-pass", "256", "--print=none", "--extract=n", "--", gen + "plain-3p.pdf", gen + "encrypted-user-owner.pdf"]);
 }
 
+// Rebuild whenever this generator changes, so a stale corpus never hides a missing fixture.
+const stamp = createHash("sha256").update(readFileSync(new URL(import.meta.url))).digest("hex");
+
 export async function buildCorpus() {
-  if (!force && existsSync(gen + "DONE")) return;
+  if (!force && existsSync(gen + "DONE") && readFileSync(gen + "DONE", "utf8") === stamp) return;
   rmSync(gen, { recursive: true, force: true });
   mkdirSync(gen, { recursive: true });
   const w = (name, bytes) => writeFileSync(gen + name, bytes);
@@ -376,7 +379,7 @@ export async function buildCorpus() {
   // 10 extra bytes after the header: every xref offset is now wrong, qpdf must rebuild the table.
   w("broken-xref.pdf", Buffer.concat([plainBytes.subarray(0, 9), Buffer.from("%padding0\n"), plainBytes.subarray(9)]));
   await buildSafety(w);
-  writeFileSync(gen + "DONE", "ok");
+  writeFileSync(gen + "DONE", stamp);
 }
 
 // Public-domain US federal form (17 USC 105). Pinned; skipped quietly when offline or when the IRS has republished it.
