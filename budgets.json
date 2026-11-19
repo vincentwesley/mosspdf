@@ -1,6 +1,7 @@
 {
   ".js": 3200,
   ".css": 80,
+  ".wasm": 2000,
   "dir:pixel": 250,
   "main-gzip": 40
 }

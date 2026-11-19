@@ -57,6 +57,24 @@ export async function readPdf(bytes: Uint8Array, password?: string): Promise<Pag
 /** The marker the corpus writes on each page, e.g. "PAGE-MARKER p2" -> "p2". */
 export const marker = (p: PageRead) => /PAGE-MARKER (\S+)/.exec(p.text)?.[1];
 
+/** Where `needle` sits on page `index` as displayed (origin bottom-left, y up): start point, and the text direction in degrees (0 = upright, left to right). */
+export async function findText(bytes: Uint8Array, index: number, needle: string) {
+  const task = pdfjs.getDocument({ data: new Uint8Array(bytes), verbosity: 0, useSystemFonts: false });
+  const doc = await task.promise;
+  try {
+    const p = await doc.getPage(index + 1);
+    const vp = p.getViewport({ scale: 1 });
+    for (const it of (await p.getTextContent()).items) {
+      if (!("str" in it) || !it.str.includes(needle)) continue;
+      const m = pdfjs.Util.transform(vp.transform, it.transform as number[]); // device space: y down
+      return { x: m[4], y: vp.height - m[5], angle: -(Math.atan2(m[1], m[0]) * 180) / Math.PI, w: vp.width, h: vp.height };
+    }
+    return undefined;
+  } finally {
+    await task.destroy();
+  }
+}
+
 export async function readInfo(bytes: Uint8Array): Promise<Record<string, unknown>> {
   const task = pdfjs.getDocument({ data: new Uint8Array(bytes), verbosity: 0 });
   const doc = await task.promise;

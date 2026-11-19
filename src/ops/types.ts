@@ -1,10 +1,12 @@
 // Shared contract for page operations. Isomorphic: no DOM, runs in Node tests and in a browser Worker.
+import type { Jpeg } from "../engines/jpeg";
 import type { Qpdf } from "../engines/qpdf";
 
 export type Bytes = Uint8Array;
 /** Engines are injected so the browser can pass preloaded wasm bytes and Node can read them from node_modules. */
 export interface Engines {
   qpdf: Qpdf;
+  jpeg: Jpeg;
 }
 export interface InFile {
   name: string;

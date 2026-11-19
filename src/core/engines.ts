@@ -1,5 +1,7 @@
 // Engine registry for the seal: each entry loads its bytes and spawns its workers BEFORE the page is sealed.
 import qpdfWasmUrl from "@neslinesli93/qpdf-wasm/dist/qpdf.wasm?url";
+import jpegDecUrl from "@jsquash/jpeg/codec/dec/mozjpeg_dec.wasm?url";
+import jpegEncUrl from "@jsquash/jpeg/codec/enc/mozjpeg_enc.wasm?url";
 import pdfjsDataUrl from "virtual:pdfjs-data";
 import opsWorkerUrl from "../workers/ops.worker.ts?worker&url";
 import pdfWorkerUrl from "pdfjs-dist/build/pdf.worker.mjs?worker&url";
@@ -17,10 +19,11 @@ export const pdfjsData = new Map<string, Uint8Array>();
 registerEngine({
   name: "qpdf",
   async load() {
-    const wasm = await fetchBytes(qpdfWasmUrl);
+    // The same worker also needs the MozJPEG codecs (compress); both are fetched here, before the seal.
+    const [wasm, jpegDecWasm, jpegEncWasm] = await Promise.all([fetchBytes(qpdfWasmUrl), fetchBytes(jpegDecUrl), fetchBytes(jpegEncUrl)]);
     const worker = new Worker(scriptUrl(opsWorkerUrl), { type: "module" });
     opsRpc = new RpcClient(worker);
-    await opsRpc.call("init", { qpdfWasm: wasm }, { transfer: [wasm.buffer as ArrayBuffer] });
+    await opsRpc.call("init", { qpdfWasm: wasm, jpegDecWasm, jpegEncWasm }, { transfer: [wasm.buffer as ArrayBuffer, jpegDecWasm.buffer as ArrayBuffer, jpegEncWasm.buffer as ArrayBuffer] });
   },
 });
 

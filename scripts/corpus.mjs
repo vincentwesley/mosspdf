@@ -5,7 +5,9 @@ import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { deflateSync } from "node:zlib";
+import { createRequire } from "node:module";
+import { crc32, deflateSync } from "node:zlib";
+import { init as initJpegEnc, default as jpegEncode } from "@jsquash/jpeg/encode.js";
 import { PDFDocument, PDFHexString, PDFName, PDFString, StandardFonts, degrees } from "@cantoo/pdf-lib";
 import { qpdfBin } from "./qpdf-bin.mjs";
 
@@ -134,6 +136,96 @@ async function imageHeavy() {
   return doc;
 }
 
+// Smooth, photo-like RGB gradient with a little seeded grain (compresses like a photo, not like noise).
+function photo(w, h, seed) {
+  const next = rng(seed);
+  const px = new Uint8ClampedArray(w * h * 4);
+  for (let y = 0; y < h; y++)
+    for (let x = 0; x < w; x++) {
+      const i = (y * w + x) * 4;
+      const g = next() * 10;
+      px[i] = 128 + 100 * Math.sin(x / 90 + seed) + g;
+      px[i + 1] = 128 + 100 * Math.sin(y / 70) + g;
+      px[i + 2] = 128 + 100 * Math.sin((x + y) / 130) + g;
+      px[i + 3] = 255;
+    }
+  return { data: px, width: w, height: h };
+}
+
+function pngEncode(w, h, rgba) {
+  const chunk = (type, data) => {
+    const b = Buffer.alloc(12 + data.length);
+    b.writeUInt32BE(data.length, 0);
+    b.write(type, 4, "latin1");
+    data.copy(b, 8);
+    b.writeUInt32BE(crc32(b.subarray(4, 8 + data.length)), 8 + data.length);
+    return b;
+  };
+  const ihdr = Buffer.alloc(13);
+  ihdr.writeUInt32BE(w, 0);
+  ihdr.writeUInt32BE(h, 4);
+  ihdr.set([8, 6, 0, 0, 0], 8);
+  const raw = Buffer.alloc((w * 4 + 1) * h);
+  for (let y = 0; y < h; y++) Buffer.from(rgba.buffer, rgba.byteOffset + y * w * 4, w * 4).copy(raw, y * (w * 4 + 1) + 1);
+  return Buffer.concat([Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]), chunk("IHDR", ihdr), chunk("IDAT", deflateSync(raw)), chunk("IEND", Buffer.alloc(0))]);
+}
+
+const addImage = (doc, page, dict, bytes) => {
+  const ref = doc.context.register(doc.context.stream(bytes, { Type: "XObject", Subtype: "Image", ...dict }));
+  const name = page.node.newXObject("Im", ref);
+  page.node.addContentStream(doc.context.register(doc.context.stream(`q 500 0 0 400 0 0 cm /${name.decodeText()} Do Q`)));
+};
+
+// JPEG (DCT), Flate gray with a PNG Sub predictor, Flate RGB + SMask (must be left alone), and a tiny image (below the size floor).
+async function imageMixed(jpeg) {
+  const doc = await newDoc();
+  const mk = () => doc.addPage([500, 400]);
+  addImage(doc, mk(), { Width: 1600, Height: 1200, ColorSpace: "DeviceRGB", BitsPerComponent: 8, Filter: "DCTDecode" }, jpeg);
+  const gw = 1200, gh = 900;
+  const gray = Buffer.alloc((gw + 1) * gh);
+  for (let y = 0; y < gh; y++) {
+    gray[y * (gw + 1)] = 1; // Sub
+    let prev = 0;
+    for (let x = 0; x < gw; x++) {
+      const v = Math.round(128 + 100 * Math.sin(x / 80) * Math.cos(y / 60));
+      gray[y * (gw + 1) + 1 + x] = (v - prev) & 255;
+      prev = v;
+    }
+  }
+  addImage(doc, mk(), { Width: gw, Height: gh, ColorSpace: "DeviceGray", BitsPerComponent: 8, Filter: "FlateDecode", DecodeParms: { Predictor: 15, Colors: 1, Columns: gw, BitsPerComponent: 8 } }, deflateSync(gray));
+  const sw = 800, sh = 600;
+  const rgb = Buffer.alloc(sw * sh * 3);
+  const next = rng(5);
+  for (let i = 0; i < rgb.length; i++) rgb[i] = (next() * 256) | 0;
+  const smask = doc.context.register(doc.context.stream(deflateSync(Buffer.alloc(sw * sh, 200)), { Type: "XObject", Subtype: "Image", Width: sw, Height: sh, ColorSpace: "DeviceGray", BitsPerComponent: 8, Filter: "FlateDecode" }));
+  addImage(doc, mk(), { Width: sw, Height: sh, ColorSpace: "DeviceRGB", BitsPerComponent: 8, Filter: "FlateDecode", SMask: smask }, deflateSync(rgb));
+  addImage(doc, mk(), { Width: 20, Height: 20, ColorSpace: "DeviceRGB", BitsPerComponent: 8, Filter: "FlateDecode" }, deflateSync(Buffer.alloc(20 * 20 * 3, 90)));
+  return doc;
+}
+
+const XMP = `<?xpacket begin=""?>
+<x:xmpmeta xmlns:x="adobe:ns:meta/"><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<rdf:Description rdf:about="" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:pdf="http://ns.adobe.com/pdf/1.3/" xmlns:xmp="http://ns.adobe.com/xap/1.0/" pdf:Producer="Old Producer" xmp:CreatorTool="Old Tool">
+<dc:title><rdf:Alt><rdf:li xml:lang="x-default">XMP Title Old</rdf:li></rdf:Alt></dc:title>
+<dc:creator><rdf:Seq><rdf:li>XMP Author Old</rdf:li></rdf:Seq></dc:creator>
+<dc:description><rdf:Alt><rdf:li xml:lang="x-default">XMP Subject Old</rdf:li></rdf:Alt></dc:description>
+<pdf:Keywords>old, keys</pdf:Keywords>
+</rdf:Description></rdf:RDF></x:xmpmeta>
+<?xpacket end="w"?>`;
+
+async function xmpDoc() {
+  const doc = await textDoc(2, "x");
+  doc.setTitle("Info Title Old");
+  doc.setAuthor("Info Author Old");
+  doc.setSubject("Info Subject Old");
+  doc.setKeywords(["old", "keys"]);
+  doc.setProducer("Old Producer");
+  doc.setCreator("Old Tool");
+  const ref = doc.context.register(doc.context.stream(Buffer.from(XMP), { Type: "Metadata", Subtype: "XML" }));
+  doc.catalog.set(PDFName.of("Metadata"), ref);
+  return doc;
+}
+
 const PNG = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==", "base64");
 
 function qpdf(args) {
@@ -160,6 +252,17 @@ export async function buildCorpus() {
   await wd("text-1000p.pdf", textDoc(1000, "k"));
   await wd("text-500p.pdf", textDoc(500, "k"));
   await wd("image-heavy.pdf", imageHeavy());
+  const req = createRequire(import.meta.url);
+  await initJpegEnc(await globalThis.WebAssembly.compile(readFileSync(req.resolve("@jsquash/jpeg/codec/enc/mozjpeg_enc.wasm"))));
+  const jpg = Buffer.from(await jpegEncode(photo(1600, 1200, 3), { quality: 95 }));
+  w("photo.jpg", jpg);
+  w("photo-small.jpg", Buffer.from(await jpegEncode(photo(400, 300, 4), { quality: 85 })));
+  w("photo-alpha.png", pngEncode(400, 300, Object.assign(photo(400, 300, 9).data, {})));
+  await wd("image-mixed.pdf", imageMixed(jpg));
+  await wd("xmp.pdf", xmpDoc());
+  const rot2 = await textDoc(4, "c");
+  rot2.getPages().forEach((p, i) => { p.setRotation(degrees(i * 90)); if (i === 1) p.setCropBox(50, 100, 400, 500); });
+  await wd("rotated-crop.pdf", rot2);
 
   const plainBytes = readFileSync(gen + "plain-3p.pdf");
   qpdf(["--encrypt", "test-pass", "test-pass", "256", "--", gen + "plain-3p.pdf", gen + "encrypted-aes256.pdf"]);

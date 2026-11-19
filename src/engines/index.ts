@@ -1,5 +1,9 @@
 import type { Engines } from "../ops/types";
+import { createJpeg } from "./jpeg";
 import { createQpdf } from "./qpdf";
 
-/** Browser: pass the preloaded wasm bytes. Node: read them from node_modules/@neslinesli93/qpdf-wasm/dist/qpdf.wasm. */
-export const createEngines = (wasm: { qpdf: Uint8Array }): Engines => ({ qpdf: createQpdf(wasm.qpdf) });
+/** Browser: pass the preloaded wasm bytes. Node: read them from node_modules (see tests/helpers/env.ts). */
+export const createEngines = async (wasm: { qpdf: Uint8Array; jpegDec: Uint8Array; jpegEnc: Uint8Array }): Promise<Engines> => ({
+  qpdf: createQpdf(wasm.qpdf),
+  jpeg: await createJpeg({ dec: wasm.jpegDec, enc: wasm.jpegEnc }),
+});
