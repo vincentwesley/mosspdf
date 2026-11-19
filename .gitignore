@@ -26,3 +26,5 @@ qa-output/
 /data/
 tools/
 tests/corpus/generated/
+/spikes/
+.worktrees/
