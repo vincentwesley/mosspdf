@@ -8,17 +8,30 @@
   <link rel="author" href="/humans.txt">
   <meta name="theme-color" content="#11150e">
   <title>Pagehold</title>
+  <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <link rel="manifest" href="/manifest.webmanifest">
   <script src="/theme-init.js"></script>
 </head>
 <body>
+  <a class="hs-skip" href="#app" data-testid="skip-link">Skip to content</a>
   <header class="top">
-    <h1>Pagehold</h1>
-    <button id="theme" class="hs-btn" type="button" aria-pressed="false">Light theme</button>
+    <a class="wordmark" href="#/" aria-label="Pagehold, home">Pagehold</a>
+    <div class="top__right">
+      <button id="seal-badge" class="seal" type="button" aria-haspopup="dialog" data-state="preparing" data-testid="seal-badge">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg>
+        <span id="seal-text">Getting ready…</span>
+      </button>
+      <button id="theme" class="hs-btn hs-btn--secondary" type="button" aria-pressed="false" data-testid="theme-toggle">Light theme</button>
+    </div>
   </header>
-  <main>
-    <p>Pagehold: private PDF tools, coming soon</p>
-  </main>
+  <main id="app" tabindex="-1"></main>
   <footer>
+  <nav class="appfoot" aria-label="Footer">
+    <span>Version <span id="app-version" data-testid="app-version"></span></span>
+    <a href="#/privacy">Privacy</a>
+    <a href="https://github.com/vincentwesley/pagehold" target="_blank" rel="noopener">GitHub</a>
+  </nav>
 <section class="section span-12 creator" aria-labelledby="h-creator">
   <div class="card">
     <div class="card__head"><h2 id="h-creator">Credits</h2></div>

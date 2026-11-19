@@ -1,0 +1,10 @@
+{
+  "A-E2E-7": {
+    "_note": "thumbs1000: measured on an idle dev machine: first thumbnail < 2 s, longest frame gap ~0.8 s (building 1,000 cards). Budgets leave room for 5 parallel Playwright workers (a loaded run saw 3.2 s) while still catching a real regression.",
+    "thumbs1000": {
+      "firstThumbMs": 8000,
+      "scrollToEndThumbMs": 12000,
+      "maxMainThreadStallMs": 4000
+    }
+  }
+}

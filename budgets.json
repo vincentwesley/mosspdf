@@ -1,5 +1,6 @@
 {
-  ".js": 120,
+  ".js": 3200,
   ".css": 80,
-  "dir:pixel": 250
+  "dir:pixel": 250,
+  "main-gzip": 40
 }

@@ -1,13 +1,52 @@
 # Third-party notices
 
-List every third-party asset (code, fonts, images, icons, datasets) with author, licence and source.
+Everything third-party that ships in the Pagehold build, with author, licence and source. `npm run licences` checks that every production dependency is allowlisted and named here.
 
-Bundled fonts (`fonts/`), all under the SIL Open Font License 1.1, full text in `fonts/OFL.txt`:
-- Space Grotesk
-- Inter
-- Silkscreen
-- JetBrains Mono
+## Code that ships in the app (production dependencies)
 
 | Item | Author | Licence | Source |
 |------|--------|---------|--------|
-| {{ITEM}} | {{AUTHOR}} | {{LICENCE}} | {{URL}} |
+| pdfjs-dist 6.5.438 (pdf.js: rendering, thumbnails; also the pdf.js worker) | Mozilla and contributors | Apache-2.0 | https://github.com/mozilla/pdf.js |
+| @cantoo/pdf-lib 2.11.1 (repair and metadata pass, runs in the ops worker only) | Cantoo (fork), Andrew Dillon (original pdf-lib) | MIT | https://github.com/cantoo-scribe/pdf-lib |
+| @neslinesli93/qpdf-wasm 0.3.1 (qpdf compiled to WebAssembly: page assembly, inspection) | Tommaso Pifferi | ISC (wrapper); the bundled qpdf is Apache-2.0, Copyright Jay Berkenbilt | https://github.com/neslinesli93/qpdf-wasm, https://github.com/qpdf/qpdf |
+| fflate 0.8.3 (dependency of @cantoo/pdf-lib) | Arjun Barrett | MIT | https://github.com/101arrowz/fflate |
+| culori 4.0.2 (dependency of @cantoo/pdf-lib) | Dan Burzo | MIT | https://github.com/Evercoder/culori |
+| html-entities 2.6.0 (dependency of @cantoo/pdf-lib) | Marat Dulin | MIT | https://github.com/mdevils/html-entities |
+| node-html-better-parser 1.5.9 (dependency of @cantoo/pdf-lib) | Xiaoyi Shi and contributors | MIT | https://github.com/Rexxars/node-html-better-parser |
+| tslib 2.8.1 (dependency of @cantoo/pdf-lib) | Microsoft | 0BSD | https://github.com/Microsoft/tslib |
+
+`@napi-rs/canvas` 1.1.1 and its platform packages (`@napi-rs/canvas-android-arm64`, `@napi-rs/canvas-darwin-arm64`, `@napi-rs/canvas-darwin-x64`, `@napi-rs/canvas-linux-arm-gnueabihf`, `@napi-rs/canvas-linux-arm64-gnu`, `@napi-rs/canvas-linux-arm64-musl`, `@napi-rs/canvas-linux-riscv64-gnu`, `@napi-rs/canvas-linux-x64-gnu`, `@napi-rs/canvas-linux-x64-musl`, `@napi-rs/canvas-win32-arm64-msvc`, `@napi-rs/canvas-win32-x64-msvc`) are optional dependencies of pdfjs-dist, MIT, Brooooooklyn (https://github.com/Brooooooklyn/canvas). They are only used by Node tests and are not in the browser build.
+
+## Data bundled with pdf.js (packed into `assets/pdfjs-data-*.bin`, from pdfjs-dist)
+
+pdf.js itself is Apache-2.0. These binary files come with their own licences, shipped in the pdfjs-dist package (`cmaps/LICENSE`, `standard_fonts/LICENSE_*`, `wasm/LICENSE_*`):
+
+| Item | Author | Licence | Source |
+|------|--------|---------|--------|
+| `cmaps/*.bcmap` (Adobe CJK character maps) | Adobe Systems Incorporated | BSD-3-Clause (Adobe, 1990-2009) | https://github.com/mozilla/pdf.js/tree/master/external/bcmaps |
+| `standard_fonts/Foxit*.pfb` (substitutes for the 14 standard PDF fonts) | Foxit Software, PDFium authors | BSD-3-Clause (PDFium, 2014) | https://github.com/mozilla/pdf.js/tree/master/external/standard_fonts |
+| `standard_fonts/LiberationSans-*.ttf` (fallback for non-embedded Arial-like fonts) | Red Hat, Inc. (Liberation fonts 1.x) | GNU GPL v2 with the Liberation font exception: documents that embed the font are not covered by the GPL. The fonts are shipped unmodified as data and are not linked into Pagehold's code. | https://github.com/mozilla/pdf.js/tree/master/external/standard_fonts |
+| `wasm/jbig2.wasm` (JBIG2 image decoder) | PDFium authors, Mozilla | BSD-3-Clause | https://pdfium.googlesource.com/pdfium/ |
+| `wasm/openjpeg.wasm` (JPEG 2000 decoder) | OpenJPEG contributors, Mozilla | BSD-2-Clause | https://github.com/uclouvain/openjpeg |
+| `wasm/qcms_bg.wasm` (colour management) | Mozilla (qcms) | MIT | https://github.com/FirefoxGraphics/qcms |
+| `wasm/quickjs-eval.wasm` (JavaScript in PDF forms; not used by the M1 tools) | Fabrice Bellard, Charlie Gordon | MIT | https://bellard.org/quickjs/ |
+
+## Fonts (`src/fonts/`)
+
+All under the SIL Open Font License 1.1, full text in `src/fonts/OFL.txt` (it travels with the fonts):
+- Space Grotesk (The Space Grotesk Project Authors)
+- Inter (The Inter Project Authors)
+- Silkscreen (The Silkscreen Project Authors)
+- JetBrains Mono (The JetBrains Mono Project Authors)
+
+## Art and brand
+
+- The house credits card art (`creator.webp`) and the logo are the owner's own and the commissioned logo; all rights reserved, not MIT (see `NOTICE.md`, `src/credits/PROVENANCE.md`).
+- The page-grid and file icons (`src/ui/icons.ts`) are simple strokes drawn for this project. No Pixelarticons, Kenney or other third-party icon or art packs are shipped.
+
+## Test and tooling only (not shipped)
+
+- `tests/corpus/external/irs-fw9.pdf`: IRS Form W-9, Internal Revenue Service, public domain (US federal work, 17 USC 105), https://www.irs.gov/pub/irs-pdf/fw9.pdf. Downloaded on demand by `scripts/corpus.mjs --external`, not committed.
+- `tests/corpus/generated/*`: self-generated, CC0 (see `tests/corpus/README.md`).
+- qpdf CLI 12.4.2 (Apache-2.0), used by tests as an independent verifier, not committed.
+- Dev dependencies (Vite, Vitest, Playwright, axe-core, fast-check, ESLint, TypeScript, wrangler, knip) are MIT, Apache-2.0 or ISC and are not part of the build output.

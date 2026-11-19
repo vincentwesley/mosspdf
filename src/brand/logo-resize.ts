@@ -51,6 +51,7 @@ if (link && svg) {
   let dragging = false;
   let suppress = false;
   const max = () => (narrow.matches ? X.middle : X.long);
+  link.addEventListener("dragstart", (e) => e.preventDefault()); // Firefox starts a native link drag, which cancels the pointer events
   link.addEventListener("pointerdown", (e) => {
     if (!e.isPrimary || e.button) return;
     id = e.pointerId;
