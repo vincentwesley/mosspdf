@@ -60,6 +60,20 @@ export function colourField(o: Base & { value: string }): Field {
   return wrap(o, input);
 }
 
+/** A password input with a Show/Hide button. Use autocomplete "new-password" when choosing one, "current-password" when entering one. */
+export function passwordField(o: Base & { autocomplete: "new-password" | "current-password" }): Field {
+  const input = h("input", { class: "hs-input", id: o.id, type: "password", attrs: { autocomplete: o.autocomplete, spellcheck: "false", autocapitalize: "off", autocorrect: "off", maxlength: 127 } });
+  const f = wrap(o, input);
+  const toggle = h("button", { class: "hs-btn hs-btn--secondary", type: "button", text: "Show", attrs: { "aria-controls": o.id, "data-testid": o.testid && `${o.testid}-toggle` } });
+  toggle.addEventListener("click", () => {
+    const show = input.type === "password";
+    input.type = show ? "text" : "password";
+    toggle.textContent = show ? "Hide" : "Show";
+  });
+  f.el.insertBefore(h("div", { class: "pwfield" }, input, toggle), f.el.lastElementChild);
+  return f;
+}
+
 export interface CheckField {
   el: HTMLDivElement;
   input: HTMLInputElement;

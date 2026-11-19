@@ -56,10 +56,11 @@ export async function protect(file: InFile, p: ProtectOptions, o: OpOptions, e: 
   checkAbort(o.signal);
   const r = await e.qpdf(
     [
+      // Named options (qpdf 11.7+), never positional: a password starting with "-" would be read as an option.
       "--encrypt",
-      p.userPassword,
-      owner,
-      "256", // AES-256, revision 6
+      `--user-password=${p.userPassword}`,
+      `--owner-password=${owner}`,
+      "--bits=256", // AES-256, revision 6
       "--accessibility=y",
       `--print=${perm.print ? "full" : "none"}`,
       `--extract=${yn(perm.copy)}`,

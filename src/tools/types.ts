@@ -1,7 +1,7 @@
 // The contract between a tool module (src/tools/<id>.ts) and the shared workspace (src/ui/workspace.ts).
 import type { LoadedFile } from "../core/store";
 import type { CallOptions } from "../core/rpc";
-import type { InFile, OpResult } from "../ops/types";
+import type { InFile, OpResult, PdfError } from "../ops/types";
 import type { PageItem } from "../ui/pagegrid";
 
 export const GROUPS = ["Organize", "Convert", "Edit", "Protect", "Fill and sign", "OCR", "Privacy", "Compare"] as const;
@@ -79,4 +79,6 @@ export interface ToolDef {
   primaryLabel?(ctx: Ctx): string;
   /** Does the work and returns the files to download. Throw `PdfError` for plain-language failures. Absent = planned: home shows "Coming soon", the route shows the intake only. */
   run?(ctx: Ctx): Promise<OpResult[]>;
+  /** `run` threw a PdfError: return true when the tool shows it inline (a field error), so the status line stays quiet. */
+  onError?(ctx: Ctx, e: PdfError): boolean;
 }

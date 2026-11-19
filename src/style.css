@@ -229,3 +229,24 @@ div.pg__thumb { cursor: default; }
 .pos__cell:hover .pos__dot { background: var(--fg-muted); }
 .pos__cell:has(:checked) .pos__dot { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
 .pos__cell:has(:focus-visible) { outline: 3px solid var(--focus); outline-offset: -3px; }
+/* M3: password, safety scan, repair */
+.protect, .scanbox, .repair { display: grid; gap: var(--s4); }
+.pwfield { display: flex; gap: var(--s2); }
+.pwfield .hs-input { flex: 1; min-width: 0; }
+.more > summary { cursor: pointer; min-height: 48px; display: flex; align-items: center; font-weight: 600; }
+.more[open] > summary { margin-bottom: var(--s3); }
+.more { display: block; }
+.more > * + * { margin-top: var(--s3); }
+.perms { border: 0; margin: 0; padding: 0; min-width: 0; }
+.perms legend { padding: 0; font-weight: 600; }
+.scan { display: grid; gap: var(--s3); }
+.scan__group { display: grid; gap: var(--s2); border-left: 4px solid var(--border-strong); padding-left: var(--s3); }
+.scan__group--high { border-color: var(--danger); }
+.scan__group--medium { border-color: var(--warn); }
+.scan h3, .repair h3 { margin: 0; font-size: 1.05rem; }
+.scan__list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s3); }
+.scan__list p, .scan__after p { margin: 0; }
+.scan__where { color: var(--fg-muted); }
+.scan__detail code { overflow-wrap: anywhere; font-size: 0.85rem; }
+.scan__why { color: var(--fg-muted); font-size: 0.9rem; }
+.scan__after { display: grid; gap: var(--s3); }
