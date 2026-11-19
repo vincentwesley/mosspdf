@@ -8,8 +8,8 @@ const corpus = (n: string) => resolve("tests/corpus/generated", `${n}.pdf`);
 const image = (n: string) => resolve("tests/fixtures/images", n);
 const input = (page: Page) => page.getByTestId("file-input");
 const GROUPS = ["Organize", "Convert", "Edit", "Protect", "Fill and sign", "OCR", "Privacy", "Compare"];
-const LIVE = ["merge", "split", "organize", "extract"];
-const PLANNED = ["images-to-pdf", "pdf-to-images", "compress", "page-numbers", "watermark", "metadata", "protect", "unprotect", "safety-scan", "repair", "fill", "sign", "ocr", "redact", "photo", "compare"];
+const LIVE = ["merge", "split", "organize", "extract", "protect", "unprotect", "safety-scan", "repair"];
+const PLANNED = ["images-to-pdf", "pdf-to-images", "compress", "page-numbers", "watermark", "metadata", "fill", "sign", "ocr", "redact", "photo", "compare"];
 
 for (const theme of ["dark", "light"] as Theme[]) {
   test(`A-E2E-10 home shows every group, live tiles as links and planned tiles as dashed Coming soon (${theme})`, async ({ page }) => {

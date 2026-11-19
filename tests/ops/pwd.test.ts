@@ -51,6 +51,20 @@ describe("add password", () => {
     expect((await readPdf(r.bytes, "pässwörd 密码")).length).toBe(3);
   });
 
+  it("@A-PWD-1 odd passwords (leading dash, option-like, spaces, unicode, 127 chars) go to qpdf as values, never as options", async () => {
+    for (const pw of ["-x", "--help", "pass word", "pässwörd", "a".repeat(127)]) {
+      for (const owner of [undefined, pw === "-x" ? "--owner" : "-o"]) {
+        const r = await protect(corpus("plain-3p"), { userPassword: pw, ownerPassword: owner }, opts(), engines);
+        expect(showEncryption(r.bytes, pw).out, pw).toMatch(/R = 6/);
+        expect(qpdfCli(r.bytes, ["--check", `--password=${pw}`]).status, pw).toBe(0);
+        expect((await readPdf(r.bytes, pw)).map((p) => p.text), pw).toEqual(P3);
+        await expect(readPdf(r.bytes, "wrong")).rejects.toThrow();
+        const back = await unprotect({ name: r.name, bytes: r.bytes }, { password: owner ?? pw }, opts(), engines);
+        expect(showEncryption(back.bytes).out).toMatch(/not encrypted/);
+      }
+    }
+  });
+
   it("@A-PWD-1 bad inputs are typed errors", async () => {
     await expect(protect(corpus("empty"), { userPassword: "x" }, opts(), engines)).rejects.toMatchObject({ code: "empty" });
     await expect(protect(corpus("renamed-text"), { userPassword: "x" }, opts(), engines)).rejects.toMatchObject({ code: "not-pdf" });

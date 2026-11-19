@@ -21,6 +21,10 @@ const SCENES: { name: string; widths: number[]; open: (p: Page) => Promise<void>
   { name: "extract", widths: [375, 1280], open: async (p) => { await loadApp(p, "/#/extract"); await add(p, "plain-3p"); await drawn(p); await p.getByTestId("page-select").first().click(); } },
   { name: "privacy-dialog", widths: [375, 1280], open: async (p) => { await loadApp(p); await p.getByTestId("seal-badge").click(); await expect(p.getByTestId("privacy-dialog")).toBeVisible(); await p.waitForTimeout(500); } },
   { name: "error", widths: [375, 1280], open: async (p) => { await loadApp(p, "/#/merge"); await add(p, "renamed-text", "empty", "plain-3p"); await expect(p.locator('[data-testid="file-row"][data-status="error"]')).toHaveCount(2); } },
+  { name: "scan-findings", widths: [375, 1280], open: async (p) => { await loadApp(p, "/#/safety-scan"); await add(p, "risk-everything"); await expect(p.getByTestId("risky-found")).toBeVisible(); } },
+  { name: "protect", widths: [375, 1280], open: async (p) => { await loadApp(p, "/#/protect"); await add(p, "plain-3p"); await expect(p.getByTestId("pw-input")).toBeVisible(); await p.getByTestId("pw-input").fill("correct horse"); await p.getByTestId("pw-confirm").fill("correct horse"); await p.getByTestId("more-options").locator("summary").click(); } },
+  { name: "unprotect", widths: [375, 1280], open: async (p) => { await loadApp(p, "/#/unprotect"); await add(p, "encrypted-aes256"); await expect(p.locator('[data-status="locked"]')).toHaveCount(1); } },
+  { name: "repair", widths: [375, 1280], open: async (p) => { await loadApp(p, "/#/repair"); await add(p, "truncated"); await p.getByTestId("primary-action").click(); await expect(p.getByTestId("repair-actions")).toBeVisible(); } },
   { name: "locked", widths: [375, 1280], open: async (p) => { await loadApp(p, "/#/organize"); await add(p, "encrypted-aes256"); await expect(p.locator('[data-status="locked"]')).toHaveCount(1); } },
 ];
 

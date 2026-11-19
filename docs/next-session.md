@@ -27,3 +27,5 @@ Continue work on **Pagehold** (repo `vincentwesley/pagehold`). Branch `m1` holds
 - Next: wire the M2/M3 ops into the `src/tools/<id>.ts` stubs (images-to-pdf, pdf-to-images, compress, page-numbers, watermark, metadata, protect, unprotect, safety-scan, repair) with e2e per tool; then PR, CI, merge, deploy, smoke.
 - To fix: Firefox intermittent worker-src CSP error on page load (seen twice in ui-shell e2e); home at 375px is ~4,200px tall with 16 placeholder tiles (make tiles compact / 2 columns on phones); qpdf passwords via `--user-password=`/`--owner-password=` (leading `-`); live smoke should run the merge flow.
 - Worktrees `.worktrees/m2-ops`, `m3-ops`, `ui-shell` can be removed once `m2` is verified.
+
+- m3-ui (local branch, not pushed): protect, unprotect, safety-scan, repair wired to the ops (`src/tools/*.ts`, `passwordField` in fields.ts, `ToolDef.onError`), `e2e/tools-m3.spec.ts`. Passwords reach qpdf as named options (`--user-password=`, `--owner-password=`, `--bits=256`). Safety scan runs on add; "Download cleaned copy" cleans and downloads in one click.

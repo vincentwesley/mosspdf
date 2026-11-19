@@ -162,7 +162,8 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
       announce(`Done. ${results.length === 1 ? "1 file" : `${results.length} files`} ready to download.`);
     } catch (e) {
       const cancelled = e instanceof PdfError && e.code === "cancelled";
-      status.textContent = cancelled ? "Cancelled. Nothing was changed." : errorMessage(e);
+      const inline = e instanceof PdfError && !cancelled && !!tool.onError?.(ctx, e);
+      status.textContent = inline ? "" : cancelled ? "Cancelled. Nothing was changed." : errorMessage(e);
       status.setAttribute("role", cancelled ? "status" : "alert");
       results = [];
     } finally {
