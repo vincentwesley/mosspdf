@@ -115,6 +115,8 @@ a.tile__in:focus-visible { box-shadow: var(--fx-card-shadow); }
 .modes { border: 0; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0 var(--s4); }
 .modes__opt { display: flex; align-items: center; }
 .modes legend { width: 100%; padding: 0; }
+.hs-check--radio { border-radius: 50%; }
+.hs-check--radio::before { inset: 5px; border-radius: 50%; clip-path: none; }
 .parts { margin: 0; padding-left: 1.5rem; display: grid; gap: 0.15rem; max-height: 12rem; overflow: auto; }
 .mergebar { display: flex; }
 .settings { padding: 0 var(--s2); }
