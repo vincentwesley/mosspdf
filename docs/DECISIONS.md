@@ -26,3 +26,19 @@ MediaPipe's WASM is about 29 MB raw. That is too heavy to preload for one tool. 
 
 ## D9. Engine split (from the spike)
 Redaction and text search use PDFium (`EPDFText_RedactInRect` + `FPDFPage_GenerateContent`). Metadata and XMP scrubbing use pdf-lib (PDFium has no XMP API). Encryption and decryption use qpdf WASM, which writes R6 AES-256. Every redacted export is checked with a `qpdf --qdf` needle scan before it is offered for download. The qpdf WASM package bundles qpdf 12.2.0.
+
+## D10. Page assembly: qpdf WASM, pdf-lib for repair and metadata (2026-11-19)
+Compared `qpdf --empty --pages ... --` (qpdf-wasm 12.2.0) with pdf-lib `copyPages` on the generated corpus (`tests/corpus/README.md`):
+
+| Check | qpdf WASM | pdf-lib copyPages |
+|---|---|---|
+| AcroForm kept on page copy | yes (`/AcroForm` present; duplicate field names renamed on merge, 10 widgets / 8 unique names) | no: widgets stay but `/AcroForm` is dropped, so the fields are dead |
+| Links, annotations | kept (URI, GoTo, Text) | kept |
+| Outlines | dropped (reported as a warning) | dropped |
+| Encrypted input with password (AES-256, RC4-40) | ok | ok |
+| Mixed sizes, /Rotate | ok | ok |
+| broken-xref, truncated | **fails: this 12.2.0 wasm build cannot rebuild a damaged xref** (the 12.4.2 CLI repairs both, exit 3) | opens, 3 pages |
+| corrupt (600 random bytes) | fails (same reason) | opens but silently keeps 1 of 3 pages |
+| 1,000 pages | 370 ms | 1,470 ms |
+
+Verdict: the premise "qpdf repairs damaged files" does not hold for the WASM build, so the decision is split. qpdf WASM does the assembly (forms kept, fastest, handles rotate and password input; output is unencrypted). When qpdf cannot open a file, pdf-lib loads and re-saves it (writing a fresh xref, blanking pages whose content stream was cut off) and qpdf continues from that copy; the user gets a `repaired` warning. pdf-lib also sets Producer/Creator after assembly, because qpdf `--update-from-json` replaces the whole trailer (a partial update loses /Size and /Root), which makes it unsafe for a one-field change. `--empty` output carries no Info, so with the credit off nothing needs removing. Cost: the credit pass re-parses the output with pdf-lib (about 1.5 s for 1,000 pages). Revisit when qpdf-wasm ships a build with working xref recovery.

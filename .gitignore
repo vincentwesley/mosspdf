@@ -28,3 +28,4 @@ tools/
 tests/corpus/generated/
 /spikes/
 .worktrees/
+tests/corpus/external/
