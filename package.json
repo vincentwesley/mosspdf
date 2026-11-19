@@ -20,11 +20,16 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test": "vitest run",
-    "test:e2e": "playwright test",
+    "test:e2e": "node scripts/pw.mjs test",
     "check": "npm run typecheck && npm run lint && npm test && npm run build",
     "check:budgets": "node scripts/check-budgets.mjs",
     "knip": "knip",
-    "deploy": "npm run build && npx --yes wrangler@4.165.0 deploy"
+    "deploy": "npm run build && npx --yes wrangler@4.165.0 deploy",
+    "pw": "node scripts/pw.mjs",
+    "test:e2e:quick": "node scripts/pw.mjs test --project=chromium",
+    "licences": "node scripts/licences.mjs",
+    "smoke:prod": "node scripts/pw.mjs --prod test --project=chromium e2e/headers.spec.ts e2e/smoke.spec.ts",
+    "acceptance": "node scripts/acceptance.mjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",

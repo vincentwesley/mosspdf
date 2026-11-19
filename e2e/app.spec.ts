@@ -1,5 +1,4 @@
-import { expect, test } from "@playwright/test";
-import AxeBuilder from "@axe-core/playwright";
+import { test, expect, checkA11y, setTheme } from "./fixtures";
 
 test("dark by default, toggles to light", async ({ page }) => {
   await page.goto("/");
@@ -10,10 +9,9 @@ test("dark by default, toggles to light", async ({ page }) => {
 });
 
 for (const theme of ["dark", "light"] as const) {
-  test(`axe clean (${theme})`, async ({ page }) => {
+  test(`A-E2E-3: axe clean (${theme})`, async ({ page }) => {
     await page.goto("/");
-    if (theme === "light") await page.getByRole("button", { name: "Light theme" }).click();
-    const { violations } = await new AxeBuilder({ page }).analyze();
-    expect(violations).toEqual([]);
+    await setTheme(page, theme);
+    await checkA11y(page, `home ${theme}`);
   });
 }
