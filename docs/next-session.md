@@ -18,3 +18,9 @@ Scaffolded 2026-11-19 from the vite-ts starter + house kit; check and build gree
 ## Known gaps / ideas
 1. Fill `docs/PLAN.md`, `ACCEPTANCE.md`, `RESEARCH.md`; no tools built yet.
 2. Report outcomes in a line or two.
+
+## M1 part B (branch m1-ui)
+- Shell, home, tool views (merge/split/organize/extract), seal (`src/core/seal.ts`, engines in `src/core/engines.ts`), privacy dialog/page, PWA (`public/sw.js`, stamped at build by `vite.config.ts`).
+- `src/ops/index.ts` + `src/ops/types.ts` are TEMPORARY stubs; the m1-ops merge replaces them. Then: import `createEngines`/`Engines` from `../engines/qpdf` in `src/workers/ops.worker.ts`, check the `SplitMode` shape, and import `parseRanges` from a leaf module so ops code stays out of the main bundle.
+- Workers load via `?worker&url` + Trusted Types policy `pagehold` (`src/core/tt.ts`); header has `trusted-types pagehold`, `style-src 'self'`.
+- pdf.js data (cmaps, fonts, wasm) is packed into one asset and served from memory (`MemoryDataFactory`); all of it is preloaded before the seal (about 2.8 MB).

@@ -40,7 +40,6 @@
     "eslint": "^10.14.0",
     "fast-check": "4.10.3",
     "knip": "^6.45.1",
-    "pdfjs-dist": "6.5.438",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.72.2",
     "vite": "^8.3.8",
@@ -48,6 +47,7 @@
   },
   "dependencies": {
     "@cantoo/pdf-lib": "2.11.1",
-    "@neslinesli93/qpdf-wasm": "0.3.1"
+    "@neslinesli93/qpdf-wasm": "0.3.1",
+    "pdfjs-dist": "6.5.438"
   }
 }

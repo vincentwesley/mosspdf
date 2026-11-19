@@ -1,0 +1,32 @@
+/* Pagehold service worker. The build stamps PRECACHE and VERSION (vite.config.ts); never edit them here.
+   Cache-first for build assets, network-first for the page, old caches dropped on activate. It only ever fetches this site. */
+const PRECACHE = __PRECACHE__;
+const VERSION = "__VERSION__";
+const CACHE = "pagehold-" + VERSION;
+
+self.addEventListener("install", (e) => {
+  // No skipWaiting here: the page decides when to switch (never during a job).
+  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(PRECACHE)));
+});
+
+self.addEventListener("activate", (e) => {
+  e.waitUntil(
+    caches.keys().then((keys) => Promise.all(keys.filter((k) => k.startsWith("pagehold-") && k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim()),
+  );
+});
+
+self.addEventListener("message", (e) => {
+  if (e.data && e.data.type === "SKIP_WAITING") self.skipWaiting();
+});
+
+self.addEventListener("fetch", (e) => {
+  const req = e.request;
+  const url = new URL(req.url);
+  if (req.method !== "GET" || url.origin !== location.origin || url.pathname === "/sw.js") return;
+  if (req.mode === "navigate") {
+    // network-first so a fresh deploy shows up; the cached copy keeps it working offline
+    e.respondWith(fetch(req).then((r) => { if (r.ok) caches.open(CACHE).then((c) => c.put("/", r.clone())); return r; }).catch(() => caches.match("/").then((r) => r || Response.error())));
+    return;
+  }
+  e.respondWith(caches.match(req).then((hit) => hit || fetch(req)));
+});
