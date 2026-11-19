@@ -37,7 +37,13 @@ function channels(ctx: PDFContext, cs: unknown): 1 | 3 | undefined {
   return undefined;
 }
 
-const inflate = async (b: Uint8Array) => new Uint8Array(await new Response(new Blob([b as BlobPart]).stream().pipeThrough(new DecompressionStream("deflate"))).arrayBuffer());
+// Not Blob.stream(): WebKit loads that through a blob: URL, which the post-seal request check (rightly) treats as a request.
+const inflate = async (b: Uint8Array) => {
+  const ds = new DecompressionStream("deflate");
+  const w = ds.writable.getWriter();
+  void w.write(b as BufferSource).then(() => w.close(), () => undefined); // a bad stream rejects the read below
+  return new Uint8Array(await new Response(ds.readable).arrayBuffer());
+};
 
 /** PNG row predictors (PDF Predictor 10-15). */
 export function unpredict(d: Uint8Array, bpp: number, rowBytes: number, rows: number): Uint8Array | undefined {

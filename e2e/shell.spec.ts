@@ -1,4 +1,5 @@
-// UI shell: the home map (live and coming-soon tiles), image and pdf-pair intake, zip download of multi-file results.
+﻿// UI shell: the home map (live and coming-soon tiles), image and pdf-pair intake, zip download of multi-file results.
+import { readdirSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { unzipSync } from "fflate";
 import type { Page } from "@playwright/test";
@@ -8,8 +9,11 @@ const corpus = (n: string) => resolve("tests/corpus/generated", `${n}.pdf`);
 const image = (n: string) => resolve("tests/fixtures/images", n);
 const input = (page: Page) => page.getByTestId("file-input");
 const GROUPS = ["Organize", "Convert", "Edit", "Protect", "Fill and sign", "OCR", "Privacy", "Compare"];
-const LIVE = ["merge", "split", "organize", "extract", "protect", "unprotect", "safety-scan", "repair"];
-const PLANNED = ["images-to-pdf", "pdf-to-images", "compress", "page-numbers", "watermark", "metadata", "fill", "sign", "ocr", "redact", "photo", "compare"];
+// Live = the tool file defines `run` (same rule as src/tools/index.ts isLive); the rest are planned.
+const TOOL_IDS = readdirSync("src/tools").map((f) => f.replace(/\.ts$/, "")).filter((id) => !["index", "types", "pages", "pagesel"].includes(id));
+const isLive = (id: string) => /^\s*(async\s+)?run\s*[(:]/m.test(readFileSync(`src/tools/${id}.ts`, "utf8"));
+const LIVE = TOOL_IDS.filter(isLive);
+const PLANNED = TOOL_IDS.filter((id) => !isLive(id));
 
 for (const theme of ["dark", "light"] as Theme[]) {
   test(`A-E2E-10 home shows every group, live tiles as links and planned tiles as dashed Coming soon (${theme})`, async ({ page }) => {
@@ -36,8 +40,8 @@ test("A-E2E-10 images: PNG and a JPG with EXIF orientation 6 show their upright 
   await expect(rows.nth(0).getByTestId("file-meta")).toContainText("40 × 20 px");
   await expect(rows.nth(1).getByTestId("file-meta")).toContainText("20 × 40 px"); // stored 40x20, upright 20x40
   await expect(rows.locator("canvas.file__thumb")).toHaveCount(2);
-  await expect(page.getByTestId("primary-action")).toBeDisabled(); // planned tool: intake only
-  await expect(page.getByTestId("coming-soon")).toBeVisible();
+  await expect(page.getByTestId("primary-action")).toBeEnabled(); // live tool: two pictures are ready to convert
+  await expect(page.getByTestId("coming-soon")).toBeHidden();
   // a PDF is not an image here: skipped with a plain notice
   await input(page).setInputFiles([corpus("plain-3p")]);
   await expect(page.getByTestId("notice")).toContainText("not a JPG, PNG or WebP image");
