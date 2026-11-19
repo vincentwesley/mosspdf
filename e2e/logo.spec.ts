@@ -150,7 +150,7 @@ test.describe("desktop", () => {
 
   test("the header is unchanged: own brand present, no logo inside it", async ({ page }) => {
     await page.goto("/");
-    await expect(page.locator("header.top h1")).toBeVisible();
+    await expect(page.locator("header.top .wordmark")).toBeVisible();
     await expect(page.locator("header.top .brand-logo")).toHaveCount(0);
     await expect(page.locator("header.top [data-logo-link]")).toHaveCount(0);
   });

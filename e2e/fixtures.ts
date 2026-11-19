@@ -82,10 +82,12 @@ export async function loadApp(page: Page, route = "/"): Promise<void> {
   await waitForSeal(page);
 }
 
-/** No horizontal overflow at the current viewport. */
+/** No horizontal overflow at the current viewport.
+ *  Measured against the layout width of <html>, not clientWidth: Playwright's iPhone WebKit on a display-scaled Windows machine reports
+ *  clientWidth 312 while the page lays out at 390 (a bare page gives scrollWidth 391 too), so clientWidth is not comparable there. 1px tolerance for that rounding. */
 export async function expectNoOverflow(page: Page): Promise<void> {
-  const { sw, cw } = await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, cw: document.documentElement.clientWidth }));
-  expect(sw, `scrollWidth ${sw} > clientWidth ${cw}`).toBeLessThanOrEqual(cw);
+  const { sw, w } = await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, w: document.documentElement.getBoundingClientRect().width }));
+  expect(sw, `scrollWidth ${sw} > layout width ${w}`).toBeLessThanOrEqual(Math.ceil(w) + 1);
 }
 
 /** axe (wcag2a/2aa/21aa/22aa); fails on any violation with a readable summary. */

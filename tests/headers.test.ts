@@ -7,13 +7,12 @@ const expected = JSON.parse(readFileSync("tests/headers.expected.json", "utf8"))
 
 /** Header lines of the rule whose path line is `path`. */
 function rule(path: string): Record<string, string> {
-  const out: Record<string, string> = {};
-  const start = txt.split(/?
-/).findIndex((l) => l === path);
+  const lines = txt.split(/\r?\n/);
+  const start = lines.findIndex((l) => l === path);
   expect(start, `rule ${path} exists`).toBeGreaterThanOrEqual(0);
-  for (const line of txt.split(/?
-/).slice(start + 1)) {
-    const m = /^s+([w-]+):s*(.+)$/.exec(line);
+  const out: Record<string, string> = {};
+  for (const line of lines.slice(start + 1)) {
+    const m = /^\s+([\w-]+):\s*(.+)$/.exec(line);
     if (!m) break;
     out[m[1].toLowerCase()] = m[2].trim();
   }

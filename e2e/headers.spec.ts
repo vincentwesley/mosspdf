@@ -27,8 +27,8 @@ test("A-NET-3: headers on a JS asset", async ({ request }) => {
 
 test("A-NET-3: headers on the engine workers (connect-src 'none', Trusted Types)", async ({ request }) => {
   const html = await (await request.get("/")).text();
-  const entry = /<script[^>]+src="(/assets/[^"]+.js)"/.exec(html)?.[1];
-  const src = (await (await request.get(entry!)).text()).match(/assets/workers/ops.worker-[w-]+.js/)?.[0];
+  const entry = /<script[^>]+src="(\/assets\/[^"]+\.js)"/.exec(html)?.[1];
+  const src = (await (await request.get(entry!)).text()).match(/assets\/workers\/ops\.worker-[\w-]+\.js/)?.[0];
   expect(src, "ops worker URL not found in the entry chunk").toBeTruthy();
   const res = await request.get("/" + src);
   expect(res.status()).toBe(200);

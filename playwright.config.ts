@@ -10,6 +10,7 @@ export default defineConfig({
   reporter: process.env.CI ? [["list"], ["html", { open: "never" }]] : "list",
   retries: process.env.CI ? 1 : 0,
   forbidOnly: !!process.env.CI,
+  workers: process.env.CI ? 2 : 3, // WASM + pdf.js in six parallel browsers exhausts a 16 GB dev machine (Firefox content process crashes)
   use: {
     baseURL: BASE_URL,
     headless: true,

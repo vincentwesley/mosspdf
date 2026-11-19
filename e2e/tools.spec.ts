@@ -166,6 +166,7 @@ test.describe("tools", () => {
     test(`A-COR-3 bad file '${name}': plain message or repaired warning, app stays usable`, async ({ page }) => {
       await loadApp(page, "/#/merge");
       await add(page, name, "plain-3p", "mixed-sizes");
+      await expect(rows(page)).toHaveCount(3);
       await expect(page.locator('[data-testid="file-row"][data-status="loading"]')).toHaveCount(0);
       const bad = rows(page).filter({ hasText: `${name}.pdf` });
       const status = await bad.getAttribute("data-status");
