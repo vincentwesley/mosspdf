@@ -3,17 +3,18 @@ import { announce, fmtSize, h, plural } from "./dom";
 import { icon } from "./icons";
 import { sortable } from "./sortable";
 
-export function fileList(o: { reorder: boolean; visible?: () => LoadedFile[] }): { el: HTMLElement; render: () => void } {
+export function fileList(o: { reorder: boolean; visible?: () => LoadedFile[]; label?: (f: LoadedFile, i: number) => string }): { el: HTMLElement; render: () => void } {
   const ul = h("ul", { class: "files", attrs: { role: "list", "data-testid": "file-list", "aria-label": "Your files" } });
 
   const iconBtn = (name: "up" | "down" | "close" | "grip", label: string, fn: (() => void) | null, testid: string, disabled = false) =>
     h("button", { class: `pg__btn${name === "grip" ? " files__grip" : ""}`, type: "button", disabled, attrs: { "aria-label": label, title: label, "data-testid": testid }, on: fn ? { click: fn } : {} }, icon(name));
 
   function row(f: LoadedFile, i: number, n: number): HTMLElement {
-    const meta = f.status === "ready" && f.info ? `${plural(f.info.pageCount, "page")} · ${fmtSize(f.size)}` : f.status === "loading" ? "Reading…" : fmtSize(f.size);
+    const meta = f.kind === "image" ? `${f.width} × ${f.height} px · ${fmtSize(f.size)}` : f.status === "ready" && f.info ? `${plural(f.info.pageCount, "page")} · ${fmtSize(f.size)}` : f.status === "loading" ? "Reading…" : fmtSize(f.size);
     const li = h("li", { class: "file", attrs: { "data-testid": "file-row", "data-file-id": f.id, "data-status": f.status } },
-      h("span", { class: "file__icon" }, icon(f.status === "locked" ? "lock" : "file")),
+      f.thumb ? thumbCanvas(f.thumb, f.name) : h("span", { class: "file__icon" }, icon(f.status === "locked" ? "lock" : "file")),
       h("div", { class: "file__main" },
+        o.label && h("p", { class: "file__tag", text: o.label(f, i), attrs: { "data-testid": "file-label" } }),
         h("p", { class: "file__name", text: f.name }),
         h("p", { class: "file__meta", text: meta, attrs: { "data-testid": "file-meta" } }),
         f.status === "error" && f.error && h("p", { class: "file__err", text: f.error, attrs: { role: "alert" } }),
@@ -25,6 +26,12 @@ export function fileList(o: { reorder: boolean; visible?: () => LoadedFile[] }):
         iconBtn("close", `Remove ${f.name}`, () => { store.remove(f.id); announce(`${f.name} removed.`); }, "file-remove")));
     return li;
   }
+  /** Previews are drawn to a canvas: images (blob: URLs) would be blocked by the sealed page. */
+  const thumbCanvas = (b: ImageBitmap, name: string) => {
+    const c = h("canvas", { class: "file__thumb", attrs: { width: b.width, height: b.height, role: "img", "aria-label": `Preview of ${name}` } });
+    c.getContext("2d")?.drawImage(b, 0, 0);
+    return c;
+  };
   const focusRow = (id: number, tid: string) => queueMicrotask(() => {
     const b = ul.querySelector<HTMLButtonElement>(`[data-file-id="${id}"] [data-testid=${tid}]`);
     (b && !b.disabled ? b : ul.querySelector<HTMLElement>(`[data-file-id="${id}"] button`))?.focus();

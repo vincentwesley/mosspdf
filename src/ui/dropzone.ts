@@ -24,8 +24,8 @@ export function initGlobalIntake(): void {
   });
 }
 
-export function dropzone(o: { compact?: boolean; title?: string }): HTMLElement {
-  const input = h("input", { type: "file", class: "sr-only", attrs: { multiple: true, accept: ".pdf,application/pdf,image/*", "data-testid": "file-input", "aria-label": "Choose files", tabindex: -1 } });
+export function dropzone(o: { compact?: boolean; title?: string; accept?: string }): HTMLElement {
+  const input = h("input", { type: "file", class: "sr-only", attrs: { multiple: true, accept: o.accept ?? ".pdf,application/pdf,image/*", "data-testid": "file-input", "aria-label": "Choose files", tabindex: -1 } });
   input.addEventListener("change", () => {
     const files = [...(input.files ?? [])];
     input.value = "";

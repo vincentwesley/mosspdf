@@ -8,8 +8,8 @@ import { bootAndSeal, seal } from "./core/seal";
 import { netlog } from "./core/netlog";
 import { badgeText, privacyDialog, privacyPage, VERSION } from "./ui/privacy";
 import { homeView } from "./ui/home";
-import { toolView } from "./ui/tool-view";
-import { toolById } from "./ui/catalog";
+import { workspace } from "./ui/workspace";
+import { toolById } from "./tools";
 import { live } from "./ui/dom";
 import { initGlobalIntake } from "./ui/dropzone";
 
@@ -66,7 +66,8 @@ initGlobalIntake();
 function resolve(): { el: HTMLElement; destroy: () => void } {
   const route = location.hash.replace(/^#\/?/, "");
   if (route === "privacy") return privacyPage();
-  if (toolById(route)) return toolView(route);
+  const tool = toolById(route);
+  if (tool) return workspace(tool);
   return homeView((h) => { location.hash = h; });
 }
 

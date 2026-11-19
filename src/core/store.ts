@@ -6,12 +6,35 @@ import { PdfError, type Inspection, type InFile, type OpResult, type PageSpec, t
 import type { CallOptions } from "./rpc";
 
 export interface LoadedFile {
-  id: number; name: string; size: number; bytes: Uint8Array; password?: string;
+  id: number; name: string; size: number; password?: string;
+  /** PDF bytes. Empty for images: they stay as the original `blob`. */
+  bytes: Uint8Array;
+  kind: "pdf" | "image";
   status: "loading" | "ready" | "locked" | "error";
   info?: Inspection; error?: string; doc?: Promise<PDFDocumentProxy>;
+  /** Images only: the untouched original, its upright size (EXIF orientation applied) and a small preview. */
+  blob?: Blob; width?: number; height?: number; thumb?: ImageBitmap;
 }
+/** What `store.add` keeps; anything else is skipped with a notice. */
+export type Intake = "pdf" | "image" | "any";
 
 const PDF_MAGIC = [0x25, 0x50, 0x44, 0x46]; // %PDF
+const THUMB = 160;
+export const isPdfFile = (f: File) => f.type === "application/pdf" || /\.pdf$/i.test(f.name);
+const isImageFile = (f: File) => /^image\/(jpeg|png|webp|heic|heif)$/.test(f.type) || /\.(jpe?g|png|webp|heic|heif)$/i.test(f.name);
+const isHeic = (f: File) => /^image\/hei[cf]$/.test(f.type) || /\.hei[cf]$/i.test(f.name);
+
+/** Decodes an image upright (EXIF orientation applied) into its size and a small preview. Throws when the browser cannot read it. */
+async function decodeImage(f: File): Promise<Pick<LoadedFile, "width" | "height" | "thumb">> {
+  const full = await createImageBitmap(f, { imageOrientation: "from-image" });
+  try {
+    const k = Math.min(1, THUMB / Math.max(full.width, full.height));
+    const thumb = await createImageBitmap(full, { resizeWidth: Math.max(1, Math.round(full.width * k)), resizeHeight: Math.max(1, Math.round(full.height * k)), resizeQuality: "medium" });
+    return { width: full.width, height: full.height, thumb };
+  } finally {
+    full.close();
+  }
+}
 let nextId = 1;
 const subs = new Set<() => void>();
 const notify = () => subs.forEach((f) => f());
@@ -23,19 +46,29 @@ export const store = {
   subscribe(f: () => void) { subs.add(f); return () => subs.delete(f); },
   setBusy(b: boolean) { store.busy = b; notify(); },
 
-  async add(list: File[]): Promise<LoadedFile[]> {
+  async add(list: File[], intake: Intake = "pdf"): Promise<LoadedFile[]> {
     const skipped: string[] = [];
+    const notes: string[] = [];
     const added: LoadedFile[] = [];
     for (const f of list) {
-      const isPdf = f.type === "application/pdf" || /\.pdf$/i.test(f.name);
-      if (!isPdf) { skipped.push(f.name); continue; }
-      const lf: LoadedFile = { id: nextId++, name: f.name, size: f.size, bytes: new Uint8Array(await f.arrayBuffer()), status: "loading" };
-      store.files.push(lf);
-      added.push(lf);
+      if (intake !== "image" && isPdfFile(f)) {
+        const lf: LoadedFile = { id: nextId++, kind: "pdf", name: f.name, size: f.size, bytes: new Uint8Array(await f.arrayBuffer()), status: "loading" };
+        store.files.push(lf);
+        added.push(lf);
+      } else if (intake !== "pdf" && isImageFile(f)) {
+        try {
+          const lf: LoadedFile = { id: nextId++, kind: "image", name: f.name, size: f.size, bytes: new Uint8Array(0), blob: f, status: "ready", ...(await decodeImage(f)) };
+          store.files.push(lf);
+        } catch {
+          notes.push(isHeic(f) ? `"${f.name}" is a HEIC photo this browser cannot read. Convert it to JPG first, then add it again.` : `"${f.name}" could not be read as an image.`);
+        }
+      } else skipped.push(f.name);
     }
-    store.notice = skipped.length
-      ? `${skipped.length === 1 ? `"${skipped[0]}" is` : `${skipped.length} files are`} not a PDF and was skipped. Turning images into PDFs is coming soon.`
-      : "";
+    if (skipped.length) {
+      const what = intake === "pdf" ? "a PDF" : intake === "image" ? "a JPG, PNG or WebP image" : "a PDF or an image";
+      notes.unshift(`${skipped.length === 1 ? `"${skipped[0]}" is` : `${skipped.length} files are`} not ${what} and was skipped.${intake === "pdf" ? " Turning images into PDFs is coming soon." : ""}`);
+    }
+    store.notice = notes.join(" ");
     notify();
     await Promise.all(added.map((f) => store.check(f)));
     return added;
@@ -94,11 +127,11 @@ export const store = {
     store.files.sort((a, b) => ids.indexOf(a.id) - ids.indexOf(b.id));
     notify();
   },
-  ready: () => store.files.filter((f) => f.status === "ready"),
+  ready: (kind: LoadedFile["kind"] = "pdf") => store.files.filter((f) => f.kind === kind && f.status === "ready"),
   doc(f: LoadedFile): Promise<PDFDocumentProxy> { return (f.doc ??= openDoc(f.bytes, f.password)); },
 };
 
-const toIn = (f: LoadedFile): InFile => ({ name: f.name, bytes: f.bytes, password: f.password });
+export const toIn = (f: LoadedFile): InFile => ({ name: f.name, bytes: f.bytes, password: f.password });
 
 export const prefs = {
   get producerCredit(): boolean {
