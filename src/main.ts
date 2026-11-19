@@ -82,8 +82,11 @@ function render(): void {
     if (!first) { scrollTo(0, 0); h1?.focus({ preventScroll: true }); }
     first = false;
   };
-  if ("startViewTransition" in document && !matchMedia("(prefers-reduced-motion: reduce)").matches && !first) (document as Document & { startViewTransition(f: () => void): unknown }).startViewTransition(swap);
-  else swap();
+  if ("startViewTransition" in document && !matchMedia("(prefers-reduced-motion: reduce)").matches && !first) {
+    // A newer navigation skips the running transition; its promises then reject with AbortError, which is harmless.
+    const vt = (document as Document & { startViewTransition(f: () => void): { ready: Promise<void>; finished: Promise<void>; updateCallbackDone: Promise<void> } }).startViewTransition(swap);
+    for (const p of [vt.ready, vt.finished, vt.updateCallbackDone]) p.catch(() => undefined);
+  } else swap();
 }
 addEventListener("hashchange", render);
 render();

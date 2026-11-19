@@ -1,26 +1,22 @@
 > Update at the end of any session that changed state. Keep it lean.
 
-Continue work on **Pagehold** (repo `vincentwesley/pagehold`, not deployed yet).
-Scaffolded 2026-11-19 from the vite-ts starter + house kit; check and build green. Only do what the owner asks.
+Continue work on **Pagehold** (repo `vincentwesley/pagehold`). Branch `m1` holds M1 (ops + UI + e2e merged); not pushed or merged to main yet.
 
 ## Before anything
-1. Work in `C:\Coding Projects\pagehold`; read this file and `docs/PLAN.md`.
-2. `npm ci --ignore-scripts`, then `npm run check`.
+1. Work in `C:\Coding Projects\pagehold`; read this file, `docs/PLAN.md`, `docs/DECISIONS.md` (D7, D10, D11).
+2. `npm ci --ignore-scripts`, `npm run pw -- install chromium firefox webkit`, then `npm run check`.
 
 ## How to work here
 - Local commits only unless the owner says push. Identity: `vincentwesley` noreply.
-- Deploys run locally: `npm run build && npx wrangler deploy` (no deploy workflow).
-- Checks: `npm run check` (typecheck + lint + unit + build); `npm run test:e2e` at milestones.
+- Deploys run locally: `npm run deploy` (no deploy workflow).
+- Checks: `npm run check`, `npm run check:budgets`, `npm run licences`; `npm run test:e2e` (5 projects, builds and serves `dist` with wrangler dev so `_headers` apply). Screenshots: `npm run pw -- test e2e/screens.spec.ts --project=chromium` writes `qa-output/screens/`.
+- qpdf CLI for tests: `tools/qpdf/*/bin/qpdf(.exe)` (found by `scripts/qpdf-bin.mjs`), then `QPDF_BIN`, then PATH.
 
 ## Current state
-- Placeholder page only ("Pagehold: private PDF tools, coming soon"), credits card + draggable logo in the footer. Strict CSP with COOP/COEP in `public/_headers`.
+- Tools: merge, split (ranges, every N, by size), organize, extract; password and bad-file handling; seal + privacy panel; PWA offline; version shown.
+- e2e covers flows, axe (both themes), overflow (320 to 1280, 200% zoom), offline (Chromium, WebKit), seal negative controls (page and ops worker), 1,000-page thumbnails (Chromium).
 
-## Known gaps / ideas
-1. Fill `docs/PLAN.md`, `ACCEPTANCE.md`, `RESEARCH.md`; no tools built yet.
-2. Report outcomes in a line or two.
-
-## M1 part B (branch m1-ui)
-- Shell, home, tool views (merge/split/organize/extract), seal (`src/core/seal.ts`, engines in `src/core/engines.ts`), privacy dialog/page, PWA (`public/sw.js`, stamped at build by `vite.config.ts`).
-- `src/ops/index.ts` + `src/ops/types.ts` are TEMPORARY stubs; the m1-ops merge replaces them. Then: import `createEngines`/`Engines` from `../engines/qpdf` in `src/workers/ops.worker.ts`, check the `SplitMode` shape, and import `parseRanges` from a leaf module so ops code stays out of the main bundle.
-- Workers load via `?worker&url` + Trusted Types policy `pagehold` (`src/core/tt.ts`); header has `trusted-types pagehold`, `style-src 'self'`.
-- pdf.js data (cmaps, fonts, wasm) is packed into one asset and served from memory (`MemoryDataFactory`); all of it is preloaded before the seal (about 2.8 MB).
+## Known gaps
+- Firefox offline test skipped (setOffline broken with service workers, docs/spikes/csp.md); keyboard-only tests skip on touch projects.
+- Liberation Sans (GPL-2 + font exception) ships in the pdf.js data pack; owner may prefer to drop it (D11).
+- Not yet: M2+ tools, update-prompt e2e (reload prompt exists, no spec), release zip.

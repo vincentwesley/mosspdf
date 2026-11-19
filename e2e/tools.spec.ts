@@ -312,7 +312,7 @@ const loaded = (route: string, ...files: string[]): ((page: Page) => Promise<voi
   await loadApp(page, route);
   await add(page, ...files);
   await readyRows(page, files.length);
-  if (route.includes("organize") || route.includes("extract")) await expect(page.locator(".pg.is-drawn").first()).toBeVisible({ timeout: 20_000 });
+  if (route.includes("organize") || route.includes("extract")) await page.locator(".pg.is-drawn").first().waitFor({ timeout: 20_000 }); // not expect().toBeVisible(): that pairing crashes Firefox in the following axe run
 };
 const VIEWS: View[] = [
   { name: "home", open: (p) => loadApp(p) },

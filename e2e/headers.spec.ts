@@ -33,7 +33,9 @@ test("A-NET-3: headers on the engine workers (connect-src 'none', Trusted Types)
   const res = await request.get("/" + src);
   expect(res.status()).toBe(200);
   const got = res.headers();
-  for (const [k, v] of Object.entries({ ...expected.global, ...expected.workers })) expect(got[k], k).toBe(v);
+  // two CSP headers may arrive as two lines or one joined value ("," or ", "): compare the policies, not the separator
+  const norm = (s: string) => s.replace(/,\s*(?=default-src)/g, ",");
+  for (const [k, v] of Object.entries({ ...expected.global, ...expected.workers })) expect(norm(got[k]), k).toBe(norm(v));
 });
 
 test("A-NET-3: headers on /sw.js (when present)", async ({ request }) => {
