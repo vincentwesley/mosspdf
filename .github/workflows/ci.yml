@@ -72,7 +72,7 @@ jobs:
           path: node_modules/playwright-core/.local-browsers
           key: pw-${{ runner.os }}-${{ steps.pw.outputs.v }}-${{ matrix.browser }}
       - name: Install Playwright browser
-        timeout-minutes: 15
+        timeout-minutes: 25
         run: npm run pw -- install --with-deps ${{ matrix.browser }}
       - run: npm run test:e2e -- --project=${{ matrix.project }}
       - name: Upload Playwright report

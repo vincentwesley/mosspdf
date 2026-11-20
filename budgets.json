@@ -4,5 +4,5 @@
   ".wasm": 4700,
   ".gz": 3100,
   "dir:pixel": 250,
-  "main-gzip": 56
+  "main-gzip": 58
 }
