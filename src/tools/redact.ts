@@ -2,7 +2,7 @@
 // them and can draw more boxes. Apply renders each affected page with black boxes painted in, as a JPEG; the ops worker rebuilds those
 // pages as pictures plus a hidden text layer of the words outside the boxes, strips the metadata and rewrites the file (src/ops/redact.ts).
 import { store } from "../core/store";
-import { ALL_DETECT, KIND_LABEL, detect, findText, mask, type Detect, type Kind } from "../core/detect";
+import { ALL_DETECT, KIND_LABEL, detect, findText, has, mask, type Detect, type Kind } from "../core/detect";
 import { layoutText, overlaps, rangeRects, type PageText, type Rect, type TextItem } from "../core/textpos";
 import type { OcrWord } from "../engines/ocr";
 import type { RedactInput, RedactPage } from "../ops";
@@ -118,7 +118,7 @@ const ui = (ctx: Ctx) => ctx.local(() => {
     const box = h("input", { class: "hs-check", id, type: "checkbox", attrs: { "data-testid": "rd-row-check" } });
     box.checked = x.checked;
     box.addEventListener("change", () => { x.checked = box.checked; paintAll(); ctx.refresh(); });
-    const label = x.kind === "manual" ? `Page ${x.page + 1}: box` : `Page ${x.page + 1}: ${x.kind === "search" ? x.text : mask(x.text)}`;
+    const label = x.kind === "manual" ? `Page ${x.page + 1}: box` : `Page ${x.page + 1}: ${x.kind === "search" ? x.text.replace(/\s+/g, " ") : mask(x.text)}`;
     return h("li", { class: "sg-row", attrs: { "data-testid": "rd-row" } },
       h("span", { class: "field field--check" }, box, h("label", { text: label, attrs: { for: id } })),
       x.note && h("span", { class: "rd-note", text: x.note }),
@@ -253,7 +253,7 @@ export const redact: ToolDef = {
         const viewport = page.getViewport({ scale });
         canvas.width = Math.ceil(viewport.width);
         canvas.height = Math.ceil(viewport.height);
-        const task = page.render({ canvas, viewport, background: "#ffffff" });
+        const task = page.render({ canvas, viewport, background: "#ffffff", annotationMode: 0 /* AnnotationMode.DISABLE: annotations are removed from the file, so their text must not be burned into the picture either */ });
         const stop = () => task.cancel();
         signal?.addEventListener("abort", stop);
         try { await task.promise; } catch (e) {
@@ -274,9 +274,10 @@ export const redact: ToolDef = {
       canvas.width = canvas.height = 0;
     }
     // What stays readable: every page that is not rebuilt, plus the kept words of those that are. A redacted string that is still there on purpose can't be checked for.
-    const kept = [...u.pages.flatMap((p, i) => (byPage.has(i) ? [] : [p.text])), ...pages.flatMap((p) => p.words.map((w) => w.text))].join(" ").toLowerCase();
-    const needles = [...new Set(chosen.flatMap((x) => x.text.split("\n").map((t) => t.trim())).filter((t) => t.length >= 4 && !kept.includes(t.toLowerCase())))];
-    const input: RedactInput = { pages, needles, items: chosen.length };
+    const kept = [...u.pages.flatMap((p, i) => (byPage.has(i) ? [] : [p.text])), ...pages.flatMap((p) => p.words.map((w) => w.text))].join(" ");
+    // Every string is scrubbed from bookmarks, names and details; the ones that also sit in text that stays are left out of the page-text check only.
+    const needles = [...new Set(chosen.flatMap((x) => x.text.split("\n").map((t) => t.trim())).filter(Boolean))];
+    const input: RedactInput = { pages, needles, keptNeedles: needles.filter((t) => has(kept, t)), items: chosen.length };
     ctx.note("Removing the text and rewriting the file");
     const r = await ctx.call<OpResult>("redact", { file: ctx.input(f), input, o: { producerCredit: ctx.producerCredit } });
     r.warnings.push({ code: "check-before-sharing", message: "Before you share it, open the file and search for a word you redacted to make sure it is gone." });

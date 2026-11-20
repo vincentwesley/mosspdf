@@ -58,8 +58,32 @@ function all(re: RegExp, s: string, kind: Kind, pick?: (m: RegExpExecArray) => {
 export interface Detect { nric: boolean; phone: boolean; email: boolean; address: boolean; postal: boolean }
 export const ALL_DETECT: Detect = { nric: true, phone: true, email: true, address: true, postal: true };
 
-/** Detector hits in `s`, sorted by position; a hit inside an earlier, longer one (a postal code inside an address) is dropped. */
+/** `s` with every line break read as a space and a hyphen at a line end joined to the next line ("Pe-\nreira" -> "Pereira"), so a match can
+ *  run over a wrapped line. `map[i]` is the index in `s` of flat character i. */
+function flatten(s: string): { flat: string; map: number[] } {
+  let flat = "";
+  const map: number[] = [];
+  for (let i = 0; i < s.length; i++) {
+    if (s[i] === "-" && s[i + 1] === "\n" && /\p{L}/u.test(s[i - 1] ?? "") && /\p{L}/u.test(s[i + 2] ?? "")) { i++; continue; }
+    flat += s[i] === "\n" ? " " : s[i];
+    map.push(i);
+  }
+  return { flat, map };
+}
+/** The hits found in the flattened text, as ranges and text of the original string. */
+function unflatten(hits: Hit[], s: string, map: number[]): Hit[] {
+  return hits.map((h) => {
+    const start = map[h.start], end = map[h.end - 1] + 1;
+    return { ...h, start, end, text: s.slice(start, end) };
+  });
+}
+
+/** Detector hits in `s` (lines may wrap anywhere), sorted by position; a hit inside an earlier, longer one (a postal code inside an address) is dropped. */
 export function detect(s: string, on: Partial<Detect> = ALL_DETECT): Hit[] {
+  const { flat, map } = flatten(s);
+  return unflatten(detectFlat(flat, on), s, map);
+}
+function detectFlat(s: string, on: Partial<Detect>): Hit[] {
   const hits: Hit[] = [];
   if (on.nric) {
     for (const h of all(RE.nric, s, "nric")) {
@@ -78,13 +102,25 @@ export function detect(s: string, on: Partial<Detect> = ALL_DETECT): Hit[] {
   return out;
 }
 
-/** Case-insensitive search for `q`; `whole` only matches whole words. */
+export const escRe = (q: string) => q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+/** Case-insensitive search for `q`, also across a line wrap; `whole` only matches whole words. */
 export function findText(s: string, q: string, whole: boolean): Hit[] {
   q = q.trim();
   if (!q) return [];
-  const esc = q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const esc = escRe(q).replace(/\s+/g, "\\s+");
   const re = new RegExp(whole ? String.raw`(?<![\p{L}\p{N}_])${esc}(?![\p{L}\p{N}_])` : esc, "giu");
-  return all(re, s, "search");
+  const { flat, map } = flatten(s);
+  return unflatten(all(re, flat, "search"), s, map);
+}
+
+/** Does `hay` contain `needle` (any capitalisation)? Needles under 4 characters only count as a whole word, so "Tan" is not found in "Tangent". */
+export function has(hay: string, needle: string): boolean {
+  const n = needle.trim().toLowerCase();
+  if (!n) return false;
+  const h = hay.toLowerCase();
+  if (n.length >= 4) return h.includes(n);
+  return new RegExp(String.raw`(?<![\p{L}\p{N}_])${escRe(n)}(?![\p{L}\p{N}_])`, "u").test(h);
 }
 
 /** A hit for the review list: enough to recognise it, not enough to read it aloud. S1234567D -> S****567D. */

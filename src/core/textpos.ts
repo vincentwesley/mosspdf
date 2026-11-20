@@ -66,7 +66,7 @@ export function layoutText(items: TextItem[], vt: number[], vw: number, vh: numb
   return { text, chars, words };
 }
 
-/** One box per item the range [start, end) touches (a match across two lines gives two boxes), grown by 0.15 em sideways and 0.1 em up and down
+/** One box per item the range [start, end) touches (a match across two lines gives two boxes), grown by 0.3 em sideways and 0.1 em up and down
  *  (a safety margin for font metrics that differ from the real glyphs; the burned-in image must never show an edge of a character). */
 export function rangeRects(pt: PageText, start: number, end: number): Rect[] {
   const byItem = new Map<number, PageText["chars"]>();
@@ -78,7 +78,7 @@ export function rangeRects(pt: PageText, start: number, end: number): Rect[] {
   return [...byItem.values()].map((cs) => {
     const u = union(cs.map((c) => c.r!));
     const [ex, ey] = cs[0].em ?? [0, 0];
-    return { x: u.x - 0.15 * ex, y: u.y - 0.1 * ey, w: u.w + 0.3 * ex, h: u.h + 0.2 * ey };
+    return { x: u.x - 0.3 * ex, y: u.y - 0.1 * ey, w: u.w + 0.6 * ex, h: u.h + 0.2 * ey };
   });
 }
 
