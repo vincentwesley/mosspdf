@@ -5,8 +5,8 @@ Resume here. Plan: `docs/PLAN.md`. Checks: `docs/ACCEPTANCE.md`. Why things are 
 ## Current state (2026-11-19)
 - Repo https://github.com/vincentwesley/pagehold (public). Live: https://pagehold.vwesley.workers.dev
 - M0 done. M1 merged (PR #2) and deployed 2026-11-19: merge, split, organize, extract, seal + privacy panel, offline PWA. CI green (unit + e2e in 5 browser projects); live smoke passed.
-- In progress: M2 ops, M3 ops (passwords, safety scan, repair), UI shell refactor into per-tool modules (`src/tools/`).
-- Follow-up: pass passwords to qpdf as `--user-password=`/`--owner-password=` so a password starting with `-` can't be read as an option; live smoke should also run the merge flow (A-REL-1).
+- M2 + M3 merged (PR #3) and deployed 2026-11-20: images to PDF, PDF to images, compress, page numbers, watermark, document details, add/remove password, safety scan + cleaned copy, repair. CI green (unit + 5 e2e jobs); live smoke (incl. a real merge, zero requests after the seal) passed.
+- Next: M4 (forms + signatures). Open item: CI-only mobile-safari CSP report on Compare intake (see next-session.md Known gaps).
 
 ## How to work here
 - Node 24: in PowerShell `fnm env --use-on-cd | Out-String | Invoke-Expression; fnm use 24`. In agent Bash shells, `cd` into the repo can fail because of the fnm hook, so use `git -C`.
