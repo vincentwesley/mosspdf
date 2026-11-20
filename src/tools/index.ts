@@ -20,8 +20,12 @@ import { ocr } from "./ocr";
 import { redact } from "./redact";
 import { photo } from "./photo";
 import { compare } from "./compare";
+import { wfEmail } from "./wf-email";
+import { wfShare } from "./wf-share";
+import { wfApply } from "./wf-apply";
+import { a11yCheck } from "./a11y-check";
 
-export const TOOLS: ToolDef[] = [merge, split, organize, extract, imagesToPdf, pdfToImages, compress, pageNumbers, watermark, metadata, protect, unprotect, safetyScan, repair, fill, sign, ocr, redact, photo, compare];
+export const TOOLS: ToolDef[] = [wfEmail, wfShare, wfApply, merge, split, organize, extract, imagesToPdf, pdfToImages, compress, pageNumbers, watermark, metadata, protect, unprotect, safetyScan, repair, fill, sign, ocr, redact, photo, compare, a11yCheck];
 
 export const toolById = (id: string): ToolDef | undefined => TOOLS.find((t) => t.id === id);
 /** Live = has a `run`; the others are planned and shown as "Coming soon". */

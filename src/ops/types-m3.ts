@@ -32,6 +32,8 @@ export type SafetyKind =
   | "go-to-remote"
   | "go-to-embedded"
   | "rich-media"
+  | "media-action"
+  | "hide-action"
   | "xfa"
   | "object-streams"
   | "jbig2";
@@ -59,6 +61,8 @@ export interface SafetyReport {
 export interface CleanOptions {
   /** Keep plain web links (/URI). Everything else the scan flags is removed. */
   keepLinks: boolean;
+  /** Also remove annotation authors and dates (/T, /M, /CreationDate) and every /Metadata (XMP) packet, whatever it hangs from. */
+  scrubPersonal?: boolean;
 }
 export interface CleanResult extends OpResult {
   removed: SafetyItem[];

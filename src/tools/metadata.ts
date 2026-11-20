@@ -57,7 +57,7 @@ export const metadata: ToolDef = {
   id: "metadata", title: "Metadata", heading: "Edit a PDF's details", group: "Edit",
   blurb: "Edit title, author and details.",
   lede: "See and change the title, author and other details stored inside a PDF, or remove them all.",
-  accepts: "pdf",
+  accepts: "pdf", batch: true,
   options(ctx) {
     const u = ui(ctx);
     u.box.append(u.status, ...KEYS.map((k) => u.fields[k].el), u.info, u.wipe.el, u.credit);

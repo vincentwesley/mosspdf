@@ -7,7 +7,7 @@ import type { OcrPage } from "../ops";
 import { compareReport, fillForm, readForm, stampPage } from "../ops";
 import type { ReportData } from "../core/compare";
 import type { FormValues, StampInput } from "../ops";
-import { redact } from "../ops";
+import { redact, accessibilityCheck } from "../ops";
 import type { RedactInput } from "../ops";
 import type { CleanOptions, ProtectOptions, UnprotectOptions } from "../ops/types-m3";
 import { createEngines } from "../engines";
@@ -50,6 +50,7 @@ const m6 = {
 };
 
 serve({
+  accessibilityCheck: ({ file }: { file: InFile }) => accessibilityCheck(file, eng()),
   ...m7,
   ...m6,
   ...m4,

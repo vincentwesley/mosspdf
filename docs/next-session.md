@@ -12,7 +12,7 @@ Continue work on **Pagehold** (repo `vincentwesley/pagehold`). main holds M0-M5 
 - Checks: `npm run check`, `npm run check:budgets`, `npm run licences`; `npm run test:e2e` (5 projects, builds and serves `dist` with wrangler dev so `_headers` apply). Screenshots: `npm run pw -- test e2e/screens.spec.ts --project=chromium` writes `qa-output/screens/`.
 - qpdf CLI for tests: `tools/qpdf/*/bin/qpdf(.exe)` (found by `scripts/qpdf-bin.mjs`), then `QPDF_BIN`, then PATH.
 - `npm ci` wipes the project-local Playwright browsers; re-run `npm run pw -- install chromium firefox webkit` after it.
-- Worktrees live in `.worktrees/` (ignored). Merge with `gh pr merge <n> --squash` WITHOUT `--delete-branch` while a worktree holds the branch (it deletes the worktree folder); remove the worktree, then `git push origin --delete <branch>`. Worktree `node_modules` = junction to the main checkout's.
+- Worktrees live in `.worktrees/` (ignored). Merge with `gh pr merge <n> --squash` WITHOUT `--delete-branch` while a worktree holds the branch (it deletes the worktree folder); remove the worktree, then `git push origin --delete <branch>`. Worktree `node_modules` = junction to the main checkout's. Remove a worktree ONLY with `powershell -File scripts/worktree-remove.ps1 <name>` (plain `git worktree remove` deletes the shared packages). A zombie WebKitWebProcess can block `npm ci`; `npm install --ignore-scripts` repairs without wiping.
 
 ## Current state
 - Adding a tool: create `src/tools/<id>.ts` exporting a `ToolDef` (see `src/tools/types.ts`; planned stubs already exist for every id on the home map: give yours a `run`), import it in `src/tools/index.ts` if new. Fields kit: `src/ui/fields.ts`. D12.
@@ -22,11 +22,13 @@ Continue work on **Pagehold** (repo `vincentwesley/pagehold`). main holds M0-M5 
 - Tools: merge, split (ranges, every N, by size), organize, extract; password and bad-file handling; seal + privacy panel; PWA offline; version shown.
 - e2e covers flows, axe (both themes), overflow (320 to 1280, 200% zoom), offline (Chromium, WebKit), seal negative controls (page and ops worker), 1,000-page thumbnails (Chromium).
 
+- M8 (D19, branch m8-power, local): palette + shortcuts (`ui/palette.ts`), workflows (`core/workflows.ts`, `tools/wf-*.ts`, `ui/steplist.ts`), `ToolDef.batch` (workspace loops `run` per file), accessibility check (`ops/a11y.ts`, `core/a11yreport.ts`). Budget main-gzip 62. Based on m6-redact.
+
 ## Known gaps
 - CI-only: mobile-safari (Linux WPE) reports an inline `style-src-elem` CSP violation (blank source, line 5) on compare intake after an earlier viewport resize in the same test. M7 tried to reproduce it: 3 runs on local mobile-safari and WebKit pass; all pdf.js documents open through `openDoc` (disableFontFace) and src/ has no style strings. Test stays `fixme` on CI mobile-safari (`e2e/shell.spec.ts`); next step is a CI run with the violation details logged (the fixture already records blockedURI/source/line).
 - Firefox offline test skipped (setOffline broken with service workers, docs/spikes/csp.md); keyboard-only tests skip on touch projects.
 - Liberation Sans (GPL-2 + font exception) ships in the pdf.js data pack; owner may prefer to drop it (D11).
-- Not yet: M8 (batch, workflows, command palette, a11y check), M9 polish, release zip.
+- Not yet: M9 polish, release zip.
 
 ## Resume point (2026-11-20, evening)
 - main = M0-M5 + UX batch (result card, Use in another tool, undo, home search, recents), OCR (D16), fill + sign (D15). Deployed 3e2f121b, smoke passed.

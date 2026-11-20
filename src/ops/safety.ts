@@ -1,9 +1,10 @@
 // Safety scan and cleaned copy. The scan reads qpdf's JSON dump (which already flattens object streams and decrypts with the
 // supplied password) and reports risky elements in plain language. It describes what an element CAN do, never what a file is.
 // The clean copy edits with pdf-lib, then qpdf re-writes it (drops orphaned objects, no object streams) and re-scans it.
-import { PDFArray, PDFDict, PDFDocument, PDFName, PDFRef, PDFStream, type PDFObject } from "@cantoo/pdf-lib";
+import { PDFArray, PDFDict, PDFDocument, PDFHexString, PDFName, PDFRef, PDFStream, PDFString, type PDFObject } from "@cantoo/pdf-lib";
 import { safeName } from "./assemble";
 import { checkAbort, classify, openPdf } from "./open";
+import { isSafeLink } from "../core/links";
 import { authorise } from "./protect";
 import { PdfError, type Bytes, type Engines, type InFile, type OpOptions, type Warning } from "./types";
 import type { CleanOptions, CleanResult, SafetyItem, SafetyKind, SafetyReport, Severity } from "./types-m3";
@@ -24,6 +25,8 @@ const INFO: Record<SafetyKind, [Severity, string]> = {
   "go-to-remote": ["medium", "A link that jumps into a different PDF file."],
   "go-to-embedded": ["medium", "A link that jumps into a PDF stored inside this one or one it is linked to."],
   "rich-media": ["high", "An embedded interactive item such as video, audio, 3D or an app. It can run its own code in the viewer."],
+  "media-action": ["medium", "An action that plays a video, sound or embedded app, which can run its own code in the viewer."],
+  "hide-action": ["medium", "An action that hides or shows parts of the page, such as form fields or notes, when something is clicked."],
   xfa: ["medium", "An older kind of dynamic form that runs scripts and loads data in some viewers. The ordinary form fields can be kept without it."],
   "object-streams": ["info", "The file packs its internal objects into compressed groups. This is normal and only means a simple text search won't show everything."],
   jbig2: ["info", "Contains images compressed with JBIG2, a format that is complex to decode. This is common in scanned documents."],
@@ -89,6 +92,8 @@ function analyse(j: J, rawObjStm: number): Omit<SafetyReport, "repaired"> {
     else if (s === "/Launch") add("launch", where, target(d));
     else if (s === "/SubmitForm") add("submit-form", where, target(d));
     else if (s === "/ImportData") add("import-data", where, target(d));
+    else if (s === "/Rendition" || s === "/Movie" || s === "/Sound" || s === "/RichMediaExecute") add("media-action", where, s.slice(1));
+    else if (s === "/Hide") add("hide-action", where);
     else if (s === "/URI") add("uri", where, str(d["/URI"]));
     else if (s === "/GoToR") add("go-to-remote", where, target(d));
     else if (s === "/GoToE") add("go-to-embedded", where, target(d));
@@ -140,8 +145,9 @@ export async function safetyScan(file: InFile, e: Engines): Promise<SafetyReport
   return { ...a.r, repaired: true };
 }
 
-const BAD_ACTIONS = new Set(["JavaScript", "Launch", "SubmitForm", "ImportData", "GoToR", "GoToE"]);
+const BAD_ACTIONS = new Set(["JavaScript", "Launch", "SubmitForm", "ImportData", "GoToR", "GoToE", "Rendition", "Movie", "Sound", "Hide", "RichMediaExecute"]);
 const N = (s: string) => PDFName.of(s);
+const uriText = (d: PDFDict) => { const u = d.lookup(N("URI")); return u instanceof PDFString || u instanceof PDFHexString ? u.decodeText() : undefined; };
 const nameOf = (v: PDFObject | undefined) => (v instanceof PDFName ? v.decodeText() : undefined);
 
 export async function cleanCopy(file: InFile, c: CleanOptions, o: OpOptions, e: Engines): Promise<CleanResult> {
@@ -162,7 +168,7 @@ export async function cleanCopy(file: InFile, c: CleanOptions, o: OpOptions, e: 
     if (d instanceof PDFArray) return d.asArray().some((x) => badAction(x, depth + 1));
     if (!(d instanceof PDFDict)) return false;
     const s = nameOf(d.lookup(N("S")));
-    return (s !== undefined && (BAD_ACTIONS.has(s) || (s === "URI" && !c.keepLinks))) || d.has(N("JS")) || badAction(d.get(N("Next")), depth + 1);
+    return (s !== undefined && (BAD_ACTIONS.has(s) || (s === "URI" && !(c.keepLinks && isSafeLink(uriText(d)))))) || d.has(N("JS")) || badAction(d.get(N("Next")), depth + 1);
   };
   const dropSub = new Set(["FileAttachment", "RichMedia"]);
   const seen = new Set<PDFObject>();
@@ -174,11 +180,20 @@ export async function cleanCopy(file: InFile, c: CleanOptions, o: OpOptions, e: 
     if (!(d instanceof PDFDict)) return;
     if (badAction(d.get(N("A")))) d.delete(N("A"));
     for (const k of ["OpenAction", "AA", "JS", "XFA", "AF"]) d.delete(N(k));
+    if (c.scrubPersonal) d.delete(N("Metadata"));
     const names = dict(d.get(N("Names")));
     if (names instanceof PDFDict) for (const k of ["JavaScript", "EmbeddedFiles"]) names.delete(N(k));
     const annots = dict(d.get(N("Annots")));
     if (annots instanceof PDFArray) {
       const keep = annots.asArray().filter((a) => !dropSub.has(nameOf(dict(a) instanceof PDFDict ? (dict(a) as PDFDict).get(N("Subtype")) : undefined) ?? ""));
+      if (c.scrubPersonal) for (const a of keep) {
+        const ad = dict(a);
+        if (!(ad instanceof PDFDict)) continue;
+        // A form field's /T is its name, not a person: only notes, popups and the like lose it.
+        for (const k of nameOf(ad.get(N("Subtype"))) === "Widget" ? ["M", "CreationDate"] : ["T", "M", "CreationDate"]) ad.delete(N(k));
+        const pop = dict(ad.get(N("Popup")));
+        if (pop instanceof PDFDict) for (const k of ["T", "M", "CreationDate"]) pop.delete(N(k));
+      }
       if (keep.length !== annots.size()) d.set(N("Annots"), ctx.obj(keep));
     }
     for (const x of d.values()) visit(x);
@@ -196,7 +211,7 @@ export async function cleanCopy(file: InFile, c: CleanOptions, o: OpOptions, e: 
   const after = await safetyScan({ name: file.name, bytes }, e);
   o.onProgress?.(4, 4);
 
-  const kept = (i: SafetyItem) => i.severity === "info" || (c.keepLinks && i.kind === "uri");
+  const kept = (i: SafetyItem) => i.severity === "info" || (c.keepLinks && i.kind === "uri" && isSafeLink(i.detail));
   const warnings: Warning[] = [];
   const left = after.items.filter((i) => !kept(i));
   if (left.length) warnings.push({ code: "residual-risk", message: `The copy still contains ${left.length} flagged item${left.length === 1 ? "" : "s"}. Don't treat it as cleaned.` });

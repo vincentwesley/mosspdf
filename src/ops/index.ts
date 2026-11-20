@@ -19,3 +19,5 @@ export { stampPage, type StampInput, type StampItem } from "./sign";
 export { compareReport } from "./report";
 // M6: redaction
 export { redact, type RedactInput, type RedactPage } from "./redact";
+// M8: accessibility check
+export { accessibilityCheck, type A11yCheck, type A11yReport, type A11yStatus } from "./a11y";

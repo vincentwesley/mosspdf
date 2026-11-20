@@ -12,6 +12,7 @@ import { workspace } from "./ui/workspace";
 import { toolById } from "./tools";
 import { live } from "./ui/dom";
 import { initGlobalIntake } from "./ui/dropzone";
+import { initPalette, MOD } from "./ui/palette";
 
 const KEY = "theme";
 const store = {
@@ -56,6 +57,12 @@ const paintBadge = () => {
 seal.subscribe(paintBadge);
 netlog.subscribe(paintBadge);
 badge.addEventListener("click", () => privacy.open(badge));
+
+// ---- command palette ----
+const palette = initPalette({ switchTheme: () => btn.click(), openPrivacy: (o) => privacy.open(o) });
+const searchBtn = document.querySelector<HTMLButtonElement>("#palette-btn")!;
+searchBtn.querySelector("kbd")!.textContent = `${MOD} K`;
+searchBtn.addEventListener("click", () => palette.open(searchBtn));
 
 // ---- router ----
 const app = document.querySelector<HTMLElement>("#app")!;

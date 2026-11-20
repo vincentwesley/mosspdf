@@ -18,7 +18,7 @@ for (const theme of ["dark", "light"] as Theme[]) {
       if (w <= 640) {
         expect(new Set(boxes.map((b) => b.x)).size, `two tile columns at ${w}px`).toBe(2);
         const height = await page.evaluate(() => document.documentElement.scrollHeight);
-        expect(height, `home height at ${w}px`).toBeLessThan(3000) // was ~4,200 at 375px with one tile per row;
+        expect(height, `home height at ${w}px`).toBeLessThan(3800); // 26 tools in two columns; one tile per row would be ~5,500
       }
       for (const b of boxes) expect(b.h, "tile tap height").toBeGreaterThanOrEqual(48);
 

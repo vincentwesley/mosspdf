@@ -42,7 +42,7 @@ export const watermark: ToolDef = {
   id: "watermark", title: "Watermark", heading: "Add a watermark", group: "Edit",
   blurb: "Stamp text on every page.",
   lede: "Stamp a line of text across your pages, such as DRAFT or CONFIDENTIAL.",
-  accepts: "pdf",
+  accepts: "pdf", batch: true,
   options(ctx) {
     const u = ui(ctx);
     return h("div", { class: "stampopts" }, u.text.el, u.opacity.el, u.angle.el, u.custom.el, u.size.el, u.colour.el, u.layer.el, u.pages.el);

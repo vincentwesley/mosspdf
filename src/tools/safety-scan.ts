@@ -1,3 +1,4 @@
+import { isSafeLink } from "../core/links";
 import { errorMessage } from "../core/store";
 import type { OpResult } from "../ops/types";
 import type { CleanResult, SafetyItem, SafetyKind, SafetyReport, Severity } from "../ops/types-m3";
@@ -6,10 +7,10 @@ import { saveResult } from "../ui/download";
 import { checkField, passwordField } from "../ui/fields";
 import type { Ctx, ToolDef } from "./types";
 
-const TITLE: Record<SafetyKind, string> = {
+export const TITLE: Record<SafetyKind, string> = {
   javascript: "Script (JavaScript)", "open-action": "Runs when opened", "additional-actions": "Event triggers", launch: "Opens a program or file",
   "embedded-file": "Hidden attached file", "file-attachment": "File attachment", "submit-form": "Sends form data", "import-data": "Loads form data",
-  uri: "Web link", "go-to-remote": "Link into another PDF", "go-to-embedded": "Link into an embedded PDF", "rich-media": "Video, audio, 3D or app", xfa: "Dynamic form (XFA)",
+  uri: "Web link", "go-to-remote": "Link into another PDF", "go-to-embedded": "Link into an embedded PDF", "rich-media": "Video, audio, 3D or app", "media-action": "Plays media or an app", "hide-action": "Hides or shows parts of the page", xfa: "Dynamic form (XFA)",
   "object-streams": "Compressed internals", jbig2: "JBIG2 images",
 };
 const GROUP: [Severity, string][] = [
@@ -67,8 +68,8 @@ function draw(ctx: Ctx) {
       ...groups(r.items));
   }
   if (s.clean) {
-    const left = s.clean.remaining.filter((i) => i.severity !== "info" && !(s.keepLinks && i.kind === "uri"));
-    const links = s.clean.remaining.filter((i) => i.kind === "uri").length;
+    const left = s.clean.remaining.filter((i) => i.severity !== "info" && !(s.keepLinks && i.kind === "uri" && isSafeLink(i.detail)));
+    const links = s.clean.remaining.filter((i) => i.kind === "uri" && isSafeLink(i.detail)).length;
     kids.push(h("section", { class: "scan__after", attrs: { "data-testid": "rescan", "aria-label": "Re-scan of the cleaned copy" } },
       h("h3", { text: "Re-scan of the cleaned copy" }),
       left.length ? h("p", { class: "hs-banner hs-banner--warn", text: `Still contains ${plural(left.length, "flagged item")}. Do not treat it as cleaned.`, attrs: { role: "status" } }) : NOTHING(),
