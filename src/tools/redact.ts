@@ -139,6 +139,7 @@ const ui = (ctx: Ctx) => ctx.local(() => {
     s.scanning = true;
     s.status.textContent = "Reading the text on each page";
     const doc = await store.doc(f);
+    const g = document.createElement("canvas").getContext("2d")!;
     const pages: PageText[] = [];
     const hits: RHit[] = [];
     try {
@@ -148,7 +149,12 @@ const ui = (ctx: Ctx) => ctx.local(() => {
         const page = await doc.getPage(i + 1);
         const vp = page.getViewport({ scale: 1 });
         const tc = await page.getTextContent();
-        const pt = layoutText((tc.items as unknown as TextItem[]).filter((it) => "str" in it), vp.transform, vp.width, vp.height);
+        const measure = (it: TextItem) => {
+          if (it.str.length > 400) return undefined;
+          g.font = `100px ${tc.styles[it.fontName ?? ""]?.fontFamily ?? "sans-serif"}`; // the font pdf.js names for this item; glyph widths differ, so measure
+          return Array.from({ length: it.str.length + 1 }, (_, n) => g.measureText(it.str.slice(0, n)).width);
+        };
+        const pt = layoutText((tc.items as unknown as TextItem[]).filter((it) => "str" in it), vp.transform, vp.width, vp.height, measure);
         pages.push(pt);
         for (const d of detect(pt.text)) hits.push({ id: nextId++, kind: d.kind, page: i, text: d.text, note: d.note, rects: rangeRects(pt, d.start, d.end), checked: true });
         page.cleanup();

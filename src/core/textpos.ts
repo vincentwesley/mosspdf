@@ -4,13 +4,13 @@
 
 /** Box as fractions of the displayed page, origin top left. */
 export interface Rect { x: number; y: number; w: number; h: number }
-export interface TextItem { str: string; transform: number[]; width: number; hasEOL?: boolean }
+export interface TextItem { str: string; transform: number[]; width: number; hasEOL?: boolean; fontName?: string }
 export interface PageWord { text: string; r: Rect }
 export interface PageText {
   /** The page's text in reading order; lines are joined with "\n". */
   text: string;
   /** One entry per character of `text`: the item it came from and its box (absent for the separators added here). */
-  chars: { item: number; r?: Rect }[];
+  chars: { item: number; r?: Rect; /** the font size as fractions of the page, for padding */ em?: [number, number] }[];
   words: PageWord[];
 }
 
@@ -24,8 +24,10 @@ const union = (rs: Rect[]): Rect => {
   return { x: x0, y: y0, w: Math.max(...rs.map((r) => r.x + r.w)) - x0, h: Math.max(...rs.map((r) => r.y + r.h)) - y0 };
 };
 
-/** `vt` is the viewport transform at scale 1 ([a,b,c,d,e,f]); `vw`, `vh` the displayed page in points. */
-export function layoutText(items: TextItem[], vt: number[], vw: number, vh: number): PageText {
+/** `vt` is the viewport transform at scale 1 ([a,b,c,d,e,f]); `vw`, `vh` the displayed page in points.
+ *  `measure(item)` gives the cumulative width of the first 0..n characters of the item (n + 1 numbers, any unit): glyphs are not equally wide,
+ *  so without it a character is placed by its index and boxes drift (the tool measures with a canvas, tests with the real font metrics). */
+export function layoutText(items: TextItem[], vt: number[], vw: number, vh: number, measure?: (it: TextItem) => number[] | undefined): PageText {
   let text = "";
   const chars: PageText["chars"] = [];
   const words: PageWord[] = [];
@@ -45,16 +47,18 @@ export function layoutText(items: TextItem[], vt: number[], vw: number, vh: numb
       if (perp > prev.fs * 0.5) sep("\n", k);
       else if (along > prev.fs * 0.25 && !/\s$/.test(text) && !/^\s/.test(it.str)) sep(" ", k);
     }
+    const cum = measure?.(it);
+    const at = (i: number) => (cum && cum.length === n + 1 && cum[n] > 0 ? cum[i] / cum[n] : i / n);
     const box = (i0: number, i1: number): Rect => {
       const xs: number[] = [], ys: number[] = [];
-      for (const t of [i0 / n, i1 / n]) for (const u of [-0.22, 1]) {
+      for (const t of [at(i0), at(i1)]) for (const u of [-0.22, 1]) {
         xs.push(m[4] + dir[0] * t * it.width + m[2] * u);
         ys.push(m[5] + dir[1] * t * it.width + m[3] * u);
       }
       const x0 = Math.min(...xs), y0 = Math.min(...ys);
       return { x: x0 / vw, y: y0 / vh, w: (Math.max(...xs) - x0) / vw, h: (Math.max(...ys) - y0) / vh };
     };
-    for (let i = 0; i < n; i++) { text += it.str[i]; chars.push({ item: k, r: box(i, i + 1) }); }
+    for (let i = 0; i < n; i++) { text += it.str[i]; chars.push({ item: k, r: box(i, i + 1), em: [fs / vw, fs / vh] }); }
     for (const w of it.str.matchAll(/\S+/g)) words.push({ text: w[0], r: box(w.index!, w.index! + w[0].length) });
     prev = { end: [m[4] + dir[0] * it.width, m[5] + dir[1] * it.width], dir, fs };
     if (it.hasEOL) sep("\n", k);
@@ -62,17 +66,19 @@ export function layoutText(items: TextItem[], vt: number[], vw: number, vh: numb
   return { text, chars, words };
 }
 
-/** One box per item the range [start, end) touches (a match across two lines gives two boxes), grown by `pad` (fraction of the page). */
-export function rangeRects(pt: PageText, start: number, end: number, pad = 0.002): Rect[] {
-  const byItem = new Map<number, Rect[]>();
+/** One box per item the range [start, end) touches (a match across two lines gives two boxes), grown by 0.15 em sideways and 0.1 em up and down
+ *  (a safety margin for font metrics that differ from the real glyphs; the burned-in image must never show an edge of a character). */
+export function rangeRects(pt: PageText, start: number, end: number): Rect[] {
+  const byItem = new Map<number, PageText["chars"]>();
   for (let i = start; i < end; i++) {
     const c = pt.chars[i];
     if (!c?.r) continue;
-    byItem.set(c.item, [...(byItem.get(c.item) ?? []), c.r]);
+    byItem.set(c.item, [...(byItem.get(c.item) ?? []), c]);
   }
-  return [...byItem.values()].map((rs) => {
-    const u = union(rs);
-    return { x: u.x - pad, y: u.y - pad, w: u.w + 2 * pad, h: u.h + 2 * pad };
+  return [...byItem.values()].map((cs) => {
+    const u = union(cs.map((c) => c.r!));
+    const [ex, ey] = cs[0].em ?? [0, 0];
+    return { x: u.x - 0.15 * ex, y: u.y - 0.1 * ey, w: u.w + 0.3 * ex, h: u.h + 0.2 * ey };
   });
 }
 
