@@ -1,6 +1,6 @@
 > Update at the end of any session that changed state. Keep it lean.
 
-Continue work on **Pagehold** (repo `vincentwesley/pagehold`). main holds M0–M3 (live).
+Continue work on **Pagehold** (repo `vincentwesley/pagehold`). main holds M0-M3 (live).
 
 ## Before anything
 1. Work in `C:\Coding Projects\pagehold`; read this file, `docs/PLAN.md`, `docs/DECISIONS.md` (D7, D10, D11).
@@ -25,5 +25,5 @@ Continue work on **Pagehold** (repo `vincentwesley/pagehold`). main holds M0–M3 
 - Not yet: M2+ tools, release zip.
 
 ## Resume point (2026-11-20)
-- main = M0–M3, live and smoke-tested. Next: M4 (forms + signatures) per docs/PLAN.md.
+- main = M0-M3, live and smoke-tested. Next: M4 (forms + signatures) per docs/PLAN.md.
 - Local full e2e is unreliable on this 16 GB machine; prefer CI (5 parallel e2e jobs) or `--project=<one>` runs locally.
