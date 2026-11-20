@@ -73,7 +73,13 @@ jobs:
           key: pw-${{ runner.os }}-${{ steps.pw.outputs.v }}-${{ matrix.browser }}
       - name: Install Playwright browser
         timeout-minutes: 25
-        run: npm run pw -- install --with-deps ${{ matrix.browser }}
+        # An Ubuntu mirror sometimes stalls the apt part for 25+ minutes; retry instead of waiting it out.
+        run: |
+          for i in 1 2 3; do
+            timeout 480 npm run pw -- install --with-deps ${{ matrix.browser }} && exit 0
+            echo "browser install attempt $i failed or stalled, retrying"
+          done
+          exit 1
       - run: npm run test:e2e -- --project=${{ matrix.project }}
       - name: Upload Playwright report
         if: failure()
