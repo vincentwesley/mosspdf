@@ -42,6 +42,21 @@ async function textDoc(n, prefix = "p", sizes) {
   return doc;
 }
 
+/** One page per entry, one line per string (M7 compare fixtures). `mark` draws a small picture at that spot (x, y from the bottom left). */
+async function linesDoc(pages, mark) {
+  const doc = await newDoc();
+  const font = await doc.embedFont(StandardFonts.Helvetica);
+  const png = mark ? await doc.embedPng(pngEncode(64, 64, photo(64, 64, 5).data)) : undefined;
+  for (const lines of pages) {
+    const page = doc.addPage([595.28, 841.89]);
+    lines.forEach((t, i) => page.drawText(t, { x: 50, y: 780 - i * 24, size: i ? 14 : 22, font }));
+    if (png) page.drawImage(png, { x: mark[0], y: mark[1], width: 64, height: 64 });
+  }
+  return doc;
+}
+const CMP_P1 = ["Quarterly report", "The team shipped three features this quarter.", "Revenue grew by ten percent over last year."];
+const CMP_TEXT = [CMP_P1, ["Plan for next quarter", "We will hire two engineers in March.", "The budget stays the same as before."], ["Appendix", "Contact the office for the full figures."]];
+
 const save = (doc) => doc.save({ useObjectStreams: false });
 
 async function plain() {
@@ -414,6 +429,12 @@ export async function buildCorpus() {
   const rot2 = await textDoc(4, "c");
   rot2.getPages().forEach((p, i) => { p.setRotation(degrees(i * 90)); if (i === 1) p.setCropBox(50, 100, 400, 500); });
   await wd("rotated-crop.pdf", rot2);
+
+  // M7 compare: v2 changes a sentence, inserts a paragraph and drops the last page; the moved pair has the same text and a picture elsewhere
+  await wd("compare-v1.pdf", linesDoc(CMP_TEXT));
+  await wd("compare-v2.pdf", linesDoc([CMP_P1, ["Plan for next quarter", "We will hire three engineers in April.", "A new paragraph about security training was added here.", "The budget stays the same as before."]]));
+  await wd("compare-moved-a.pdf", linesDoc(CMP_TEXT, [400, 500]));
+  await wd("compare-moved-b.pdf", linesDoc(CMP_TEXT, [100, 200]));
 
   const plainBytes = readFileSync(gen + "plain-3p.pdf");
   qpdf(["--encrypt", "test-pass", "test-pass", "256", "--", gen + "plain-3p.pdf", gen + "encrypted-aes256.pdf"]);
