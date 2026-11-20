@@ -12,7 +12,7 @@ Continue work on **Pagehold** (repo `vincentwesley/pagehold`). main holds M0-M5 
 - Checks: `npm run check`, `npm run check:budgets`, `npm run licences`; `npm run test:e2e` (5 projects, builds and serves `dist` with wrangler dev so `_headers` apply). Screenshots: `npm run pw -- test e2e/screens.spec.ts --project=chromium` writes `qa-output/screens/`.
 - qpdf CLI for tests: `tools/qpdf/*/bin/qpdf(.exe)` (found by `scripts/qpdf-bin.mjs`), then `QPDF_BIN`, then PATH.
 - `npm ci` wipes the project-local Playwright browsers; re-run `npm run pw -- install chromium firefox webkit` after it.
-- Worktrees live in `.worktrees/` (ignored). Merge with `gh pr merge <n> --squash` WITHOUT `--delete-branch` while a worktree holds the branch (it deletes the worktree folder); remove the worktree, then `git push origin --delete <branch>`. Worktree `node_modules` = junction to the main checkout's.
+- Worktrees live in `.worktrees/` (ignored). Merge with `gh pr merge <n> --squash` WITHOUT `--delete-branch` while a worktree holds the branch (it deletes the worktree folder); remove the worktree, then `git push origin --delete <branch>`. Worktree `node_modules` = junction to the main checkout's. Remove a worktree ONLY with `powershell -File scripts/worktree-remove.ps1 <name>` (plain `git worktree remove` deletes the shared packages). A zombie WebKitWebProcess can block `npm ci`; `npm install --ignore-scripts` repairs without wiping.
 
 ## Current state
 - Adding a tool: create `src/tools/<id>.ts` exporting a `ToolDef` (see `src/tools/types.ts`; planned stubs already exist for every id on the home map: give yours a `run`), import it in `src/tools/index.ts` if new. Fields kit: `src/ui/fields.ts`. D12.
