@@ -42,6 +42,8 @@ export interface Ctx {
   local<T>(init: () => T): T;
   /** Progress and cancel options for the running job (valid inside `run`). */
   readonly o: CallOptions;
+  /** Replaces the running job's status line ("Reading page 3 of 12"). */
+  note(text: string): void;
   /** Calls an op in the ops worker with the job's abort signal and progress wired in. */
   call<T>(op: string, payload: unknown): Promise<T>;
   /** A loaded PDF in the form the ops expect. */

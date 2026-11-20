@@ -53,7 +53,7 @@ function swPrecache(): Plugin {
     enforce: "post",
     closeBundle() {
       const dist = "dist";
-      const files = walk(dist).map((f) => "/" + relative(dist, f).split("\\").join("/")).filter((f) => f !== "/sw.js" && f !== "/_headers" && f !== "/index.html").sort();
+      const files = walk(dist).map((f) => "/" + relative(dist, f).split("\\").join("/")).filter((f) => f !== "/sw.js" && f !== "/_headers" && f !== "/index.html" && !/^\/assets\/(tesseract-core|eng\.traineddata)-/.test(f)).sort(); // OCR engine: cached on first use instead (D16)
       const list = ["/", ...files];
       const hash = createHash("sha256").update(JSON.stringify(list)).update(readFileSync(join(dist, "index.html"))).digest("hex").slice(0, 10);
       const sw = readFileSync(join(dist, "sw.js"), "utf8").replace("__PRECACHE__", JSON.stringify(list)).replace("__VERSION__", `${pkg.version}-${hash}`);

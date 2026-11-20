@@ -53,6 +53,7 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
     refresh: () => update(),
     local: <T,>(init: () => T) => (local ??= init()) as T,
     get o() { return o; },
+    note(text) { jobNote = text; status.textContent = text; },
     call: <T,>(op: string, payload: unknown) => opsRpc.call<T>(op, payload, { ...o }),
     input: toIn,
   };

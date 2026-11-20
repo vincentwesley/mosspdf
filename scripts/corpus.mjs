@@ -1,4 +1,4 @@
-﻿// Deterministic test corpus -> tests/corpus/generated/ (gitignored). `node scripts/corpus.mjs [--force] [--external]`.
+// Deterministic test corpus -> tests/corpus/generated/ (gitignored). `node scripts/corpus.mjs [--force] [--external]`.
 // Everything is self-generated with pdf-lib + the qpdf CLI; all names/data are made up (CC0, see tests/corpus/README.md).
 // --external also downloads openly licensed real-world files into tests/corpus/external/ (sha256-pinned, optional).
 import { execFileSync } from "node:child_process";
@@ -10,6 +10,7 @@ import { crc32, deflateSync } from "node:zlib";
 import { init as initJpegEnc, default as jpegEncode } from "@jsquash/jpeg/encode.js";
 import { PDFDocument, PDFHexString, PDFName, PDFString, StandardFonts, degrees } from "@cantoo/pdf-lib";
 import { qpdfBin } from "./qpdf-bin.mjs";
+import { grayPng, scanGray, SCAN_LINES } from "./scan-image.mjs";
 
 const root = fileURLToPath(new URL("../tests/corpus/", import.meta.url));
 const gen = root + "generated/";
@@ -121,6 +122,14 @@ async function js() {
 }
 
 // 5 pages of seeded RGB noise, Flate-compressed at level 1 (noise does not shrink): ~20 MB.
+/** Image-only pages that look scanned (no text objects): A4 at 150 dpi. `withText` puts a real-text page first. */
+async function scanned(withText) {
+  const doc = withText ? await textDoc(1, "t") : await newDoc();
+  const img = await doc.embedPng(grayPng(scanGray(SCAN_LINES)));
+  doc.addPage([595.28, 841.89]).drawImage(img, { x: 0, y: 0, width: 595.28, height: 841.89 });
+  return doc;
+}
+
 async function imageHeavy() {
   const doc = await newDoc();
   const next = rng(42);
@@ -351,6 +360,8 @@ export async function buildCorpus() {
   await wd("text-1000p.pdf", textDoc(1000, "k"));
   await wd("text-500p.pdf", textDoc(500, "k"));
   await wd("image-heavy.pdf", imageHeavy());
+  await wd("scan-1p.pdf", scanned(false));
+  await wd("scan-mixed-2p.pdf", scanned(true));
   const req = createRequire(import.meta.url);
   await initJpegEnc(await globalThis.WebAssembly.compile(readFileSync(req.resolve("@jsquash/jpeg/codec/enc/mozjpeg_enc.wasm"))));
   const jpg = Buffer.from(await jpegEncode(photo(1600, 1200, 3), { quality: 95 }));
