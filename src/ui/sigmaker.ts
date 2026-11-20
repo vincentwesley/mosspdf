@@ -150,6 +150,8 @@ export function sigMaker(o: { id: string; name: string; colour: () => string; on
     el,
     /** The made picture (trimmed, transparent), or null while nothing is drawn, typed or chosen. */
     result: () => results[tab],
+    /** The tab in use (the pen colour does not apply to an upload). */
+    tab: () => tab,
     /** The pen colour changed: retype the name. (Drawn strokes keep the colour they were drawn in.) */
     refresh() { if (word.value.trim()) { drawWord(); changed(); } },
   };

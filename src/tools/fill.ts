@@ -31,7 +31,7 @@ const ui = (ctx: Ctx) => ctx.local(() => {
     root: h("div", { class: "fill" }),
   };
   s.listBox.append(h("p", { class: "fill__note", text: "The same fields as on the pages, in order. Use this list with a screen reader or on a small screen." }), s.list);
-  s.root.append(s.hint, s.flatten.el, s.phone, s.pv.el, s.listBox);
+  s.root.append(s.hint, h("div", { class: "fill__layout" }, h("div", { class: "fill__side" }, s.flatten.el, s.phone, s.listBox), s.pv.el));
   return Object.assign(s, { load });
 
   function cur(f: FormField): FieldValue { return s.values.get(f.name) ?? f.value; }

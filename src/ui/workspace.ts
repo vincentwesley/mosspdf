@@ -199,13 +199,14 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
     const warns = results.flatMap((r) => r.warnings);
     const outBytes = results.reduce((n, r) => n + r.bytes.length, 0);
     const delta = inBytes ? Math.round(((inBytes - outBytes) / inBytes) * 100) : 0;
-    const change = delta > 0 ? `Saved ${delta}%.` : delta < 0 ? `${-delta}% larger.` : "About the same size.";
+    // Only a saving is news; most tools add a little (fonts, a text layer), and "67% larger" on a 2 KB file reads like a fault.
+    const change = delta > 0 ? `Saved ${delta}%.` : "";
     const single = results.length === 1 && /\.pdf$/i.test(results[0].name);
     const next = single ? nextTools(tool) : [];
     const zipName = `${stem(ctx.file?.name ?? "pagehold")}-${tool.id}.zip`;
     resultBox.append(
       h("h2", { id: "res-h", text: results.length > 1 ? `Done. ${results.length} files are ready.` : "Done. Your file is ready.", attrs: { tabindex: -1 } }),
-      ...(inBytes ? [h("p", { class: "res__sum", text: `${fmtSize(inBytes)} → ${fmtSize(outBytes)}. ${change}`, attrs: { "data-testid": "result-summary" } })] : []),
+      ...(inBytes ? [h("p", { class: "res__sum", text: `${fmtSize(inBytes)} → ${fmtSize(outBytes)}. ${change}`.trim(), attrs: { "data-testid": "result-summary" } })] : []),
       h("ul", { class: "outs", attrs: { role: "list" } }, ...results.map((r) =>
         h("li", { class: "out", attrs: { "data-testid": "result-row" } },
           h("span", { class: "out__name", text: r.name }),

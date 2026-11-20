@@ -100,7 +100,7 @@ export function pageView(o: { onSlot?: (s: Slot) => void } = {}) {
         io.observe(wrap);
         return { index, wrap, overlay };
       });
-      el.replaceChildren(...slots.map((s) => s.wrap));
+      el.replaceChildren(...slots.map((s) => h("div", { class: "vw__item" }, s.wrap, h("p", { class: "vw__label", text: `Page ${s.index + 1}`, attrs: { "aria-hidden": "true" } }))));
     },
     destroy() { io.disconnect(); ro.disconnect(); clearTimeout(timer); drawn.forEach((d) => d.cancel()); },
   };

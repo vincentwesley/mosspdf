@@ -70,19 +70,25 @@ const ui = (ctx: Ctx) => ctx.local(() => {
   };
   const sig: Maker = sigMaker({ id: "sg-sig", name: "signature", colour: () => PEN[s.pen.value() as keyof typeof PEN], onChange: () => ctx.refresh() });
   const ini: Maker = sigMaker({ id: "sg-ini", name: "initials", colour: () => PEN[s.pen.value() as keyof typeof PEN], onChange: () => ctx.refresh() });
-  const sigBox = h("div", { class: "sg-make", attrs: { "data-testid": "sg-sig-box" } }, h("h3", { text: "Your signature" }), sig.el);
-  const iniBox = h("div", { class: "sg-make", attrs: { "data-testid": "sg-ini-box" } }, h("h3", { text: "Your initials" }), ini.el);
+  const sigBox = h("div", { class: "sg-make", attrs: { "data-testid": "sg-sig-box" } }, h("h4", { text: "Your signature" }), sig.el);
+  const iniBox = h("div", { class: "sg-make", attrs: { "data-testid": "sg-ini-box" } }, h("h4", { text: "Your initials" }), ini.el);
   const note = h("p", { class: "sg-note", text: "Your signature is not saved anywhere. It stays in this tab until you close it." });
   const disclaimer = h("p", { class: "hs-banner hs-banner--info", text: "This adds a picture of your signature. It is not a certified digital signature, and some organisations require one.", attrs: { role: "note", "data-testid": "sign-disclaimer" } });
   const today = new Date();
   [...s.dateFmt.input.options].forEach((o) => { o.textContent = DATES[o.value](today); });
   const placed = h("section", { class: "sg-placed", attrs: { "aria-labelledby": "sg-placed-h" } }, h("h3", { id: "sg-placed-h", text: "Placed items" }), s.list);
+  const step = (n: number, title: string, ...kids: HTMLElement[]) => h("section", { class: "sg-step" }, h("h3", { text: `${n}. ${title}` }), ...kids);
   s.root.append(
     s.hint,
-    h("div", { class: "sg-tools" }, s.pen.el, s.kind.el, sigBox, iniBox, s.dateFmt.el, s.text.el, note),
-    h("div", { class: "sg-where" }, s.all.el, s.pageNo.el, s.place, s.msg),
-    h("p", { class: "sg-help", text: "Click or tap a page to place it there. Drag to move, drag the corner or press + and - to resize, arrow keys nudge (Shift for bigger steps), Delete removes." }),
-    s.pv.el, placed, disclaimer);
+    h("div", { class: "sg-layout" },
+      h("div", { class: "sg-side" },
+        step(1, "Make your signature", sigBox, iniBox, note),
+        step(2, "Choose what to place", s.kind.el, s.dateFmt.el, s.text.el),
+        step(3, "Place it",
+          h("p", { class: "sg-help", text: "Click or tap a page to place it there. Drag to move, drag the corner or press + and - to resize, arrow keys nudge (Shift for bigger steps), Delete removes." }),
+          h("div", { class: "sg-where" }, s.pageNo.el, s.place, s.all.el), s.msg),
+        placed, disclaimer),
+      s.pv.el));
   return Object.assign(s, { sig, ini, add, renderList, begin });
 
   function describe(it: Item): string {
@@ -253,10 +259,12 @@ export const sign: ToolDef = {
     u.hint.hidden = !!f;
     u.hint.textContent = "Add a PDF above to start.";
     const k = u.kind.value();
-    u.root.querySelectorAll<HTMLElement>(".sg-tools, .sg-where, .sg-help, .vw, .sg-placed, [data-testid=sign-disclaimer]").forEach((e) => (e.hidden = !f));
+    u.root.querySelectorAll<HTMLElement>(".sg-side, .vw").forEach((e) => (e.hidden = !f));
     u.root.querySelector<HTMLElement>("[data-testid=sg-sig-box]")!.hidden = k !== "signature";
     u.root.querySelector<HTMLElement>("[data-testid=sg-ini-box]")!.hidden = k !== "initials";
-    u.pen.el.hidden = k !== "signature" && k !== "initials";
+    const boxEl = u.root.querySelector<HTMLElement>(k === "initials" ? "[data-testid=sg-ini-box]" : "[data-testid=sg-sig-box]")!;
+    if (u.pen.el.parentElement !== boxEl) boxEl.append(u.pen.el);
+    u.pen.el.hidden = (k !== "signature" && k !== "initials") || (k === "initials" ? u.ini : u.sig).tab() === "upload";
     u.dateFmt.el.hidden = k !== "date";
     u.text.el.hidden = k !== "text";
     const bad = badChars(u.text.input.value);
