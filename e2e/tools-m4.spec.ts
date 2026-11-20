@@ -84,7 +84,7 @@ test.describe("Fill forms", () => {
     await ready(page);
     await list(page).getByLabel("full_name").fill("李小龍");
     await primary(page).click();
-    await expect(page.locator(".job__status")).toContainText("can't take characters like");
+    await expect(page.getByTestId("job-error")).toContainText("can't take characters like");
     await expect(page.getByTestId("result-row")).toHaveCount(0);
   });
 
