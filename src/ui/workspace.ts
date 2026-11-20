@@ -24,6 +24,8 @@ const stem = (name: string) => name.replace(/\.[^.]+$/, "");
 export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void } {
   const kind: LoadedFile["kind"] = tool.accepts === "images" ? "image" : "pdf";
   const multi = tool.accepts !== "pdf";
+  /** One PDF at a time (new replaces old) unless the tool is a batch tool. */
+  const single = tool.accepts === "pdf" && !tool.batch;
   const gridOpts: GridOpts | null = tool.grid ? { open: true, ...(tool.grid === true ? {} : tool.grid) } : null;
 
   // ---- state ----
@@ -35,15 +37,17 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
   let primaryEnabled = false;
   let o: CallOptions = {};
   let local: unknown;
+  let batchFile: LoadedFile | undefined;
+  let batchNote = "";
   const ofKind = () => store.files.filter((f) => f.kind === kind);
   /** Single-PDF tools work on the newest file; the others on all of their kind. */
-  const mine = () => (tool.accepts === "pdf" ? ofKind().slice(-1) : ofKind());
+  const mine = () => (single ? ofKind().slice(-1) : ofKind());
   const ready = () => mine().filter((f) => f.status === "ready");
 
   const ctx: Ctx = {
     tool,
-    get files() { return ready(); },
-    get file() { return ready()[0]; },
+    get files() { return batchFile ? [batchFile] : ready(); },
+    get file() { return batchFile ?? ready()[0]; },
     items: [],
     dirty: false,
     pagesOpen: gridOpts?.open ?? true,
@@ -61,7 +65,7 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
   // ---- skeleton ----
   const h1 = h("h1", { text: tool.heading ?? tool.title, attrs: { tabindex: -1, "data-testid": "view-heading" } });
   setFilesHandler((list) => {
-    if (tool.accepts === "pdf") {
+    if (single) {
       // One PDF at a time: a new one replaces the current one, with an undo.
       const pick = list.find(isPdfFile);
       const olds = ofKind();
@@ -82,7 +86,7 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
   const notice = h("p", { class: "hs-banner hs-banner--info", attrs: { role: "status", "data-testid": "notice" }, hidden: true });
   const fl = fileList({
     reorder: multi,
-    visible: () => (tool.accepts === "pdf" ? store.files.filter((f) => f.kind === "pdf").slice(-1) : ofKind()),
+    visible: () => (single ? ofKind().slice(-1) : ofKind()),
     label: tool.accepts === "pdf-pair" ? (_f, i) => (i === 0 ? "Original" : "Changed") : undefined,
   });
   const tip = h("p", { class: "tip", hidden: multi }, "Want to combine files? ", h("a", { href: "#/merge", text: "Use Merge", attrs: { "data-testid": "tip-merge" } }));
@@ -148,7 +152,7 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
     tool.sync?.(ctx);
     gridBox.hidden = !grid || !ctx.pagesOpen || ctx.items.length === 0;
     primaryEnabled = !!tool.run && (tool.ready ? tool.ready(ctx) : tool.accepts === "pdf-pair" ? ctx.files.length === 2 : ctx.files.length > 0);
-    primary.textContent = tool.run ? (tool.primaryLabel?.(ctx) ?? tool.title) : "Coming soon";
+    primary.textContent = tool.run ? (tool.primaryLabel?.(ctx) ?? tool.title) + (tool.batch && ctx.files.length > 1 ? ` (${ctx.files.length} files)` : "") : "Coming soon";
     primary.disabled = !primaryEnabled || busy;
     cancel.hidden = !busy;
     clearAll.disabled = busy;
@@ -169,12 +173,24 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
     errBox.textContent = "";
     inBytes = ctx.files.reduce((n, f) => n + f.size, 0);
     abort = new AbortController();
-    o = { signal: abort.signal, onProgress: (d, t) => { prog.max = t; prog.value = d; jobNote = `Working… ${d} of ${t}`; status.textContent = jobNote; } };
+    o = { signal: abort.signal, onProgress: (d, t) => { prog.max = t; prog.value = d; jobNote = `${batchNote}Working… ${d} of ${t}`; status.textContent = jobNote; } };
     jobNote = "Working…";
     prog.removeAttribute("value");
     store.setBusy(true);
     try {
-      results = await tool.run(ctx);
+      if (tool.batch && ctx.files.length > 1) {
+        // Batch: the same options on every file in turn; ctx.file is the current one while its run is going.
+        const list = ctx.files;
+        for (const [i, f] of list.entries()) {
+          if (o.signal?.aborted) throw new PdfError("cancelled", "Cancelled.");
+          batchFile = f;
+          batchNote = `File ${i + 1} of ${list.length}. `;
+          jobNote = `${batchNote}Working…`;
+          status.textContent = jobNote;
+          prog.removeAttribute("value");
+          try { results.push(...await tool.run(ctx)); } finally { batchFile = undefined; }
+        }
+      } else results = await tool.run(ctx);
       status.textContent = "";
       announce(`Done. ${results.length === 1 ? "1 file" : `${results.length} files`} ready to download.`);
     } catch (e) {
@@ -186,6 +202,7 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
     } finally {
       abort = null;
       o = {};
+      batchNote = "";
       store.setBusy(false);
       renderResults();
       update();

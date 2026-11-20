@@ -4,7 +4,7 @@ import type { CallOptions } from "../core/rpc";
 import type { InFile, OpResult, PdfError } from "../ops/types";
 import type { PageItem } from "../ui/pagegrid";
 
-export const GROUPS = ["Organize", "Convert", "Edit", "Protect", "Fill and sign", "OCR", "Privacy", "Compare"] as const;
+export const GROUPS = ["Workflows", "Organize", "Convert", "Edit", "Protect", "Fill and sign", "OCR", "Privacy", "Compare"] as const;
 export type GroupName = (typeof GROUPS)[number];
 
 /** What a tool takes in. pdf: one PDF (a new one replaces it); pdfs: any number, reorderable; images: JPG/PNG/WebP, reorderable; pdf-pair: exactly two PDFs, labelled Original / Changed. */
@@ -63,6 +63,8 @@ export interface ToolDef {
   /** One sentence under the heading. */
   lede: string;
   accepts: Accepts;
+  /** accepts "pdf" only: several PDFs may be added and `run` is called once per file (ctx.file is the current one), results as a list and a .zip. */
+  batch?: true;
   /** Show the page grid (reorder, rotate, delete, optionally select). */
   grid?: boolean | GridOpts;
   /** Dropzone heading when the default for `accepts` does not fit. */

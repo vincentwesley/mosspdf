@@ -52,7 +52,7 @@ export const pageNumbers: ToolDef = {
   id: "page-numbers", title: "Page numbers", heading: "Add page numbers", group: "Edit",
   blurb: "Number the pages.",
   lede: "Print a number on each page. Choose where it goes and how it looks.",
-  accepts: "pdf",
+  accepts: "pdf", batch: true,
   options(ctx) {
     const u = ui(ctx);
     return h("div", { class: "stampopts" }, u.position.el, u.format.el, u.start.el, u.size.el, u.pages.el);

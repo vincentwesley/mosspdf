@@ -41,7 +41,7 @@ export const protect: ToolDef = {
   id: "protect", title: "Add password", heading: "Add a password", group: "Protect",
   blurb: "Lock a PDF with a password.",
   lede: "Lock a PDF so it needs a password to open.",
-  accepts: "pdf",
+  accepts: "pdf", batch: true,
   options(ctx) { return ui(ctx).box; },
   sync(ctx) {
     const u = ui(ctx);

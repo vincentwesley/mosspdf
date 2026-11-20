@@ -23,7 +23,7 @@ export const repair: ToolDef = {
   id: "repair", title: "Repair", heading: "Repair a PDF", group: "Protect",
   blurb: "Fix a damaged PDF.",
   lede: "Try to rescue a PDF that will not open properly.",
-  accepts: "pdf",
+  accepts: "pdf", batch: true,
   options(ctx) { show(ctx); return ui(ctx).box; },
   sync: show,
   primaryLabel: () => "Repair",

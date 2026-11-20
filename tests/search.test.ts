@@ -11,3 +11,14 @@ describe("matchTool", () => {
     expect(matchTool(merge, "  ")).toBe(true);
   });
 });
+
+import { scoreTool } from "../src/core/toolsearch";
+describe("scoreTool", () => {
+  it("ranks title starts above blurb hits and finds letters in order", () => {
+    expect(scoreTool(merge, "mer")).toBeGreaterThan(scoreTool(merge, "combine"));
+    expect(scoreTool(merge, "mrg")).toBeGreaterThan(0);
+    expect(scoreTool(merge, "zzz")).toBe(0);
+    expect(scoreTool(merge, "merge zzz")).toBe(0);
+    expect(scoreTool(merge, "")).toBeGreaterThan(0);
+  });
+});

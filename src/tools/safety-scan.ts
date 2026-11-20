@@ -6,7 +6,7 @@ import { saveResult } from "../ui/download";
 import { checkField, passwordField } from "../ui/fields";
 import type { Ctx, ToolDef } from "./types";
 
-const TITLE: Record<SafetyKind, string> = {
+export const TITLE: Record<SafetyKind, string> = {
   javascript: "Script (JavaScript)", "open-action": "Runs when opened", "additional-actions": "Event triggers", launch: "Opens a program or file",
   "embedded-file": "Hidden attached file", "file-attachment": "File attachment", "submit-form": "Sends form data", "import-data": "Loads form data",
   uri: "Web link", "go-to-remote": "Link into another PDF", "go-to-embedded": "Link into an embedded PDF", "rich-media": "Video, audio, 3D or app", xfa: "Dynamic form (XFA)",
