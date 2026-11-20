@@ -17,3 +17,5 @@ export { addTextLayer, type OcrPage } from "./ocr";
 export { fillForm, readForm, type FieldType, type FieldValue, type FormField, type FormInfo, type FormValues, type FormWidget } from "./forms";
 export { stampPage, type StampInput, type StampItem } from "./sign";
 export { compareReport } from "./report";
+// M6: redaction
+export { redact, type RedactInput, type RedactPage } from "./redact";

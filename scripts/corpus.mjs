@@ -394,6 +394,47 @@ async function buildSafety(w) {
 // Rebuild whenever this generator changes, so a stale corpus never hides a missing fixture.
 const stamp = createHash("sha256").update(readFileSync(new URL(import.meta.url))).digest("hex");
 
+// M6: made-up personal details (a valid-checksum NRIC, phone, email, address) in the page text, Info title, an outline entry and an annotation.
+async function redactSample() {
+  const doc = await newDoc();
+  const font = await doc.embedFont(StandardFonts.Helvetica);
+  const ctx = doc.context;
+  const p1 = doc.addPage([595.28, 841.89]);
+  const p2 = doc.addPage([595.28, 841.89]);
+  [["Applicant: Tan Wei Ming", 700], ["NRIC: S1234567D", 670], ["Phone: 9123 4567", 640], ["Email: wei.ming@example.com", 610],
+    ["Address: Blk 123 Ang Mo Kio Ave 6, #12-34, Singapore 560123", 580], ["KEEP-THIS-SENTENCE stays searchable", 540]].forEach(([s, y]) => p1.drawText(s, { x: 50, y, size: 14, font }));
+  p2.drawText("PAGE-MARKER r2 nothing private here", { x: 50, y: 700, size: 14, font });
+  doc.setTitle("Application for S1234567D");
+  doc.setAuthor("Tan Wei Ming");
+  doc.setCreationDate(fixedDate);
+  const note = reg(doc, { Type: "Annot", Subtype: "Text", Rect: [300, 640, 320, 660], Contents: PDFString.of("Call 9123 4567"), Name: "Comment" });
+  p1.node.set(PDFName.of("Annots"), ctx.obj([note]));
+  const outlines = ctx.nextRef(), item = ctx.nextRef();
+  ctx.assign(item, ctx.obj({ Title: PDFString.of("Contact wei.ming@example.com"), Parent: outlines, Dest: [p1.ref, PDFName.of("Fit")] }));
+  ctx.assign(outlines, ctx.obj({ Type: "Outlines", First: item, Last: item, Count: 1 }));
+  doc.catalog.set(PDFName.of("Outlines"), outlines);
+  return doc;
+}
+
+// A JPEG with an EXIF block: camera, date and a GPS latitude (made up, city-level). Little-endian TIFF built by hand.
+function withExif(jpeg) {
+  const ascii = (s) => Buffer.from(s + "\0", "latin1");
+  const make = ascii("PagerCam"), model = ascii("PH-1"), date = ascii("2026:01:02 03:04:05");
+  const entry = (tag, type, count, value) => { const b = Buffer.alloc(12); b.writeUInt16LE(tag, 0); b.writeUInt16LE(type, 2); b.writeUInt32LE(count, 4); b.writeUInt32LE(value, 8); return b; };
+  const ifd = (entries) => { const n = Buffer.alloc(2); n.writeUInt16LE(entries.length, 0); return Buffer.concat([n, ...entries, Buffer.alloc(4)]); };
+  const rational = Buffer.alloc(24);
+  [[1, 1], [17, 1], [0, 1]].forEach(([a, b], i) => { rational.writeUInt32LE(a, i * 8); rational.writeUInt32LE(b, i * 8 + 4); });
+  const head = Buffer.from("II*\0\x08\0\0\0", "latin1");
+  const [offMake, offModel, offExif, offDate, offGps, offLat] = [62, 71, 76, 94, 114, 144];
+  const tiff = Buffer.concat([head,
+    ifd([entry(0x010f, 2, make.length, offMake), entry(0x0110, 2, model.length, offModel), entry(0x8769, 4, 1, offExif), entry(0x8825, 4, 1, offGps)]),
+    make, model, ifd([entry(0x9003, 2, date.length, offDate)]), date,
+    ifd([entry(1, 2, 2, "N\0".charCodeAt(0)), entry(2, 5, 3, offLat)]), rational]);
+  const body = Buffer.concat([Buffer.from("Exif\0\0", "latin1"), tiff]);
+  const seg = Buffer.alloc(4);
+  seg.writeUInt16BE(0xffe1, 0); seg.writeUInt16BE(body.length + 2, 2);
+  return Buffer.concat([jpeg.subarray(0, 2), seg, body, jpeg.subarray(2)]);
+}
 export async function buildCorpus() {
   if (!force && existsSync(gen + "DONE") && readFileSync(gen + "DONE", "utf8") === stamp) return;
   rmSync(gen, { recursive: true, force: true });
@@ -426,6 +467,8 @@ export async function buildCorpus() {
   w("photo-alpha.png", pngEncode(400, 300, Object.assign(photo(400, 300, 9).data, {})));
   await wd("image-mixed.pdf", imageMixed(jpg));
   await wd("xmp.pdf", xmpDoc());
+  await wd("redact-sample.pdf", redactSample());
+  w("photo-gps.jpg", withExif(Buffer.from(await jpegEncode(photo(400, 300, 5), { quality: 90 }))));
   const rot2 = await textDoc(4, "c");
   rot2.getPages().forEach((p, i) => { p.setRotation(degrees(i * 90)); if (i === 1) p.setCropBox(50, 100, 400, 500); });
   await wd("rotated-crop.pdf", rot2);

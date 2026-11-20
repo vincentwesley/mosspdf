@@ -27,11 +27,14 @@ for (const theme of ["dark", "light"] as Theme[]) {
       expect(dz!.y).toBeLessThan(boxes[0].y);
 
       // planned tiles stay dashed and are not links
+      // (every tool is live since M6, so this only runs while some tool is still planned)
       const pending = page.locator(".tile__in.hs-pending").first();
-      expect(await pending.evaluate((e) => e.tagName)).not.toBe("A");
-      expect(await pending.evaluate((e) => getComputedStyle(e).outlineStyle)).toBe("dashed");
-      await expect(pending.locator("a")).toHaveCount(0);
-      await expect(pending).toContainText("Coming soon");
+      if (await pending.count()) {
+        expect(await pending.evaluate((e) => e.tagName)).not.toBe("A");
+        expect(await pending.evaluate((e) => getComputedStyle(e).outlineStyle)).toBe("dashed");
+        await expect(pending.locator("a")).toHaveCount(0);
+        await expect(pending).toContainText("Coming soon");
+      }
       if (w === 320 || w === 375) await checkA11y(page, `home ${theme} ${w}px`);
     }
   });

@@ -7,6 +7,8 @@ import type { OcrPage } from "../ops";
 import { compareReport, fillForm, readForm, stampPage } from "../ops";
 import type { ReportData } from "../core/compare";
 import type { FormValues, StampInput } from "../ops";
+import { redact } from "../ops";
+import type { RedactInput } from "../ops";
 import type { CleanOptions, ProtectOptions, UnprotectOptions } from "../ops/types-m3";
 import { createEngines } from "../engines";
 import type { Engines, InFile, OpOptions, OpResult, PageSpec, SplitMode } from "../ops/types";
@@ -42,8 +44,14 @@ const m7 = {
   compareReport: async ({ report, o }: { report: ReportData; o: O }, ctx: Ctx) => out(await compareReport(report, opts(o, ctx))),
 };
 
+// M6 op (redaction)
+const m6 = {
+  redact: async ({ file, input, o }: { file: InFile; input: RedactInput; o: { producerCredit: boolean } }, ctx: Ctx) => out(await redact(file, input, opts(o, ctx), eng())),
+};
+
 serve({
   ...m7,
+  ...m6,
   ...m4,
   ...m3,
   init: async ({ qpdfWasm, jpegDecWasm, jpegEncWasm }: { qpdfWasm: Uint8Array; jpegDecWasm: Uint8Array; jpegEncWasm: Uint8Array }) => {

@@ -22,6 +22,14 @@ export async function addTextLayer(file: InFile, pages: OcrPage[], o: OpOptions,
   if (!pages.length) throw new PdfError("unsupported", "There is no text to add.", file.name);
   const p = await prepare(file, o, e);
   const doc = await PDFDocument.load(p.bytes, { updateMetadata: false });
+  await drawLayer(doc, pages, file, o);
+  if (o.producerCredit) applyCredit(doc);
+  const name = safeName(file.name, "document").replace(/\.pdf$/i, "") + "-searchable.pdf";
+  return { bytes: await doc.save({ useObjectStreams: false }), name, warnings: p.warnings };
+}
+
+/** Adds the invisible words of `pages` to the matching pages of `doc` (shared with redaction, which rebuilds the pages first). */
+export async function drawLayer(doc: PDFDocument, pages: OcrPage[], file: InFile, o: OpOptions): Promise<void> {
   const font = await doc.embedFont(StandardFonts.Helvetica);
   const known = new Set(font.getCharacterSet());
   const all = doc.getPages();
@@ -56,7 +64,4 @@ export async function addTextLayer(file: InFile, pages: OcrPage[], o: OpOptions,
     }
     o.onProgress?.(k + 1, pages.length);
   }
-  if (o.producerCredit) applyCredit(doc);
-  const name = safeName(file.name, "document").replace(/\.pdf$/i, "") + "-searchable.pdf";
-  return { bytes: await doc.save({ useObjectStreams: false }), name, warnings: p.warnings };
 }
