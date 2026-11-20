@@ -46,7 +46,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        project: [chromium, firefox, webkit, mobile-chrome, mobile-safari]
+        include:
+          - { project: chromium, browser: chromium }
+          - { project: firefox, browser: firefox }
+          - { project: webkit, browser: webkit }
+          - { project: mobile-chrome, browser: chromium }
+          - { project: mobile-safari, browser: webkit }
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -65,9 +70,10 @@ jobs:
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: node_modules/playwright-core/.local-browsers
-          key: pw-${{ runner.os }}-${{ steps.pw.outputs.v }}
-      - name: Install Playwright browsers
-        run: npm run pw -- install --with-deps chromium firefox webkit
+          key: pw-${{ runner.os }}-${{ steps.pw.outputs.v }}-${{ matrix.browser }}
+      - name: Install Playwright browser
+        timeout-minutes: 15
+        run: npm run pw -- install --with-deps ${{ matrix.browser }}
       - run: npm run test:e2e -- --project=${{ matrix.project }}
       - name: Upload Playwright report
         if: failure()
