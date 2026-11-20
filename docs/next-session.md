@@ -1,6 +1,6 @@
 > Update at the end of any session that changed state. Keep it lean.
 
-Continue work on **Pagehold** (repo `vincentwesley/pagehold`). main holds M0-M5 + UX batch (live).
+Continue work on **Pagehold** (repo `vincentwesley/pagehold`). main holds M0-M8 (all tools live).
 
 ## Before anything
 1. Work in `C:\Coding Projects\pagehold`; read this file, `docs/PLAN.md`, `docs/DECISIONS.md` (D7, D10, D11).
@@ -30,9 +30,10 @@ Continue work on **Pagehold** (repo `vincentwesley/pagehold`). main holds M0-M5 
 - Liberation Sans (GPL-2 + font exception) ships in the pdf.js data pack; owner may prefer to drop it (D11).
 - Not yet: M9 polish, release zip.
 
-## Resume point (2026-11-20, evening)
-- main = M0-M5 + UX batch (result card, Use in another tool, undo, home search, recents), OCR (D16), fill + sign (D15). Deployed 3e2f121b, smoke passed.
-- Worktree `.worktrees/m6` (branch `m6-redact`, local only): redact + photo clean (D17). Box-offset leak fixed (measured glyph widths, padding, pixel test); WIP commit 8e6c348: unit 201/201 and tools-m6 green on chromium + webkit; still to do: re-shoot `screens -g redact` and look at the boxes, firefox/mobile runs, security review. Its base is the pre-squash M4 commits: rebase with `git rebase --onto main eb0cb54 m6-redact`. main-gzip budget raised to 52 KB: consider lazy-loading tool modules instead.
-- Worktree `.worktrees/m7` (branch `m7-compare`, local only): Compare built (D18): core/diff.ts, core/pagewords.ts, core/compare.ts, core/pixeldiff.ts, ops/report.ts, ui/compareview.ts, tools/compare.ts; tools-m7 e2e. main-gzip budget 49 KB. Still to do: PR, deploy, smoke.
-- Then: PR each (merge without `--delete-branch`), deploy, smoke; M8; M9 + v1.0.0.
+## Resume point (2026-11-20, night)
+- main = M0-M8, deployed ad62444c, live smoke passed. All 26 tools live (no planned tiles left).
+- Done this session: UX batch, OCR (D16), fill + sign (D15), redact + photo (D17, security-review fixes), compare (D18), command palette, workflows, batch, accessibility check (D19, Safe to share fixes). docs/LEGAL-REVIEW.md, docs/COMPARISON.md, docs/NEEDS-VIN.md written.
+- Next, M9: persona walkthroughs (USABILITY.md) + two polish passes; privacy page wording vs LEGAL-REVIEW (Cloudflare request logs); README screenshots; large-file perf check (500 pages / 200 MB); main bundle is 62 KB gzip (consider preloading tool chunks before the seal); version 1.0.0 + release zip (static build + local server script) + tag; fresh-clone acceptance; final HANDOVER with three lists.
+- Known flaky locally under load: screens sign (light), tools A-COR-3 bad file 'empty'. CI apt installs now retry.
+- `.worktrees/m7` and `.worktrees/m8` folders may linger (locked by the editor); they are no longer git worktrees and are gitignored: delete when unlocked.
 - Local full e2e is unreliable on this 16 GB machine; prefer CI or `--project=<one>` runs locally.
