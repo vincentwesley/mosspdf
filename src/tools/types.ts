@@ -79,6 +79,8 @@ export interface ToolDef {
   ready?(ctx: Ctx): boolean;
   /** Label of the main button. Default: the title. */
   primaryLabel?(ctx: Ctx): string;
+  /** Replaces the "1 MB to 1 MB" line of the result card with this text. */
+  summary?(ctx: Ctx): string;
   /** Tool ids offered as next steps after a single-PDF result. Default: DEFAULT_NEXT. Planned tools are skipped. */
   next?: string[];
   /** Does the work and returns the files to download. Throw `PdfError` for plain-language failures. Absent = planned: home shows "Coming soon", the route shows the intake only. */

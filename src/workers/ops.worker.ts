@@ -4,7 +4,8 @@ import { addPageNumbers, assemble, compress, imagesToPdf, inspect, merge, readMe
 import type { CompressLevel, ImageInput, ImagesToPdfOptions, MetadataEdit, PageNumberOptions, WatermarkOptions } from "../ops";
 import { addTextLayer, cleanCopy, protect, repair, safetyScan, unprotect } from "../ops";
 import type { OcrPage } from "../ops";
-import { fillForm, readForm, stampPage } from "../ops";
+import { compareReport, fillForm, readForm, stampPage } from "../ops";
+import type { ReportData } from "../core/compare";
 import type { FormValues, StampInput } from "../ops";
 import type { CleanOptions, ProtectOptions, UnprotectOptions } from "../ops/types-m3";
 import { createEngines } from "../engines";
@@ -36,7 +37,13 @@ const m4 = {
   stampPage: async ({ file, input, o }: { file: InFile; input: StampInput; o: { producerCredit: boolean } }, ctx: Ctx) => out(await stampPage(file, input, opts(o, ctx), eng())),
 };
 
+// M7 (compare)
+const m7 = {
+  compareReport: async ({ report, o }: { report: ReportData; o: O }, ctx: Ctx) => out(await compareReport(report, opts(o, ctx))),
+};
+
 serve({
+  ...m7,
   ...m4,
   ...m3,
   init: async ({ qpdfWasm, jpegDecWasm, jpegEncWasm }: { qpdfWasm: Uint8Array; jpegDecWasm: Uint8Array; jpegEncWasm: Uint8Array }) => {

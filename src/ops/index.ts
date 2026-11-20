@@ -16,3 +16,4 @@ export { addTextLayer, type OcrPage } from "./ocr";
 // M4: fill forms, sign
 export { fillForm, readForm, type FieldType, type FieldValue, type FormField, type FormInfo, type FormValues, type FormWidget } from "./forms";
 export { stampPage, type StampInput, type StampItem } from "./sign";
+export { compareReport } from "./report";

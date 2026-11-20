@@ -22,7 +22,7 @@ Continue work on **Pagehold** (repo `vincentwesley/pagehold`). main holds M0-M5 
 - e2e covers flows, axe (both themes), overflow (320 to 1280, 200% zoom), offline (Chromium, WebKit), seal negative controls (page and ops worker), 1,000-page thumbnails (Chromium).
 
 ## Known gaps
-- CI-only: mobile-safari (Linux WPE) reports an inline `style-src-elem` CSP violation (blank source, line 5) on compare intake after an earlier viewport resize in the same test; passes locally and on CI webkit. Test is `fixme` on CI mobile-safari (`e2e/shell.spec.ts`); investigate when Compare is built (M7).
+- CI-only: mobile-safari (Linux WPE) reports an inline `style-src-elem` CSP violation (blank source, line 5) on compare intake after an earlier viewport resize in the same test. M7 tried to reproduce it: 3 runs on local mobile-safari and WebKit pass; all pdf.js documents open through `openDoc` (disableFontFace) and src/ has no style strings. Test stays `fixme` on CI mobile-safari (`e2e/shell.spec.ts`); next step is a CI run with the violation details logged (the fixture already records blockedURI/source/line).
 - Firefox offline test skipped (setOffline broken with service workers, docs/spikes/csp.md); keyboard-only tests skip on touch projects.
 - Liberation Sans (GPL-2 + font exception) ships in the pdf.js data pack; owner may prefer to drop it (D11).
 - Not yet: M8 (batch, workflows, command palette, a11y check), M9 polish, release zip.
@@ -30,6 +30,6 @@ Continue work on **Pagehold** (repo `vincentwesley/pagehold`). main holds M0-M5 
 ## Resume point (2026-11-20, evening)
 - main = M0-M5 + UX batch (result card, Use in another tool, undo, home search, recents), OCR (D16), fill + sign (D15). Deployed 3e2f121b, smoke passed.
 - Worktree `.worktrees/m6` (branch `m6-redact`, local only): redact + photo clean (D17). Box-offset leak fixed (measured glyph widths, padding, pixel test); WIP commit 8e6c348: unit 201/201 and tools-m6 green on chromium + webkit; still to do: re-shoot `screens -g redact` and look at the boxes, firefox/mobile runs, security review. Its base is the pre-squash M4 commits: rebase with `git rebase --onto main eb0cb54 m6-redact`. main-gzip budget raised to 52 KB: consider lazy-loading tool modules instead.
-- Worktree `.worktrees/m7` (branch `m7-compare`): Compare NOT started (empty WIP commit). Plan: own Myers word diff `src/core/diff.ts`, `src/core/pagewords.ts`, report op, tabbed UI (changes, side by side, overlay). Grep for style strings in src/ found no cause of the mobile-safari CSP report yet. Lazy-loading tool chunks would need preloading before the seal.
+- Worktree `.worktrees/m7` (branch `m7-compare`, local only): Compare built (D18): core/diff.ts, core/pagewords.ts, core/compare.ts, core/pixeldiff.ts, ops/report.ts, ui/compareview.ts, tools/compare.ts; tools-m7 e2e. main-gzip budget 49 KB. Still to do: PR, deploy, smoke.
 - Then: PR each (merge without `--delete-branch`), deploy, smoke; M8; M9 + v1.0.0.
 - Local full e2e is unreliable on this 16 GB machine; prefer CI or `--project=<one>` runs locally.

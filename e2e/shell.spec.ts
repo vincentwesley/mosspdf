@@ -131,7 +131,7 @@ test("A-E2E-5 no horizontal overflow: image tool", async ({ page }) => {
 
 test("A-E2E-5 no horizontal overflow: compare with files", async ({ page }, info) => {
   // ponytail: Linux CI mobile-safari (WPE) only reports an inline style-src-elem violation (blank source, line 5) after the two
-  // PDFs are added; passes locally on WebKit and mobile-safari and on CI webkit. Compare is not live yet (M7): investigate there.
+  // PDFs are added; passes locally on WebKit and mobile-safari and on CI webkit. M7 (Compare live): not reproducible locally on WebKit or mobile-safari (3 runs); all pdf.js documents open through openDoc (disableFontFace), no style strings in src/.
   test.fixme(info.project.name === "mobile-safari" && !!process.env.CI, "CI-only WPE inline-style CSP report on compare intake, see docs/next-session.md");
   await loadApp(page, "/#/compare");
   await input(page).setInputFiles([corpus("plain-3p"), corpus("mixed-sizes")]);
