@@ -5,6 +5,8 @@ import { opsRpc } from "../core/engines";
 import type { CallOptions } from "../core/rpc";
 import { PdfError, type OpResult } from "../ops/types";
 import type { Ctx, GridOpts, ToolDef } from "../tools/types";
+import { nextTools } from "../tools";
+import { pushRecent } from "../core/recent";
 import { announce, fmtSize, h } from "./dom";
 import { toast } from "./toast";
 import { dropzone, setFilesHandler } from "./dropzone";
@@ -29,6 +31,7 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
   let results: OpResult[] = [];
   let abort: AbortController | null = null;
   let jobNote = "";
+  let inBytes = 0;
   let primaryEnabled = false;
   let o: CallOptions = {};
   let local: unknown;
@@ -87,12 +90,14 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
   const optBox = h("section", { class: "opts hs-card", hidden: !tool.options, attrs: { "aria-label": "Options" } }, optSet);
   const gridBox = h("section", { class: "gridbox", attrs: { "aria-label": "Pages" } });
   const resultBox = h("section", { class: "results hs-card", hidden: true, attrs: { "data-testid": "results", "aria-labelledby": "res-h" } });
+  // One stable status region for progress and done; failures go to the separate alert so the status element never changes role.
   const status = h("p", { class: "job__status", attrs: { role: "status" } });
+  const errBox = h("p", { class: "job__status job__status--err", attrs: { role: "alert", "data-testid": "job-error" } });
   const prog = h("progress", { class: "hs-progress", attrs: { max: 100, value: 0, "aria-label": "Progress" }, hidden: true });
   const primary = h("button", { class: "hs-btn", type: "button", attrs: { "data-testid": "primary-action" } });
   const cancel = h("button", { class: "hs-btn hs-btn--secondary", type: "button", text: "Cancel", hidden: true, attrs: { "data-testid": "cancel-job" } });
   const clearAll = h("button", { class: "hs-btn hs-btn--ghost", type: "button", text: "Clear all", attrs: { "data-testid": "clear-all" } });
-  const bar = h("div", { class: "actionbar" }, h("div", { class: "actionbar__in" }, prog, status, h("div", { class: "actionbar__btns" }, primary, cancel, clearAll)));
+  const bar = h("div", { class: "actionbar" }, h("div", { class: "actionbar__in" }, prog, status, errBox, h("div", { class: "actionbar__btns" }, primary, cancel, clearAll)));
 
   // output settings
   const credit = h("input", { class: "hs-check", id: "credit", type: "checkbox", attrs: { "data-testid": "producer-credit" } });
@@ -102,11 +107,20 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
     h("summary", { text: "Output settings" }),
     h("div", { class: "settings__row" }, credit, h("label", { attrs: { for: "credit" }, text: "Mention Pagehold in the file's details (Producer)" })));
 
+  const kbd = h("details", { class: "kbd", attrs: { "data-testid": "kbd-help" } },
+    h("summary", { text: "Keyboard shortcuts" }),
+    h("ul", {}, ...[
+      "Tab moves between pages.",
+      "Alt plus an arrow key moves the focused page.",
+      "Delete removes the focused page.",
+      ...(gridOpts?.selectable ? ["Enter or Space selects or unselects the focused page."] : []),
+    ].map((t) => h("li", { text: t }))));
   const grid = gridOpts ? pageGrid({
     items: () => ctx.items, set: (p) => { ctx.items = p; }, selectable: !!gridOpts.selectable, showFile: !!gridOpts.showFile,
     onChange: () => { ctx.dirty = true; results = []; tool.onItems?.(ctx); update(false); },
   }) : null;
-  if (grid) gridBox.append(grid.el);
+  if (grid) gridBox.append(grid.el, kbd);
+  if (tool.run) pushRecent(tool.id);
   if (tool.options) optSet.append(tool.options(ctx));
 
   // ---- logic ----
@@ -151,6 +165,8 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
     results = [];
     resultBox.hidden = true;
     status.textContent = "";
+    errBox.textContent = "";
+    inBytes = ctx.files.reduce((n, f) => n + f.size, 0);
     abort = new AbortController();
     o = { signal: abort.signal, onProgress: (d, t) => { prog.max = t; prog.value = d; jobNote = `Working… ${d} of ${t}`; status.textContent = jobNote; } };
     jobNote = "Working…";
@@ -163,8 +179,8 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
     } catch (e) {
       const cancelled = e instanceof PdfError && e.code === "cancelled";
       const inline = e instanceof PdfError && !cancelled && !!tool.onError?.(ctx, e);
-      status.textContent = inline ? "" : cancelled ? "Cancelled. Nothing was changed." : errorMessage(e);
-      status.setAttribute("role", cancelled ? "status" : "alert");
+      status.textContent = cancelled ? "Cancelled. Nothing was changed." : "";
+      errBox.textContent = inline || cancelled ? "" : errorMessage(e);
       results = [];
     } finally {
       abort = null;
@@ -180,21 +196,42 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
     resultBox.replaceChildren();
     if (!results.length) return;
     const warns = results.flatMap((r) => r.warnings);
+    const outBytes = results.reduce((n, r) => n + r.bytes.length, 0);
+    const delta = inBytes ? Math.round(((inBytes - outBytes) / inBytes) * 100) : 0;
+    const change = delta > 0 ? `Saved ${delta}%.` : delta < 0 ? `${-delta}% larger.` : "About the same size.";
+    const single = results.length === 1 && /\.pdf$/i.test(results[0].name);
+    const next = single ? nextTools(tool) : [];
     const zipName = `${stem(ctx.file?.name ?? "pagehold")}-${tool.id}.zip`;
     resultBox.append(
       h("h2", { id: "res-h", text: results.length > 1 ? `Done. ${results.length} files are ready.` : "Done. Your file is ready.", attrs: { tabindex: -1 } }),
+      ...(inBytes ? [h("p", { class: "res__sum", text: `${fmtSize(inBytes)} → ${fmtSize(outBytes)}. ${change}`, attrs: { "data-testid": "result-summary" } })] : []),
       h("ul", { class: "outs", attrs: { role: "list" } }, ...results.map((r) =>
         h("li", { class: "out", attrs: { "data-testid": "result-row" } },
           h("span", { class: "out__name", text: r.name }),
           h("span", { class: "out__size", text: fmtSize(r.bytes.length) }),
           h("button", { class: "hs-btn", type: "button", text: "Download", attrs: { "aria-label": `Download ${r.name}`, "data-testid": "result-download" }, on: { click: () => void saveResult(r) } })))),
       ...(results.length > 1 ? [h("div", { class: "outs__all" }, h("button", { class: "hs-btn hs-btn--secondary", type: "button", text: "Download all (.zip)", attrs: { "data-testid": "download-zip" }, on: { click: () => void saveZip(results, zipName) } }))] : []),
-      ...warns.map((w) => h("p", { class: "hs-banner hs-banner--warn", text: w.message, attrs: { role: "note" } })));
+      ...warns.map((w) => h("p", { class: "hs-banner hs-banner--warn", text: w.message, attrs: { role: "note" } })),
+      h("div", { class: "res__next" },
+        ...(next.length ? [h("h3", { id: "next-h", text: "Use in another tool" }), h("ul", { class: "res__tools", attrs: { role: "list", "aria-labelledby": "next-h" } }, ...next.map((t) =>
+          h("li", {}, h("button", { class: "hs-btn hs-btn--secondary", type: "button", text: t.title, attrs: { "data-testid": `next-${t.id}` }, on: { click: () => void useIn(results[0], t.id) } }))))] : []),
+        h("button", { class: "hs-btn hs-btn--ghost", type: "button", text: "Start over", attrs: { "data-testid": "start-over" }, on: { click: startOver } })));
   }
 
+  /** Replaces the loaded files with a result and opens another tool on it. The store is global, so it survives the route change. */
+  async function useIn(r: OpResult, id: string) {
+    store.clear();
+    await store.add([new File([r.bytes as BlobPart], r.name, { type: "application/pdf" })]);
+    location.hash = `#/${id}`;
+  }
+  function startOver() {
+    const snapshot = store.files.slice();
+    store.clear(); results = []; status.textContent = ""; errBox.textContent = ""; itemsKey = ""; ctx.items = []; grid?.sync(); update();
+    if (snapshot.length) toast(snapshot.length === 1 ? `Cleared ${snapshot[0].name}.` : `Cleared ${snapshot.length} files.`, { label: "Undo", run: () => store.restore(snapshot) });
+  }
   primary.addEventListener("click", () => void run());
   cancel.addEventListener("click", () => abort?.abort());
-  clearAll.addEventListener("click", () => { store.clear(); results = []; status.textContent = ""; itemsKey = ""; ctx.items = []; grid?.sync(); update(); });
+  clearAll.addEventListener("click", startOver);
   const unsub = store.subscribe(() => update());
 
   const el = h("div", { class: "view tool" },

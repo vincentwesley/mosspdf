@@ -29,3 +29,8 @@ export const isLive = (t: ToolDef) => !!t.run;
 export const LIVE = TOOLS.filter(isLive);
 /** Home map: every group that has a tool, in GROUPS order. */
 export const CATALOG: { name: GroupName; tools: ToolDef[] }[] = GROUPS.map((name) => ({ name, tools: TOOLS.filter((t) => t.group === name) })).filter((g) => g.tools.length);
+
+const DEFAULT_NEXT = ["compress", "protect", "page-numbers", "watermark", "organize"];
+/** Live tools to suggest after `tool` produced a PDF (its `next` list, else the default), never the tool itself. */
+export const nextTools = (tool: ToolDef): ToolDef[] =>
+  (tool.next ?? DEFAULT_NEXT).filter((id) => id !== tool.id).map(toolById).filter((t): t is ToolDef => !!t && isLive(t)).slice(0, 5);

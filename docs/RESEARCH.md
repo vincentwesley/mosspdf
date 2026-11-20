@@ -90,3 +90,27 @@ Drawn/typed marks are simple electronic signatures at most; validity depends on 
 ## 11. Name
 
 "PaperDesk" is a live iPad note app that imports PDFs ([App Store](https://apps.apple.com/us/app/paperdesk/id367563434)); see DECISIONS D1.
+
+## 12. UX teardown and brainstorm (2026-11-20)
+
+Sources: iLovePDF sign and tools pages, Smallpdf sign, PDF24 home, BentoPDF review (itsfoss.com/bentopdf), Capterra/G2/Trustpilot reviews of Smallpdf and iLovePDF, a self-audit of Pagehold's code and screenshots. Reddit was not reachable; complaint evidence is secondhand.
+
+What users complain about elsewhere: task caps, ads that misfire, watermarks on free output, upload to servers, login or upgrade walls at download, slow OCR, poor compression quality. What they praise: free with no account, ease of use, local processing, offline after first load.
+
+Nobody checked combines size before/after, a preview and a next step on the result screen. Few tools fill existing form fields well.
+
+Accepted (ranked):
+1. Result card with size before → after and change, "Start over", and "Use in another tool" (hands the output to the next tool without a download).
+2. Home search and "Recently used" (local to the browser, nothing leaves it).
+3. Undo for Clear all and file removal; "Remove files that can't be opened".
+4. Sign: draw / type / upload, initials, date with format choice, free text, place on this page or all pages, keyboard move and resize (iLovePDF has the most complete flow; we match it without accounts).
+5. Fill existing AcroForm fields in place on the page, with a plain field list fallback for phones.
+6. OCR output as a searchable PDF and as plain text.
+7. Command palette and single-key shortcuts (M8).
+8. Ready-made workflows (M8).
+
+Rejected:
+- QR handoff to sign on a phone (iLovePDF): needs a server relay; breaks "nothing leaves the device".
+- Cloud import (Drive, Dropbox): network, and a privacy risk.
+- Saving signatures between visits: convenient but sensitive; not stored at all (D15).
+- Accounts, caps, watermarks, upsells: never.

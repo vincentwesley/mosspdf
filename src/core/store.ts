@@ -66,7 +66,7 @@ export const store = {
     }
     if (skipped.length) {
       const what = intake === "pdf" ? "a PDF" : intake === "image" ? "a JPG, PNG or WebP image" : "a PDF or an image";
-      notes.unshift(`${skipped.length === 1 ? `"${skipped[0]}" is` : `${skipped.length} files are`} not ${what} and was skipped.${intake === "pdf" ? " Turning images into PDFs is coming soon." : ""}`);
+      notes.unshift(`${skipped.length === 1 ? `"${skipped[0]}" is` : `${skipped.length} files are`} not ${what} and was skipped.${intake === "pdf" ? " To turn images into a PDF, use Images to PDF." : ""}`);
     }
     store.notice = notes.join(" ");
     notify();
@@ -167,5 +167,5 @@ export function errorMessage(e: unknown): string {
     };
     return `${who}${e.message} ${next[e.code] ?? ""}`.trim();
   }
-  return `Something went wrong: ${e instanceof Error ? e.message : String(e)}. Your files are still here. Try again, or remove the file and add it again.`;
+  return "Something went wrong with this file. Your files are still here. Try again, or remove the file and add it again.";
 }
