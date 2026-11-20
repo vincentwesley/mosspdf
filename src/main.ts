@@ -35,7 +35,6 @@ const btn = document.querySelector<HTMLButtonElement>("#theme")!;
 function sync(t: Theme): void {
   applyTheme(t);
   btn.setAttribute("aria-pressed", String(t === "light"));
-  btn.textContent = t === "light" ? "Dark theme" : "Light theme";
 }
 sync(store.get());
 btn.addEventListener("click", () => {

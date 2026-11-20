@@ -1,4 +1,4 @@
-﻿// Flow specs for the M2 tools: images to PDF, PDF to images, compress, page numbers, watermark, metadata.
+// Flow specs for the M2 tools: images to PDF, PDF to images, compress, page numbers, watermark, metadata.
 // Each flow: open, run, download, verify the file (qpdf --check, then pdf.js for pages, text, metadata, size). Titles carry the ACCEPTANCE ID.
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -120,7 +120,7 @@ test.describe("M2 tools", () => {
     await expect(page.getByTestId("level-about")).toContainText("Text stays sharp");
     await expect(page.getByTestId("primary-action")).toHaveText("Compress PDF");
     await run(page);
-    await expect(page.getByTestId("compress-summary")).toContainText(/MB → .*Saved \d+%/);
+    await expect(page.getByTestId("result-summary")).toContainText(/MB → .*Saved \d+%/);
     const dl = await savePdf(page);
     expect(dl.bytes.length).toBeLessThan(readFileSync(corpus("image-mixed")).length);
     expect((await readPdf(dl.bytes)).length).toBe((await readPdf(readFileSync(corpus("image-mixed")))).length);
@@ -138,7 +138,7 @@ test.describe("M2 tools", () => {
     await readyRows(page, 1);
     await run(page);
     await expect(page.getByTestId("results")).toContainText("already compact");
-    await expect(page.getByTestId("compress-summary")).toContainText("nothing was saved");
+    await expect(page.getByTestId("result-summary")).toContainText(/→/);
     const dl = await savePdf(page);
     expect(dl.bytes.equals(first.bytes)).toBe(true);
   });

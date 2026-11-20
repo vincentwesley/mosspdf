@@ -1,5 +1,5 @@
 import type { CompressLevel, CompressResult } from "../ops/compress";
-import { announce, fmtSize, h } from "../ui/dom";
+import { announce, h } from "../ui/dom";
 import { radioGroup } from "../ui/fields";
 import { pdfLossWarnings } from "./pages";
 import type { Ctx, ToolDef } from "./types";
@@ -13,8 +13,6 @@ const LEVELS: Record<CompressLevel, [label: string, about: string]> = {
 const ui = (ctx: Ctx) => ctx.local(() => ({
   level: radioGroup({ name: "level", legend: "How much to shrink it", value: "balanced", testid: (v) => `level-${v}`, onChange: () => ctx.refresh(), options: (Object.keys(LEVELS) as CompressLevel[]).map((k) => [k, LEVELS[k][0]]) }),
   about: h("p", { class: "field__hint", attrs: { "data-testid": "level-about" } }),
-  summary: h("p", { class: "compress__sum", attrs: { role: "status", "data-testid": "compress-summary" }, hidden: true }),
-  last: null as { id: number; before: number; after: number } | null,
 }));
 
 export const compress: ToolDef = {
@@ -24,18 +22,11 @@ export const compress: ToolDef = {
   accepts: "pdf",
   options(ctx) {
     const u = ui(ctx);
-    return h("div", { class: "compress" }, u.level.el, u.about, u.summary);
+    return h("div", { class: "compress" }, u.level.el, u.about);
   },
   sync(ctx) {
     const u = ui(ctx);
     u.about.textContent = LEVELS[u.level.value() as CompressLevel][1];
-    if (u.last && u.last.id !== ctx.file?.id) u.last = null;
-    const l = u.last;
-    u.summary.hidden = !l;
-    if (l) {
-      const saved = l.before - l.after;
-      u.summary.textContent = saved > 0 ? `${fmtSize(l.before)} → ${fmtSize(l.after)}. Saved ${Math.round((saved / l.before) * 100)}%.` : `${fmtSize(l.before)} → ${fmtSize(l.after)}. This file is already compact, so nothing was saved.`;
-    }
   },
   warnings: pdfLossWarnings,
   primaryLabel: () => "Compress PDF",
@@ -43,7 +34,6 @@ export const compress: ToolDef = {
     const u = ui(ctx);
     const f = ctx.file!;
     const r = await ctx.call<CompressResult>("compress", { file: ctx.input(f), level: u.level.value(), o: { producerCredit: ctx.producerCredit } });
-    u.last = { id: f.id, before: r.before, after: r.after };
     const notSmaller = r.warnings.some((w) => w.code === "not-smaller");
     const { before, after, ...out } = r;
     void before; void after;

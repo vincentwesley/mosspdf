@@ -259,3 +259,19 @@ div.pg__thumb { cursor: default; }
 .scan__detail code { overflow-wrap: anywhere; font-size: 0.85rem; }
 .scan__why { color: var(--fg-muted); font-size: 0.9rem; }
 .scan__after { display: grid; gap: var(--s3); }
+
+/* ---- UX batch ---- */
+.job__status--err { color: var(--danger); font-weight: 600; min-height: 0; }
+.job__status--err:empty { display: none; }
+.res__sum { margin: 0; font-weight: 600; }
+.res__next { display: grid; gap: var(--s3); margin-top: var(--s3); }
+.res__next h3 { margin: 0; font-size: 1rem; }
+.res__tools, .recent__list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--s3); }
+.filelist { display: grid; gap: var(--s3); }
+.find { display: grid; gap: var(--s2); margin-bottom: var(--s4); }
+.find__label { font-weight: 600; }
+.find__none { margin: 0; color: var(--fg-muted); }
+.recent { display: grid; gap: var(--s3); margin-bottom: var(--s4); }
+.kbd { color: var(--fg-muted); }
+.kbd summary { min-height: 48px; display: flex; align-items: center; cursor: pointer; }
+.kbd ul { margin: 0; padding-left: var(--s5); }
