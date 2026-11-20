@@ -83,6 +83,8 @@ export interface ToolDef {
   next?: string[];
   /** Does the work and returns the files to download. Throw `PdfError` for plain-language failures. Absent = planned: home shows "Coming soon", the route shows the intake only. */
   run?(ctx: Ctx): Promise<OpResult[]>;
+  /** The view is being torn down (route change): release observers and timers. */
+  destroy?(ctx: Ctx): void;
   /** `run` threw a PdfError: return true when the tool shows it inline (a field error), so the status line stays quiet. */
   onError?(ctx: Ctx, e: PdfError): boolean;
 }

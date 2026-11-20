@@ -31,7 +31,7 @@ export async function fetchBytes(url: string): Promise<Uint8Array> {
 async function preloadStatic(): Promise<void> {
   const imgs = [...document.images];
   await Promise.all([
-    ...["1em 'Space Grotesk'", "600 1em 'Inter'", "1em Inter", "1em Silkscreen", "1em 'JetBrains Mono'"].map((f) => document.fonts.load(f)),
+    ...["1em 'Space Grotesk'", "600 1em 'Inter'", "1em Inter", "1em Silkscreen", "1em 'JetBrains Mono'", "1em Caveat"].map((f) => document.fonts.load(f)),
     ...imgs.map((i) => { i.loading = "eager"; return i.decode().catch(() => undefined); }),
   ]);
   await document.fonts.ready;

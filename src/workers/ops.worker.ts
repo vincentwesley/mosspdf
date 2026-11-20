@@ -4,6 +4,8 @@ import { addPageNumbers, assemble, compress, imagesToPdf, inspect, merge, readMe
 import type { CompressLevel, ImageInput, ImagesToPdfOptions, MetadataEdit, PageNumberOptions, WatermarkOptions } from "../ops";
 import { addTextLayer, cleanCopy, protect, repair, safetyScan, unprotect } from "../ops";
 import type { OcrPage } from "../ops";
+import { fillForm, readForm, stampPage } from "../ops";
+import type { FormValues, StampInput } from "../ops";
 import type { CleanOptions, ProtectOptions, UnprotectOptions } from "../ops/types-m3";
 import { createEngines } from "../engines";
 import type { Engines, InFile, OpOptions, OpResult, PageSpec, SplitMode } from "../ops/types";
@@ -27,7 +29,15 @@ const m3 = {
   addTextLayer: async ({ file, pages, o }: { file: InFile; pages: OcrPage[]; o: { producerCredit: boolean } }, ctx: Ctx) => out(await addTextLayer(file, pages, opts(o, ctx), eng())),
 };
 
+// M4 ops (fill forms, sign)
+const m4 = {
+  readForm: ({ file }: { file: InFile }) => readForm(file, {}, eng()),
+  fillForm: async ({ file, values, flatten, o }: { file: InFile; values: FormValues; flatten: boolean; o: { producerCredit: boolean } }, ctx: Ctx) => out(await fillForm(file, values, { flatten }, opts(o, ctx), eng())),
+  stampPage: async ({ file, input, o }: { file: InFile; input: StampInput; o: { producerCredit: boolean } }, ctx: Ctx) => out(await stampPage(file, input, opts(o, ctx), eng())),
+};
+
 serve({
+  ...m4,
   ...m3,
   init: async ({ qpdfWasm, jpegDecWasm, jpegEncWasm }: { qpdfWasm: Uint8Array; jpegDecWasm: Uint8Array; jpegEncWasm: Uint8Array }) => {
     engines = await createEngines({ qpdf: qpdfWasm, jpegDec: jpegDecWasm, jpegEnc: jpegEncWasm });

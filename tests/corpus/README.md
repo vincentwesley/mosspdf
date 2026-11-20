@@ -26,3 +26,6 @@
 
 ## M3 safety and password fixtures
 `risk-js-openaction`, `risk-js-names` (JavaScript name tree), `risk-page-aa`, `risk-annot-aa`, `risk-launch`, `risk-embedded` (name-tree attachment + FileAttachment annotation), `risk-submit`, `risk-importdata`, `risk-uri` (two links), `risk-gotor`, `risk-gotoe`, `risk-richmedia`, `risk-xfa` (AcroForm + XFA), `risk-jbig2`. `risk-everything` combines all of these (except JBIG2); `-objstm` is the same content in object streams and `-encrypted` is AES-256 with user password `user-pass`. `restricted-owner-only`: opens without a password, owner password `owner-pass`, print/copy/edit denied. `encrypted-user-owner`: user `user-pass`, owner `owner-pass`, print/copy denied. Clean files: plain-3p, forms, outline, mixed-sizes.
+
+## M4 fill and sign fixtures
+`forms-2p`: two pages, the second turned 90 degrees; text, multiline text, max-length text (4), checkbox, radio group (a, b), dropdown, option list, a read-only text field (REF-001), and a text field on page 2. `xfa-only`: AcroForm with an XFA entry and no fields. Also used: `forms`, `signed` (/ByteRange + /Type /Sig), `risk-xfa` (AcroForm + XFA hybrid), `rotated`, `rotated-crop`.
