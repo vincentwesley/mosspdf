@@ -1,6 +1,6 @@
 > Update at the end of any session that changed state. Keep it lean.
 
-Continue work on **Pagehold** (repo `vincentwesley/pagehold`). main holds M0-M3 (live); branch `m4-fill-sign` adds M4 (fill forms, sign), not merged yet.
+Continue work on **Pagehold** (repo `vincentwesley/pagehold`). main holds M0-M5 + UX batch (live).
 
 ## Before anything
 1. Work in `C:\Coding Projects\pagehold`; read this file, `docs/PLAN.md`, `docs/DECISIONS.md` (D7, D10, D11).
@@ -25,8 +25,11 @@ Continue work on **Pagehold** (repo `vincentwesley/pagehold`). main holds M0-M3 
 - CI-only: mobile-safari (Linux WPE) reports an inline `style-src-elem` CSP violation (blank source, line 5) on compare intake after an earlier viewport resize in the same test; passes locally and on CI webkit. Test is `fixme` on CI mobile-safari (`e2e/shell.spec.ts`); investigate when Compare is built (M7).
 - Firefox offline test skipped (setOffline broken with service workers, docs/spikes/csp.md); keyboard-only tests skip on touch projects.
 - Liberation Sans (GPL-2 + font exception) ships in the pdf.js data pack; owner may prefer to drop it (D11).
-- Not yet: M2+ tools, release zip.
+- Not yet: M8 (batch, workflows, command palette, a11y check), M9 polish, release zip.
 
-## Resume point (2026-11-20)
-- main = M0-M3, live. M4 built on branch `m4-fill-sign` (review, merge, then M5 per docs/PLAN.md).
-- Local full e2e is unreliable on this 16 GB machine; prefer CI (5 parallel e2e jobs) or `--project=<one>` runs locally.
+## Resume point (2026-11-20, evening)
+- main = M0-M5 + UX batch (result card, Use in another tool, undo, home search, recents), OCR (D16), fill + sign (D15). Deployed 3e2f121b, smoke passed.
+- Worktree `.worktrees/m6` (branch `m6-redact`, local only): redact + photo clean (D17). Box-offset leak fixed (measured glyph widths, padding, pixel test); check the last commit message for anything marked WIP/unverified. Its base is the pre-squash M4 commits: rebase with `git rebase --onto main eb0cb54 m6-redact`. main-gzip budget raised to 52 KB: consider lazy-loading tool modules instead.
+- Worktree `.worktrees/m7` (branch `m7-compare`, local only): Compare (D18), likely WIP; read its last commit body.
+- Then: PR each (merge without `--delete-branch`), deploy, smoke; M8; M9 + v1.0.0.
+- Local full e2e is unreliable on this 16 GB machine; prefer CI or `--project=<one>` runs locally.
