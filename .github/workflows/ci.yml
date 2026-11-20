@@ -78,6 +78,7 @@ jobs:
           for i in 1 2 3; do
             timeout 480 npm run pw -- install --with-deps ${{ matrix.browser }} && exit 0
             echo "browser install attempt $i failed or stalled, retrying"
+            sudo dpkg --configure -a || true
           done
           exit 1
       - run: npm run test:e2e -- --project=${{ matrix.project }}
