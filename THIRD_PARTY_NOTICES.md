@@ -9,7 +9,8 @@ Everything third-party that ships in the Pagehold build, with author, licence an
 | pdfjs-dist 6.5.438 (pdf.js: rendering, thumbnails; also the pdf.js worker) | Mozilla and contributors | Apache-2.0 | https://github.com/mozilla/pdf.js |
 | @cantoo/pdf-lib 2.11.1 (repair and metadata pass, runs in the ops worker only) | Cantoo (fork), Andrew Dillon (original pdf-lib) | MIT | https://github.com/cantoo-scribe/pdf-lib |
 | @neslinesli93/qpdf-wasm 0.3.1 (qpdf compiled to WebAssembly: page assembly, inspection) | Tommaso Pifferi | ISC (wrapper); the bundled qpdf is Apache-2.0, Copyright Jay Berkenbilt | https://github.com/neslinesli93/qpdf-wasm, https://github.com/qpdf/qpdf |
-| fflate 0.8.3 (dependency of @cantoo/pdf-lib) | Arjun Barrett | MIT | https://github.com/101arrowz/fflate |
+| @jsquash/jpeg 1.6.0 (MozJPEG compiled to WebAssembly: image recompression in compress, ops worker only; its codec/LICENSE.codec.md covers MozJPEG, IJG and libjpeg-turbo terms: BSD-3-Clause, IJG, Zlib) | Jamie Sinclair (repackaged from Squoosh by Google) | Apache-2.0 | https://github.com/jamsinclair/jSquash |
+| fflate 0.8.3 (zip downloads in the app; also a dependency of @cantoo/pdf-lib) | Arjun Barrett | MIT | https://github.com/101arrowz/fflate |
 | culori 4.0.2 (dependency of @cantoo/pdf-lib) | Dan Burzo | MIT | https://github.com/Evercoder/culori |
 | html-entities 2.6.0 (dependency of @cantoo/pdf-lib) | Marat Dulin | MIT | https://github.com/mdevils/html-entities |
 | node-html-better-parser 1.5.9 (dependency of @cantoo/pdf-lib) | Xiaoyi Shi and contributors | MIT | https://github.com/Rexxars/node-html-better-parser |

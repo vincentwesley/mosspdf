@@ -23,3 +23,6 @@
 | image-heavy | about 19 MB: 5 pages of seeded random-noise RGB images (Flate-compressed, not JPEG: no JPEG encoder is bundled) |
 
 `node scripts/corpus.mjs --external` also downloads `tests/corpus/external/irs-fw9.pdf` (IRS Form W-9, a US federal work, public domain under 17 USC 105), checked against a pinned sha256. Skipped quietly when offline or when the IRS has republished the file. Tests do not depend on it.
+
+## M3 safety and password fixtures
+`risk-js-openaction`, `risk-js-names` (JavaScript name tree), `risk-page-aa`, `risk-annot-aa`, `risk-launch`, `risk-embedded` (name-tree attachment + FileAttachment annotation), `risk-submit`, `risk-importdata`, `risk-uri` (two links), `risk-gotor`, `risk-gotoe`, `risk-richmedia`, `risk-xfa` (AcroForm + XFA), `risk-jbig2`. `risk-everything` combines all of these (except JBIG2); `-objstm` is the same content in object streams and `-encrypted` is AES-256 with user password `user-pass`. `restricted-owner-only`: opens without a password, owner password `owner-pass`, print/copy/edit denied. `encrypted-user-owner`: user `user-pass`, owner `owner-pass`, print/copy denied. Clean files: plain-3p, forms, outline, mixed-sizes.

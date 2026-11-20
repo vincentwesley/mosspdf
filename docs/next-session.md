@@ -11,12 +11,28 @@ Continue work on **Pagehold** (repo `vincentwesley/pagehold`). Branch `m1` holds
 - Deploys run locally: `npm run deploy` (no deploy workflow).
 - Checks: `npm run check`, `npm run check:budgets`, `npm run licences`; `npm run test:e2e` (5 projects, builds and serves `dist` with wrangler dev so `_headers` apply). Screenshots: `npm run pw -- test e2e/screens.spec.ts --project=chromium` writes `qa-output/screens/`.
 - qpdf CLI for tests: `tools/qpdf/*/bin/qpdf(.exe)` (found by `scripts/qpdf-bin.mjs`), then `QPDF_BIN`, then PATH.
+- `npm ci` wipes the project-local Playwright browsers; re-run `npm run pw -- install chromium firefox webkit` after it.
 
 ## Current state
+- Adding a tool: create `src/tools/<id>.ts` exporting a `ToolDef` (see `src/tools/types.ts`; planned stubs already exist for every id on the home map: give yours a `run`), import it in `src/tools/index.ts` if new. Fields kit: `src/ui/fields.ts`. D12.
 - Tools: merge, split (ranges, every N, by size), organize, extract; password and bad-file handling; seal + privacy panel; PWA offline; version shown.
 - e2e covers flows, axe (both themes), overflow (320 to 1280, 200% zoom), offline (Chromium, WebKit), seal negative controls (page and ops worker), 1,000-page thumbnails (Chromium).
 
 ## Known gaps
+- CI-only: mobile-safari (Linux WPE) reports an inline `style-src-elem` CSP violation (blank source, line 5) on compare intake after an earlier viewport resize in the same test; passes locally and on CI webkit. Test is `fixme` on CI mobile-safari (`e2e/shell.spec.ts`); investigate when Compare is built (M7).
 - Firefox offline test skipped (setOffline broken with service workers, docs/spikes/csp.md); keyboard-only tests skip on touch projects.
 - Liberation Sans (GPL-2 + font exception) ships in the pdf.js data pack; owner may prefer to drop it (D11).
-- Not yet: M2+ tools, update-prompt e2e (reload prompt exists, no spec), release zip.
+- Not yet: M2+ tools, release zip.
+
+## Resume point (2026-11-19, usage limit)
+- M1 merged (PR #2) and live. Branch `m2` (local, not pushed) = main + m2-ops + m3-ops + ui-shell merged; unit checks passed before the ui-shell merge; re-run `npm ci --ignore-scripts && npm run check && npm run check:budgets && npm run licences && npm run test:e2e` on `m2` first.
+- Next: wire the M2/M3 ops into the `src/tools/<id>.ts` stubs (images-to-pdf, pdf-to-images, compress, page-numbers, watermark, metadata, protect, unprotect, safety-scan, repair) with e2e per tool; then PR, CI, merge, deploy, smoke.
+- Fixed on branch `fixes` (2026-11-19, local): Firefox worker-src race (D14), compact phone home, live smoke merge flow, update-prompt e2e. Still open: qpdf passwords via `--user-password=`/`--owner-password=`. Parallel worktrees: set `PH_PORT` (and never run two e2e runs on one worktree: both rebuild `dist/`).
+- Worktrees `.worktrees/m2-ops`, `m3-ops`, `ui-shell` can be removed once `m2` is verified.
+
+- m3-ui (local branch, not pushed): protect, unprotect, safety-scan, repair wired to the ops (`src/tools/*.ts`, `passwordField` in fields.ts, `ToolDef.onError`), `e2e/tools-m3.spec.ts`. Passwords reach qpdf as named options (`--user-password=`, `--owner-password=`, `--bits=256`). Safety scan runs on add; "Download cleaned copy" cleans and downloads in one click.
+
+## Resume point (2026-11-19, end of session)
+- PR #3 (`m2` → main: M2 + M3 tools, fixes) is open; CI split into `test` + 5 parallel `e2e (<project>)` jobs. `test` passed; e2e jobs were still running at session end. Check `gh pr checks 3`; if green: merge, `npm run deploy`, `npm run smoke:prod`, update HANDOVER/CHANGELOG. If red: fix, push to `m2`.
+- Local full e2e is unreliable on this 16 GB machine (wrangler dev truncates assets under 3 browsers; memory kills runs); prefer CI or `--project=<one>` runs.
+- Next after merge: M4 (forms + signatures).

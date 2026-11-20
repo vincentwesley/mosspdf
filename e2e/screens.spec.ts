@@ -6,6 +6,7 @@ import { test, expect, loadApp, setTheme, shot, type Theme } from "./fixtures";
 
 const corpus = (n: string) => resolve("tests/corpus/generated", `${n}.pdf`);
 const add = (page: Page, ...names: string[]) => page.getByTestId("file-input").setInputFiles(names.map(corpus));
+const image = (n: string) => resolve("tests/fixtures/images", n);
 const drawn = async (page: Page) => {
   await page.locator(".pg.is-drawn").first().waitFor({ timeout: 20_000 }); // not expect().toBeVisible(): that pairing crashes Firefox in the following axe run
   await page.waitForTimeout(600);
@@ -19,8 +20,18 @@ const SCENES: { name: string; widths: number[]; open: (p: Page) => Promise<void>
   { name: "split", widths: [375, 1280], open: async (p) => { await loadApp(p, "/#/split"); await add(p, "plain-3p"); await p.getByTestId("range-input").fill("1-2, 3"); await expect(p.getByTestId("split-part")).toHaveCount(2); } },
   { name: "organize", widths: [375, 1280], open: async (p) => { await loadApp(p, "/#/organize"); await add(p, "rotated"); await drawn(p); } },
   { name: "extract", widths: [375, 1280], open: async (p) => { await loadApp(p, "/#/extract"); await add(p, "plain-3p"); await drawn(p); await p.getByTestId("page-select").first().click(); } },
+  { name: "images-to-pdf", widths: [375, 1280], open: async (p) => { await loadApp(p, "/#/images-to-pdf"); await p.getByTestId("file-input").setInputFiles([image("exif6-40x20.jpg"), resolve("tests/corpus/generated/photo-small.jpg")]); await expect(p.getByTestId("file-row")).toHaveCount(2); await p.getByTestId("size-a4").check(); } },
+  { name: "pdf-to-images", widths: [375, 1280], open: async (p) => { await loadApp(p, "/#/pdf-to-images"); await add(p, "plain-3p"); await expect(p.getByTestId("file-meta")).toContainText("3 pages"); await p.getByTestId("format-jpeg").check(); } },
+  { name: "compress", widths: [375, 1280], open: async (p) => { await loadApp(p, "/#/compress"); await add(p, "image-mixed"); await expect(p.getByTestId("file-meta")).toContainText("pages"); await p.getByTestId("primary-action").click(); await expect(p.getByTestId("compress-summary")).toBeVisible(); } },
+  { name: "page-numbers", widths: [375, 1280], open: async (p) => { await loadApp(p, "/#/page-numbers"); await add(p, "plain-3p"); await expect(p.getByTestId("file-meta")).toContainText("3 pages"); await p.getByTestId("pos-top-right").check(); } },
+  { name: "watermark", widths: [375, 1280], open: async (p) => { await loadApp(p, "/#/watermark"); await add(p, "plain-3p"); await expect(p.getByTestId("file-meta")).toContainText("3 pages"); await p.getByTestId("wm-text").fill("CONFIDENTIAL"); } },
+  { name: "metadata", widths: [375, 1280], open: async (p) => { await loadApp(p, "/#/metadata"); await add(p, "plain-3p"); await expect(p.getByTestId("md-title")).toHaveValue("Quarterly notes (made up)"); } },
   { name: "privacy-dialog", widths: [375, 1280], open: async (p) => { await loadApp(p); await p.getByTestId("seal-badge").click(); await expect(p.getByTestId("privacy-dialog")).toBeVisible(); await p.waitForTimeout(500); } },
   { name: "error", widths: [375, 1280], open: async (p) => { await loadApp(p, "/#/merge"); await add(p, "renamed-text", "empty", "plain-3p"); await expect(p.locator('[data-testid="file-row"][data-status="error"]')).toHaveCount(2); } },
+  { name: "scan-findings", widths: [375, 1280], open: async (p) => { await loadApp(p, "/#/safety-scan"); await add(p, "risk-everything"); await expect(p.getByTestId("risky-found")).toBeVisible(); } },
+  { name: "protect", widths: [375, 1280], open: async (p) => { await loadApp(p, "/#/protect"); await add(p, "plain-3p"); await expect(p.getByTestId("pw-input")).toBeVisible(); await p.getByTestId("pw-input").fill("correct horse"); await p.getByTestId("pw-confirm").fill("correct horse"); await p.getByTestId("more-options").locator("summary").click(); } },
+  { name: "unprotect", widths: [375, 1280], open: async (p) => { await loadApp(p, "/#/unprotect"); await add(p, "encrypted-aes256"); await expect(p.locator('[data-status="locked"]')).toHaveCount(1); } },
+  { name: "repair", widths: [375, 1280], open: async (p) => { await loadApp(p, "/#/repair"); await add(p, "truncated"); await p.getByTestId("primary-action").click(); await expect(p.getByTestId("repair-actions")).toBeVisible(); } },
   { name: "locked", widths: [375, 1280], open: async (p) => { await loadApp(p, "/#/organize"); await add(p, "encrypted-aes256"); await expect(p.locator('[data-status="locked"]')).toHaveCount(1); } },
 ];
 

@@ -1,14 +1,16 @@
-import { defineConfig, devices } from "@playwright/test";
+﻿import { defineConfig, devices } from "@playwright/test";
 
 // BASE_URL set => test that deployment and skip the local server. Port avoids 4397 (unknown process on the owner's machine).
-const PORT = 4811;
+const PORT = Number(process.env.PH_PORT ?? 4811); // PH_PORT lets parallel worktrees run side by side
 const BASE_URL = process.env.BASE_URL ?? `http://127.0.0.1:${PORT}`;
 
 export default defineConfig({
   testDir: "e2e",
   globalSetup: "./e2e/global-setup.ts",
   reporter: process.env.CI ? [["list"], ["html", { open: "never" }]] : "list",
-  retries: process.env.CI ? 1 : 0,
+  // One retry everywhere: wrangler dev occasionally truncates a large engine asset under 3 parallel browsers (ERR_INCOMPLETE_CHUNKED_ENCODING); a retry shows up as "flaky", never silently green.
+  retries: 1,
+  expect: { timeout: 10_000 }, // qpdf/pdf.js work in a loaded run outlasts the 5 s default
   forbidOnly: !!process.env.CI,
   workers: process.env.CI ? 2 : 3, // WASM + pdf.js in six parallel browsers exhausts a 16 GB dev machine (Firefox content process crashes)
   use: {

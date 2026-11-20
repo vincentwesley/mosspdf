@@ -1,4 +1,4 @@
-// Every spec imports { test, expect } from here. The extended context fails a test on: console.error, page error, unhandled rejection,
+﻿// Every spec imports { test, expect } from here. The extended context fails a test on: console.error, page error, unhandled rejection,
 // CSP violation, any cross-origin request (A-NET-2), and any request after `pagehold:sealed` (A-NET-1, measured per docs/spikes/csp.md:
 // context.route + serviceWorkers "block"; page.on('request') is unreliable in Chromium).
 import { test as base, expect, type BrowserContext, type Page } from "@playwright/test";
@@ -35,7 +35,7 @@ export const test = base.extend<{ allowedErrors: RegExp[] }>({
     await context.addInitScript(() => {
       const w = window as unknown as Win;
       if (window.top === window) w.__phReport("doc-start", "");
-      document.addEventListener("securitypolicyviolation", (e) => w.__phReport("csp-violation", `${e.violatedDirective} ${e.blockedURI}`), true);
+      document.addEventListener("securitypolicyviolation", (e) => w.__phReport("csp-violation", `${e.violatedDirective} ${e.blockedURI} @${e.sourceFile}:${e.lineNumber} sealed=${(w as unknown as {__phSealed?: boolean}).__phSealed ?? false} t=${Math.round(performance.now())}`), true);
       window.addEventListener("unhandledrejection", (e) => w.__phReport("unhandled-rejection", String(e.reason)));
       window.addEventListener("pagehold:sealed", () => {
         w.__phSealed = true;
@@ -71,7 +71,7 @@ export const test = base.extend<{ allowedErrors: RegExp[] }>({
 });
 
 /** Resolves once the page has fired `pagehold:sealed` (and the fixture has recorded it). Requests from then on fail the test. */
-export async function waitForSeal(page: Page, timeout = 15_000): Promise<void> {
+export async function waitForSeal(page: Page, timeout = 45_000): Promise<void> {
   await page.waitForFunction(() => (window as unknown as Win).__phSealed === true, undefined, { timeout });
   await expect.poll(() => states.get(page.context())!.sealed.has(page), { timeout }).toBe(true);
 }

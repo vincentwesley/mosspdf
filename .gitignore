@@ -24,7 +24,7 @@ brag-output/
 qa-output/
 .playwright-mcp/
 /data/
-tools/
+/tools/
 tests/corpus/generated/
 /spikes/
 .worktrees/
