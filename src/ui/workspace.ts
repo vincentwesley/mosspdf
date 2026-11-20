@@ -239,5 +239,5 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
     h("header", { class: "view__head" }, h1, h("p", { class: "view__lede", text: tool.lede })),
     dz, soon, notice, fl.el, tip, warnBox, optBox, gridBox, settings, resultBox, bar);
   update();
-  return { el, destroy: () => { unsub(); grid?.destroy(); abort?.abort(); } };
+  return { el, destroy: () => { unsub(); grid?.destroy(); abort?.abort(); tool.destroy?.(ctx); } };
 }

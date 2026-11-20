@@ -41,6 +41,7 @@ All under the SIL Open Font License 1.1, full text in `src/fonts/OFL.txt` (it tr
 - Inter (The Inter Project Authors)
 - Silkscreen (The Silkscreen Project Authors)
 - JetBrains Mono (The JetBrains Mono Project Authors)
+- Caveat (The Caveat Project Authors; the typed-signature handwriting in Sign, from the Fontsource package build https://fontsource.org/fonts/caveat)
 
 ## Art and brand
 

@@ -1,6 +1,6 @@
 > Update at the end of any session that changed state. Keep it lean.
 
-Continue work on **Pagehold** (repo `vincentwesley/pagehold`). main holds M0-M3 (live).
+Continue work on **Pagehold** (repo `vincentwesley/pagehold`). main holds M0-M3 (live); branch `m4-fill-sign` adds M4 (fill forms, sign), not merged yet.
 
 ## Before anything
 1. Work in `C:\Coding Projects\pagehold`; read this file, `docs/PLAN.md`, `docs/DECISIONS.md` (D7, D10, D11).
@@ -16,6 +16,7 @@ Continue work on **Pagehold** (repo `vincentwesley/pagehold`). main holds M0-M3 
 ## Current state
 - Adding a tool: create `src/tools/<id>.ts` exporting a `ToolDef` (see `src/tools/types.ts`; planned stubs already exist for every id on the home map: give yours a `run`), import it in `src/tools/index.ts` if new. Fields kit: `src/ui/fields.ts`. D12.
 - M5 OCR (branch m5-ocr, D16): #/ocr loads Tesseract (about 6 MB) before the seal only when the page boots on that route; other routes show a reload button. Engine in src/engines/ocr.ts, worker src/workers/ocr.worker.ts, text layer op src/ops/ocr.ts. Fixtures scan-1p.pdf, scan-mixed-2p.pdf (scripts/scan-image.mjs). Cancel takes effect between pages. Budgets raised (.wasm 4700, .gz 3100).
+- M4 (D15): `src/ui/pageview.ts` is the shared page viewer (overlay layer per page); `src/tools/fill.ts` + `src/ops/forms.ts`; `src/tools/sign.ts` + `src/ui/sigmaker.ts` + `src/ops/sign.ts`. `ToolDef.destroy` is new. Caveat font preloaded before the seal.
 - Tools: merge, split (ranges, every N, by size), organize, extract; password and bad-file handling; seal + privacy panel; PWA offline; version shown.
 - e2e covers flows, axe (both themes), overflow (320 to 1280, 200% zoom), offline (Chromium, WebKit), seal negative controls (page and ops worker), 1,000-page thumbnails (Chromium).
 
@@ -26,5 +27,5 @@ Continue work on **Pagehold** (repo `vincentwesley/pagehold`). main holds M0-M3 
 - Not yet: M2+ tools, release zip.
 
 ## Resume point (2026-11-20)
-- main = M0-M3, live and smoke-tested. Next: M4 (forms + signatures) per docs/PLAN.md.
+- main = M0-M3, live. M4 built on branch `m4-fill-sign` (review, merge, then M5 per docs/PLAN.md).
 - Local full e2e is unreliable on this 16 GB machine; prefer CI (5 parallel e2e jobs) or `--project=<one>` runs locally.

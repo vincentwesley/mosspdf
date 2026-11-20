@@ -59,14 +59,14 @@ export function toUser(v: View, u: number, vv: number): [number, number] {
   }
 }
 
-function checkWinAnsi(font: PDFFont, text: string, what: string) {
+export function checkWinAnsi(font: PDFFont, text: string, what: string) {
   const ok = new Set(font.getCharacterSet());
   const bad = [...new Set([...text])].filter((c) => !ok.has(c.codePointAt(0)!));
   if (bad.length)
     throw new PdfError("unsupported", `${what} has characters that can't be used yet: ${bad.map((c) => `"${c}"`).join(" ")}. Use Western European letters, digits and basic punctuation.`);
 }
 
-const hex = (c: string) => {
+export const hex = (c: string) => {
   const m = /^#([0-9a-f]{6})$/i.exec(c);
   if (!m) throw new PdfError("unsupported", `"${c}" isn't a colour. Use the form #rrggbb.`);
   return [0, 2, 4].map((i) => (parseInt(m[1].slice(i, i + 2), 16) / 255).toFixed(3));

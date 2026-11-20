@@ -13,3 +13,6 @@ export { cleanCopy, safetyScan } from "./safety";
 export { repair } from "./repair";
 export type * from "./types-m3";
 export { addTextLayer, type OcrPage } from "./ocr";
+// M4: fill forms, sign
+export { fillForm, readForm, type FieldType, type FieldValue, type FormField, type FormInfo, type FormValues, type FormWidget } from "./forms";
+export { stampPage, type StampInput, type StampItem } from "./sign";

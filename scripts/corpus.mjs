@@ -115,6 +115,45 @@ async function signed() {
   return doc;
 }
 
+
+// M4: a richer form (two pages, the second turned 90 degrees) and an XFA-only form (no standard fields).
+async function forms2() {
+  const doc = await textDoc(2, "f");
+  const [p1, p2] = doc.getPages();
+  p2.setRotation(degrees(90));
+  const form = doc.getForm();
+  form.createTextField("full_name").addToPage(p1, { x: 50, y: 600, width: 200, height: 24 });
+  const notes = form.createTextField("notes");
+  notes.enableMultiline();
+  notes.addToPage(p1, { x: 50, y: 500, width: 250, height: 80 });
+  const code = form.createTextField("code");
+  code.setMaxLength(4);
+  code.addToPage(p1, { x: 300, y: 600, width: 80, height: 24 });
+  form.createCheckBox("agree").addToPage(p1, { x: 50, y: 460, width: 20, height: 20 });
+  const r = form.createRadioGroup("choice");
+  r.addOptionToPage("a", p1, { x: 50, y: 420, width: 20, height: 20 });
+  r.addOptionToPage("b", p1, { x: 90, y: 420, width: 20, height: 20 });
+  const d = form.createDropdown("country");
+  d.addOptions(["Alpha", "Beta", "Gamma"]);
+  d.addToPage(p1, { x: 50, y: 370, width: 200, height: 24 });
+  const l = form.createOptionList("interests");
+  l.addOptions(["Chess", "Go", "Shogi"]);
+  l.addToPage(p1, { x: 300, y: 340, width: 120, height: 60 });
+  const ro = form.createTextField("ref_no");
+  ro.setText("REF-001");
+  ro.enableReadOnly();
+  ro.addToPage(p1, { x: 300, y: 420, width: 100, height: 24 });
+  form.createTextField("page2_note").addToPage(p2, { x: 60, y: 600, width: 200, height: 24 });
+  return doc;
+}
+
+async function xfaOnly() {
+  const doc = await textDoc(1);
+  const ctx = doc.context;
+  doc.catalog.set(PDFName.of("AcroForm"), ctx.obj({ Fields: [], XFA: [PDFString.of("template"), ctx.register(ctx.stream("<xdp:xdp xmlns:xdp='http://ns.adobe.com/xdp/'/>"))] }));
+  return doc;
+}
+
 async function js() {
   const doc = await textDoc(1);
   doc.catalog.set(PDFName.of("OpenAction"), doc.context.obj({ Type: "Action", S: "JavaScript", JS: PDFString.of('app.alert("hello");') }));
@@ -356,6 +395,8 @@ export async function buildCorpus() {
   await wd("outline.pdf", outline());
   await wd("forms.pdf", forms());
   await wd("signed.pdf", signed());
+  await wd("forms-2p.pdf", forms2());
+  await wd("xfa-only.pdf", xfaOnly());
   await wd("javascript.pdf", js());
   await wd("text-1000p.pdf", textDoc(1000, "k"));
   await wd("text-500p.pdf", textDoc(500, "k"));
