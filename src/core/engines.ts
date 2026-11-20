@@ -2,8 +2,11 @@
 import qpdfWasmUrl from "@neslinesli93/qpdf-wasm/dist/qpdf.wasm?url";
 import jpegDecUrl from "@jsquash/jpeg/codec/dec/mozjpeg_dec.wasm?url";
 import jpegEncUrl from "@jsquash/jpeg/codec/enc/mozjpeg_enc.wasm?url";
+import ocrWasmUrl from "tesseract.js-core/tesseract-core-simd-lstm.wasm?url";
+import ocrLangUrl from "@tesseract.js-data/eng/4.0.0_best_int/eng.traineddata.gz?url";
 import pdfjsDataUrl from "virtual:pdfjs-data";
 import opsWorkerUrl from "../workers/ops.worker.ts?worker&url";
+import ocrWorkerUrl from "../workers/ocr.worker.ts?worker&url";
 import pdfWorkerUrl from "pdfjs-dist/build/pdf.worker.mjs?worker&url";
 import type * as PdfJs from "pdfjs-dist/build/pdf.mjs";
 import { RpcClient } from "./rpc";
@@ -44,6 +47,20 @@ registerEngine({
     });
     pdfWorker = new mod.PDFWorker({ port } as never);
     await running;
+  },
+});
+
+// OCR (D16): ~6 MB, so only a page that boots on #/ocr loads it. A sealed page cannot start it later (no new worker, no fetch).
+export let ocrRpc: RpcClient | undefined;
+registerEngine({
+  name: "ocr",
+  async load() {
+    if (location.hash.replace(/^#\/?/, "") !== "ocr") return;
+    const [wasm, lang] = await Promise.all([fetchBytes(ocrWasmUrl), fetchBytes(ocrLangUrl)]);
+    const rpc = new RpcClient(new Worker(scriptUrl(ocrWorkerUrl), { type: "module" }));
+    // Like the ops worker: init only returns once the worker script is running, i.e. before the seal (D14).
+    await rpc.call("init", { wasm, lang }, { transfer: [wasm.buffer as ArrayBuffer, lang.buffer as ArrayBuffer] });
+    ocrRpc = rpc;
   },
 });
 

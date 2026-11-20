@@ -2,7 +2,8 @@
 import { serve, Transfer, type Ctx } from "../core/rpc";
 import { addPageNumbers, assemble, compress, imagesToPdf, inspect, merge, readMetadata, split, watermark, writeMetadata } from "../ops";
 import type { CompressLevel, ImageInput, ImagesToPdfOptions, MetadataEdit, PageNumberOptions, WatermarkOptions } from "../ops";
-import { cleanCopy, protect, repair, safetyScan, unprotect } from "../ops";
+import { addTextLayer, cleanCopy, protect, repair, safetyScan, unprotect } from "../ops";
+import type { OcrPage } from "../ops";
 import type { CleanOptions, ProtectOptions, UnprotectOptions } from "../ops/types-m3";
 import { createEngines } from "../engines";
 import type { Engines, InFile, OpOptions, OpResult, PageSpec, SplitMode } from "../ops/types";
@@ -23,6 +24,7 @@ const m3 = {
   safetyScan: ({ file }: { file: InFile }) => safetyScan(file, eng()),
   cleanCopy: async ({ file, c, o }: { file: InFile; c: CleanOptions; o: { producerCredit: boolean } }, ctx: Ctx) => out(await cleanCopy(file, c, opts(o, ctx), eng())),
   repair: async ({ file, o }: { file: InFile; o: { producerCredit: boolean } }, ctx: Ctx) => out(await repair(file, opts(o, ctx), eng())),
+  addTextLayer: async ({ file, pages, o }: { file: InFile; pages: OcrPage[]; o: { producerCredit: boolean } }, ctx: Ctx) => out(await addTextLayer(file, pages, opts(o, ctx), eng())),
 };
 
 serve({

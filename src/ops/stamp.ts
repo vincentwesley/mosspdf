@@ -25,7 +25,7 @@ export interface WatermarkOptions {
   layer?: "over" | "under"; // default over
 }
 
-interface View {
+export interface View {
   x0: number;
   y0: number;
   x1: number;
@@ -34,7 +34,7 @@ interface View {
   w: number; // displayed width
   h: number;
 }
-function view(page: PDFPage): View {
+export function view(page: PDFPage): View {
   const m = page.getMediaBox();
   const c = page.getCropBox();
   const x0 = Math.max(Math.min(m.x, m.x + m.width), Math.min(c.x, c.x + c.width));
@@ -46,7 +46,7 @@ function view(page: PDFPage): View {
   return { x0, y0, x1, y1, rot, w: swap ? y1 - y0 : x1 - x0, h: swap ? x1 - x0 : y1 - y0 };
 }
 /** Displayed (u right, v up, origin bottom-left of what the viewer shows) -> user space. */
-function toUser(v: View, u: number, vv: number): [number, number] {
+export function toUser(v: View, u: number, vv: number): [number, number] {
   switch (v.rot) {
     case 0:
       return [v.x0 + u, v.y0 + vv];

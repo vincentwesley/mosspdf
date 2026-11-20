@@ -55,6 +55,7 @@ export function privacyDialog(): { dialog: HTMLDialogElement; open: (opener: HTM
       h("button", { class: "dlg__x", type: "button", attrs: { "aria-label": "Close", "data-testid": "privacy-close" }, on: { click: () => dialog.close() } }, icon("close"))),
     h("p", { text: "Pagehold loads its PDF engines first, then seals the page. After that the browser blocks every request, so your files cannot be sent anywhere. Nothing is uploaded, and there are no accounts, cookies or analytics." }),
     summary,
+    h("p", { class: "pv__sum", text: "If you opened Pagehold on the OCR page, the OCR engine (about 6 MB) was loaded before the page sealed, like the other engines. It is listed below as a request before seal." }),
     h("h3", { text: "Requests since this page loaded" }),
     table,
     h("h3", { text: "Check it yourself" }),

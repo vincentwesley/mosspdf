@@ -12,3 +12,4 @@ export { protect, unprotect } from "./protect";
 export { cleanCopy, safetyScan } from "./safety";
 export { repair } from "./repair";
 export type * from "./types-m3";
+export { addTextLayer, type OcrPage } from "./ocr";
