@@ -29,7 +29,7 @@ Continue work on **Pagehold** (repo `vincentwesley/pagehold`). main holds M0-M5 
 
 ## Resume point (2026-11-20, evening)
 - main = M0-M5 + UX batch (result card, Use in another tool, undo, home search, recents), OCR (D16), fill + sign (D15). Deployed 3e2f121b, smoke passed.
-- Worktree `.worktrees/m6` (branch `m6-redact`, local only): redact + photo clean (D17). Box-offset leak fixed (measured glyph widths, padding, pixel test); check the last commit message for anything marked WIP/unverified. Its base is the pre-squash M4 commits: rebase with `git rebase --onto main eb0cb54 m6-redact`. main-gzip budget raised to 52 KB: consider lazy-loading tool modules instead.
-- Worktree `.worktrees/m7` (branch `m7-compare`, local only): Compare (D18), likely WIP; read its last commit body.
+- Worktree `.worktrees/m6` (branch `m6-redact`, local only): redact + photo clean (D17). Box-offset leak fixed (measured glyph widths, padding, pixel test); WIP commit 8e6c348: unit 201/201 and tools-m6 green on chromium + webkit; still to do: re-shoot `screens -g redact` and look at the boxes, firefox/mobile runs, security review. Its base is the pre-squash M4 commits: rebase with `git rebase --onto main eb0cb54 m6-redact`. main-gzip budget raised to 52 KB: consider lazy-loading tool modules instead.
+- Worktree `.worktrees/m7` (branch `m7-compare`): Compare NOT started (empty WIP commit). Plan: own Myers word diff `src/core/diff.ts`, `src/core/pagewords.ts`, report op, tabbed UI (changes, side by side, overlay). Grep for style strings in src/ found no cause of the mobile-safari CSP report yet. Lazy-loading tool chunks would need preloading before the seal.
 - Then: PR each (merge without `--delete-branch`), deploy, smoke; M8; M9 + v1.0.0.
 - Local full e2e is unreliable on this 16 GB machine; prefer CI or `--project=<one>` runs locally.
