@@ -10,7 +10,7 @@ const image = (n: string) => resolve("tests/fixtures/images", n);
 const input = (page: Page) => page.getByTestId("file-input");
 const GROUPS = ["Workflows", "Organize", "Convert", "Edit", "Protect", "Fill and sign", "OCR", "Privacy", "Compare"];
 // Live = the tool file defines `run` (same rule as src/tools/index.ts isLive); the rest are planned.
-const TOOL_IDS = readdirSync("src/tools").map((f) => f.replace(/\.ts$/, "")).filter((id) => !["index", "types", "pages", "pagesel"].includes(id));
+const TOOL_IDS = readdirSync("src/tools").map((f) => f.replace(/\.ts$/, "")).filter((id) => !["index", "all", "types", "pages", "pagesel"].includes(id));
 const isLive = (id: string) => /^\s*(async\s+)?run\s*[(:]/m.test(readFileSync(`src/tools/${id}.ts`, "utf8"));
 const LIVE = TOOL_IDS.filter(isLive);
 const PLANNED = TOOL_IDS.filter((id) => !isLive(id));
@@ -137,4 +137,22 @@ test("A-E2E-5 no horizontal overflow: compare with files", async ({ page }, info
   await input(page).setInputFiles([corpus("plain-3p"), corpus("mixed-sizes")]);
   await expect(page.getByTestId("file-label")).toHaveCount(2);
   await expectNoOverflow(page);
+});
+
+// Evidence for the fixme above: CI-only, never fails. Same intake, but violations are collected and attached in full so the next CI run names the source.
+test.describe("compare intake CSP diagnostic (CI mobile-safari)", () => {
+  test.use({ allowedErrors: [/csp-violation/] });
+  test("collect violations", async ({ page }, info) => {
+    test.skip(info.project.name !== "mobile-safari" || !process.env.CI, "diagnostic for the CI-only report");
+    await page.addInitScript(() => {
+      const v: unknown[] = ((window as unknown as { __v: unknown[] }).__v = []);
+      document.addEventListener("securitypolicyviolation", (e) => v.push({ directive: e.violatedDirective, blockedURI: e.blockedURI, sourceFile: e.sourceFile, line: e.lineNumber, column: e.columnNumber, sample: e.sample, disposition: e.disposition }), true);
+    });
+    await loadApp(page, "/#/compare");
+    await input(page).setInputFiles([corpus("plain-3p"), corpus("mixed-sizes")]);
+    await expect(page.getByTestId("file-label")).toHaveCount(2);
+    const v = await page.evaluate(() => (window as unknown as { __v: unknown[] }).__v);
+    await info.attach("csp-violations.json", { body: JSON.stringify(v, null, 2), contentType: "application/json" });
+    info.annotations.push({ type: "csp-violations", description: JSON.stringify(v) });
+  });
 });

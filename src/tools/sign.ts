@@ -56,7 +56,7 @@ const ui = (ctx: Ctx) => ctx.local(() => {
     items: [] as Item[],
     els: new Map<number, HTMLElement>(),
     pen: radioGroup({ name: "sg-pen", legend: "Pen colour", value: "black", testid: (v) => `pen-${v}`, onChange: () => { sig.refresh(); ini.refresh(); ctx.refresh(); }, options: [["black", "Black"], ["blue", "Blue"]] }),
-    kind: radioGroup({ name: "sg-kind", legend: "What to place", value: "signature", testid: (v) => `kind-${v}`, onChange: () => ctx.refresh(), options: [["signature", "Signature"], ["initials", "Initials"], ["date", "Date"], ["text", "Text"]] }),
+    kind: radioGroup({ name: "sg-kind", legend: "What to place", value: "signature", testid: (v) => `kind-${v}`, onChange: () => { if (/^(signature|initials)$/.test(s.kind.value())) fold.open = true; ctx.refresh(); }, options: [["signature", "Signature"], ["initials", "Initials"], ["date", "Date"], ["text", "Text"]] }),
     dateFmt: selectField({ id: "sg-datefmt", label: "Date format", testid: "sg-datefmt", onInput: () => ctx.refresh(), options: [["long", ""], ["dmy", ""], ["iso", ""]] }),
     text: textField({ id: "sg-text", label: "Text to place", testid: "sg-text", msgTestId: "sg-text-msg", reserve: true, onInput: () => ctx.refresh() }),
     all: checkField({ id: "sg-all", label: "Put it on every page", testid: "sg-all" }),
@@ -78,11 +78,14 @@ const ui = (ctx: Ctx) => ctx.local(() => {
   [...s.dateFmt.input.options].forEach((o) => { o.textContent = DATES[o.value](today); });
   const placed = h("section", { class: "sg-placed", attrs: { "aria-labelledby": "sg-placed-h" } }, h("h3", { id: "sg-placed-h", text: "Placed items" }), s.list);
   const step = (n: number, title: string, ...kids: HTMLElement[]) => h("section", { class: "sg-step" }, h("h3", { text: `${n}. ${title}` }), ...kids);
+  // Phones: step 1 is a disclosure that folds away once something is placed, so the page is what you see (the maker is tall).
+  const fold = h("details", { class: "sg-fold", attrs: { open: "", "data-testid": "sg-fold" } }, h("summary", { text: "1. Make your signature" }), sigBox, iniBox, note);
+  const phone = matchMedia("(max-width: 63.99rem)");
   s.root.append(
     s.hint,
     h("div", { class: "sg-layout" },
       h("div", { class: "sg-side" },
-        step(1, "Make your signature", sigBox, iniBox, note),
+        h("section", { class: "sg-step" }, fold),
         step(2, "Choose what to place", s.kind.el, s.dateFmt.el, s.text.el),
         step(3, "Place it",
           h("p", { class: "sg-help", text: "Click or tap a page to place it there. Drag to move, drag the corner or press + and - to resize, arrow keys nudge (Shift for bigger steps), Delete removes." }),
@@ -193,7 +196,7 @@ const ui = (ctx: Ctx) => ctx.local(() => {
     let it: Item;
     if (kind === "signature" || kind === "initials") {
       const canvas = (kind === "signature" ? sig : ini).result();
-      if (!canvas) { s.msg.textContent = kind === "signature" ? "Make your signature first: draw it, type it or upload it." : "Make your initials first: draw them, type them or upload them."; return; }
+      if (!canvas) { fold.open = true; s.msg.textContent = kind === "signature" ? "Make your signature first: draw it, type it or upload it." : "Make your initials first: draw them, type them or upload them."; return; }
       const fw = kind === "signature" ? 0.28 : 0.1;
       const fh = (fw * vp.width * (canvas.height / canvas.width)) / vp.height;
       it = { ...base, what: kind === "signature" ? "Signature" : "Initials", canvas, fw, fx: clamp(cx - fw / 2, 0, 1 - fw), fy: clamp(cy - fh / 2, 0, 1 - fh) };
@@ -209,6 +212,7 @@ const ui = (ctx: Ctx) => ctx.local(() => {
     clampIn(it, s.els.get(it.id)!, slot.overlay);
     layout(it, s.els.get(it.id)!);
     renderList();
+    if (it.canvas && phone.matches) fold.open = false;
     announce(`${it.what} placed on page ${it.page + 1}.`);
     const placedEl = s.els.get(it.id)!;
     placedEl.scrollIntoView({ block: "center", behavior: "auto" }); // instant: no motion to gate, and no scroll in flight under keyboard nudges

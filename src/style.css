@@ -309,6 +309,15 @@ div.pg__thumb { cursor: default; }
   .fill__side { display: grid; gap: var(--s4); align-content: start; }
 }
 .sg-make { display: grid; gap: var(--s3); }
+.sg-fold > :not(summary) { margin-top: var(--s3); }
+.sg-fold > summary { min-height: 48px; display: flex; align-items: center; cursor: pointer; font-size: 1.05rem; font-weight: 700; }
+.sg-fold > summary:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+@media (max-width: 63.99rem) { /* phone: steps, then the page, then the placed list and the note */
+  .sg-side { display: contents; }
+  .sg-side > .sg-placed, .sg-side > .hs-banner { order: 2; }
+  .sg-layout > .vw { order: 1; }
+  .sg-fold > summary { font-size: 1.05rem; }
+}
 .sg-placed h3 { margin: 0; font-size: 1.05rem; }
 .sg-where { display: flex; flex-wrap: wrap; gap: var(--s3) var(--s4); align-items: end; }
 .sg-where .field { max-width: 9rem; }

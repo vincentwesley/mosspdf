@@ -147,3 +147,8 @@ Symptom: a `worker-src` CSP violation on page load in Firefox, seen twice in a f
 - Why: another app already uses the product's earlier name. Owner decision.
 - Effect: display name, package, repo (`vincentwesley/mosspdf`), storage keys (`mosspdf.*`), cache names and release zips (`mosspdf-vX.Y.Z.zip`) all use the new name. Live site moves to https://mosspdf.pages.dev (Cloudflare Pages, `wrangler pages deploy`).
 - Note: existing browser data stored under the old keys is not migrated; the app has no accounts and keeps only preferences locally.
+
+## D25. Tool code split out of the main chunk (2026-11-21)
+- **Registry.** `src/tools/index.ts` holds light rows (id, title, blurb, group, next) for home, palette and routing; `src/tools/all.ts` imports every tool module and becomes its own chunk. `tests/tools-meta.test.ts` keeps rows and modules in step.
+- **Seal.** main.ts imports `tools/all` at start and registers it as an engine, so the chunk loads before the seal; a tool route renders once it has arrived. No chunk is fetched after sealing. The SW precache walks dist, so the chunk is cached for offline.
+- **Result.** main gzip 63.3 to 24.7 KB (tools chunk 41.6 KB); `main-gzip` budget 64 to 28 KB. Planned ("Coming soon") tiles are gone from home: no tool is planned.

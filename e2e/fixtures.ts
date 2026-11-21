@@ -35,7 +35,7 @@ export const test = base.extend<{ allowedErrors: RegExp[] }>({
     await context.addInitScript(() => {
       const w = window as unknown as Win;
       if (window.top === window) w.__phReport("doc-start", "");
-      document.addEventListener("securitypolicyviolation", (e) => w.__phReport("csp-violation", `${e.violatedDirective} ${e.blockedURI} @${e.sourceFile}:${e.lineNumber} sealed=${(w as unknown as {__phSealed?: boolean}).__phSealed ?? false} t=${Math.round(performance.now())}`), true);
+      document.addEventListener("securitypolicyviolation", (e) => w.__phReport("csp-violation", `${e.violatedDirective} ${e.blockedURI} @${e.sourceFile}:${e.lineNumber}:${e.columnNumber} sample=${JSON.stringify(e.sample)} sealed=${(w as unknown as {__phSealed?: boolean}).__phSealed ?? false} t=${Math.round(performance.now())}`), true);
       window.addEventListener("unhandledrejection", (e) => w.__phReport("unhandled-rejection", String(e.reason)));
       window.addEventListener("mosspdf:sealed", () => {
         w.__phSealed = true;

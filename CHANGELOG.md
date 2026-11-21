@@ -3,6 +3,8 @@
 All notable changes to this project are documented here. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
+- Tool code moved to its own chunk, loaded before the seal (D25); main bundle 63 to 25 KB gzip.
+- Sign on phones: "Make your signature" folds away once placed, and the page comes before the placed list.
 
 ## [1.3.0] - 2026-11-21
 - Renamed to MossPDF; new address https://mosspdf.pages.dev.
