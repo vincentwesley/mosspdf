@@ -143,7 +143,7 @@ Symptom: a `worker-src` CSP violation on page load in Firefox, seen twice in a f
 
 ## D23. Renamed to MossPDF; hosted on Cloudflare Pages (mosspdf.pages.dev) (2026-11-21)
 - Hosting: owner wanted mosspdf.pages.dev. New wrangler delegates new Pages projects to Workers, so the project was created once with `pages project create --force` (classic Pages); later `pages deploy` runs go to it directly. Pages applies `_headers` the same way, adds `Access-Control-Allow-Origin: *` (harmless for public static files) and serves index.html for unknown paths (hash routing, fine). Local e2e still serves dist with `wrangler dev -c scripts/wrangler.dev.jsonc` (moved out of the root so `pages deploy` doesn't read it).
-- Old addresses (pagehold/mosspdf .vwesley.workers.dev) are redirect-only Workers deployed from outside the repo.
+- Old addresses (the previous name and mosspdf on vwesley.workers.dev) are redirect-only Workers deployed from outside the repo.
 - Why: another app already uses the product's earlier name. Owner decision.
 - Effect: display name, package, repo (`vincentwesley/mosspdf`), storage keys (`mosspdf.*`), cache names and release zips (`mosspdf-vX.Y.Z.zip`) all use the new name. Live site moves to https://mosspdf.pages.dev (Cloudflare Pages, `wrangler pages deploy`).
 - Note: existing browser data stored under the old keys is not migrated; the app has no accounts and keeps only preferences locally.
