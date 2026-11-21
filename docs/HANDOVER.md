@@ -19,7 +19,7 @@ Resume here. Plan: `docs/PLAN.md`. Checks: `docs/ACCEPTANCE.md`. Why things are 
 3. Optional custom domain (Cloudflare dashboard → Workers → pagehold → Domains & Routes).
 
 ## 3. Next most valuable ideas (ranked)
-1. **Safety scan and repair memory**: about 10x the file size in RAM at 200 MB (PERF.md); scan structure without copying stream data.
+1. **Repair memory**: scan fixed in v1.2.1 (+69 MB at 193 MB); repair still about 3x (qpdf output in MEMFS, no streaming in this build).
 2. **Split tool code into chunks preloaded before the seal**: main bundle is 62 KB gzip (budget 64).
 3. **CI-only mobile-safari CSP report** on compare intake: test still `fixme`; log violation details in a CI run.
 4. **Chinese text in fill and stamps** (route-loaded CJK font subset, about 1-1.5 MB, like OCR languages). Tamil needs shaping that pdf-lib lacks: keep refusing.
