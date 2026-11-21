@@ -108,7 +108,7 @@ test.describe("Fill forms", () => {
     await loadApp(page, "/#/fill");
     await add(page, "xfa-only");
     await ready(page);
-    await expect(page.getByTestId("warnings")).toContainText("Pagehold can't fill it in");
+    await expect(page.getByTestId("warnings")).toContainText("MossPDF can't fill it in");
     await expect(primary(page)).toBeDisabled();
     await page.getByTestId("clear-all").click();
     await add(page, "plain-3p");

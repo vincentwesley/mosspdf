@@ -14,7 +14,7 @@ import { engines, opts } from "./helpers/env";
 import type { InFile } from "../src/ops/types";
 
 const run = process.env.PH_PERF === "1";
-const dir = run ? mkdtempSync(join(tmpdir(), "pagehold-perf-")) : "";
+const dir = run ? mkdtempSync(join(tmpdir(), "mosspdf-perf-")) : "";
 const rows: { op: string; input: string; ms: number; rssMB: number; ok: boolean; note: string }[] = [];
 const mb = (n: number) => Math.round(n / 1048576);
 

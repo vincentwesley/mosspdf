@@ -19,7 +19,7 @@ const ui = (ctx: Ctx) => ctx.local(() => ({
 }));
 
 export const wfShare: ToolDef = {
-  id: "wf-share", title: "Safe to share", group: "Workflows",
+  id: "wf-share", title: "Clean copy to share", group: "Workflows",
   blurb: "Clean a PDF before you send it.",
   lede: "Takes out scripts, actions and hidden attachments, then removes the title, author, dates and program names stored inside.",
   accepts: "pdf",
@@ -30,7 +30,7 @@ export const wfShare: ToolDef = {
   },
   warnings: pdfLossWarnings,
   summary: (ctx) => ui(ctx).sum,
-  primaryLabel: () => "Make it safe to share",
+  primaryLabel: () => "Make a cleaned copy",
   async run(ctx) {
     const u = ui(ctx);
     const f = ctx.file!;

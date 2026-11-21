@@ -1,4 +1,4 @@
-// D7: preload every engine asset, spawn the workers, then lock the page with a meta CSP and announce `pagehold:sealed`.
+// D7: preload every engine asset, spawn the workers, then lock the page with a meta CSP and announce `mosspdf:sealed`.
 // Add an engine (pdfium, tesseract...) with registerEngine(); nothing else changes.
 import { netlog } from "./netlog";
 
@@ -50,7 +50,7 @@ export function bootAndSeal(): Promise<void> {
       netlog.markSealed();
       set("sealed");
       document.documentElement.dataset.sealed = "true";
-      window.dispatchEvent(new Event("pagehold:sealed"));
+      window.dispatchEvent(new Event("mosspdf:sealed"));
     } catch (e) {
       seal.error = e instanceof Error ? e.message : String(e);
       set("failed");

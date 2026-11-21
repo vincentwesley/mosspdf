@@ -1,10 +1,10 @@
-# Pagehold
+# MossPDF
 
-Free, private PDF tools that run entirely in your browser. Files never leave your device, and the page proves it: after loading, it seals itself against the network and shows a log of every request it made.
+Free, private PDF tools that run entirely in your browser. Files never leave your device, and the page proves it: after loading, it locks itself against the network and shows a log of the requests it made.
 
-**Live:** https://pagehold.vwesley.workers.dev (installable, works offline)
+**Live:** https://mosspdf.pages.dev (installable, works offline after the first visit)
 
-![Pagehold home: 26 tools grouped by task](docs/media/home-1280.png)
+![MossPDF home: 26 tools grouped by task](docs/media/home-1280.png)
 
 ## Tools
 
@@ -13,10 +13,10 @@ Free, private PDF tools that run entirely in your browser. Files never leave you
 - **Edit:** page numbers, watermark, metadata, accessibility check
 - **Protect:** add or remove a password (only with the correct password), safety scan with a cleaned copy, repair
 - **Fill and sign:** fill form fields, sign (draw, type or upload; a visual signature, not a certified one)
-- **OCR:** make scans searchable (English)
-- **Privacy:** redact for good (Singapore NRIC/FIN, phones, emails, addresses, search, hand-drawn boxes), photo clean (EXIF and GPS removal, blur boxes)
+- **OCR:** make scans searchable (English, Chinese (Simplified), Malay, Tamil)
+- **Privacy:** remove text, not just cover it (Singapore NRIC/FIN, phones, emails, addresses, search, hand-drawn boxes), photo clean (EXIF and GPS removal, blur boxes)
 - **Compare:** word diff, side by side, pixel overlay, report
-- **Workflows:** Small enough to email, Safe to share, Job application pack
+- **Workflows:** Small enough to email, Clean copy to share, Job application pack
 - **Power features:** command palette (Ctrl/Cmd+K), keyboard shortcuts (?), batch mode with a zip of results
 
 | Redact | Compare | Sign on a phone |
@@ -26,13 +26,13 @@ Free, private PDF tools that run entirely in your browser. Files never leave you
 ## How the privacy works
 
 - The site's CSP allows only its own origin. After the engines load, the page adds a stricter CSP that blocks all network access, and the engine workers have none at all.
-- The **Sealed** badge lists every request since the page loaded. The privacy page explains how to check this yourself in DevTools.
-- No accounts, analytics, cookies or ads. The browser stores only your theme, logo size, recently used tools and the output setting. Files and signatures are never stored.
+- The **Sealed** badge lists the requests since the page loaded that the browser reports. The privacy page explains how to check this yourself in DevTools.
+- No accounts, analytics, cookies or ads. The browser stores only your theme, logo size, recently used tools, the OCR languages you chose, a small counter for the logo tip and the output setting. Files and signatures are never stored.
 - See [docs/LEGAL-REVIEW.md](docs/LEGAL-REVIEW.md) for what the app claims and its limits, and [docs/COMPARISON.md](docs/COMPARISON.md) for how it compares with other PDF tools.
 
 ## Run it offline from a release
 
-Download `pagehold-vX.Y.Z.zip` from [Releases](https://github.com/vincentwesley/pagehold/releases), unzip it, then run `node serve.mjs` inside the folder (Node 18+) and open the address it prints. The bundled server applies the same security headers as the live site.
+Download `mosspdf-vX.Y.Z.zip` from [Releases](https://github.com/vincentwesley/mosspdf/releases), unzip it, then run `node serve.mjs` inside the folder (Node 18+) and open the address it prints. The bundled server applies the same security headers as the live site.
 
 ## Develop
 
@@ -42,7 +42,7 @@ npm run pw -- install chromium firefox webkit   # browsers for e2e
 npm run dev            # local dev server
 npm run check          # typecheck + lint + unit + build
 npm run test:e2e       # Playwright, headless, 5 browser projects
-npm run release        # after build: release/pagehold-vX.Y.Z.zip
+npm run release        # after build: release/mosspdf-vX.Y.Z.zip
 ```
 
 Architecture, decisions and plans live in `docs/` (start with [docs/PLAN.md](docs/PLAN.md)). Large-file timings: [docs/PERF.md](docs/PERF.md). Usability walkthroughs: [docs/USABILITY.md](docs/USABILITY.md).
@@ -53,7 +53,7 @@ Cloudflare Workers static assets, deployed locally: `npm run deploy`, then `npm 
 
 ## Secrets and network
 
-No secrets and no network calls at runtime; everything runs in the browser. Provided as is, no warranty.
+No secrets and no third-party network calls at runtime; everything runs in the browser. Provided as is, no warranty.
 
 ## Credits
 

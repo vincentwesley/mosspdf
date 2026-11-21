@@ -1,4 +1,4 @@
-Pagehold - private PDF tools that run entirely in your browser.
+MossPDF - private PDF tools that run entirely in your browser.
 This folder is a static build. Your files never leave your computer.
 
 RUN IT
@@ -11,7 +11,7 @@ It works offline. serve.mjs only listens on 127.0.0.1 (this computer), serves th
 and applies the security headers from the _headers file.
 
 OTHER WAYS
-  Any static file server works, but the Pagehold seal (strict CSP, no network for the PDF
+  Any static file server works, but the MossPDF seal (strict CSP, no network for the PDF
   workers) depends on the headers in _headers. Plain servers ignore that file, so prefer
   serve.mjs. Opening index.html straight from disk (file://) does not work.
 

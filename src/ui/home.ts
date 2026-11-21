@@ -70,7 +70,7 @@ export function homeView(navigate: (hash: string) => void): { el: HTMLElement; d
   const el = h("div", { class: "view home" },
     h("header", { class: "hero" },
       h("h1", { text: "PDF tools that stay on your device.", attrs: { tabindex: -1, "data-testid": "view-heading" } }),
-      h("p", { class: "hero__lede" }, "Your files never leave this device. ", h("a", { href: "#/privacy", text: "See how to check" }), ".")),
+      h("p", { class: "hero__lede" }, "Your files stay on this device. ", h("a", { href: "#/privacy", text: "See how to check" }), ".")),
     dropzone({}),
     findRow,
     recentRow,

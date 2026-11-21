@@ -1,6 +1,6 @@
 {
-  "name": "pagehold",
-  "version": "1.2.1",
+  "name": "mosspdf",
+  "version": "1.3.0",
   "private": true,
   "description": "Private PDF tools that run entirely in the browser.",
   "type": "module",
@@ -8,7 +8,7 @@
   "author": "Vin, Vin's Atelier (https://vwesley.dev)",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vincentwesley/pagehold.git"
+    "url": "git+https://github.com/vincentwesley/mosspdf.git"
   },
   "engines": {
     "node": ">=24"
@@ -24,7 +24,7 @@
     "check": "npm run typecheck && npm run lint && npm test && npm run build",
     "check:budgets": "node scripts/check-budgets.mjs",
     "knip": "knip",
-    "deploy": "npm run build && npx --yes wrangler@4.165.0 deploy",
+    "deploy": "npm run build && npx --yes wrangler@4.165.0 pages deploy dist --project-name mosspdf --branch main",
     "pw": "node scripts/pw.mjs",
     "test:e2e:quick": "node scripts/pw.mjs test --project=chromium",
     "licences": "node scripts/licences.mjs",

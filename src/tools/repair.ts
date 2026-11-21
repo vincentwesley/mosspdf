@@ -11,7 +11,7 @@ function show(ctx: Ctx) {
   const r = f && u.fileId === f.id ? u.last : undefined;
   if (!r) return void u.box.replaceChildren(h("p", { class: "field__hint", text: "Repair rebuilds the file's structure and keeps what can still be read. It cannot bring back content that is gone." }));
   u.box.replaceChildren(
-    h("h3", { text: r.repaired ? "What Pagehold did" : "Result" }),
+    h("h3", { text: r.repaired ? "What MossPDF did" : "Result" }),
     h("ul", { class: "scan__list", attrs: { role: "list", "data-testid": "repair-actions" } }, ...r.actions.map((a) => h("li", { text: a }))),
     h("p", { text: `Pages in the repaired file: ${r.pagesAfter}.${r.pagesBefore ? ` The damaged original seems to have had about ${r.pagesBefore}.` : ""}`, attrs: { "data-testid": "repair-pages" } }),
     h("p", r.complete

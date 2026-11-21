@@ -11,7 +11,7 @@ const entries = [
   ...walk("dist").map((f) => [relative("dist", f).split("\\").join("/"), f]),
   ["serve.mjs", "scripts/serve.mjs"], ["README.txt", "scripts/release-readme.txt"],
   ["LICENSE", "LICENSE"], ["NOTICE.md", "NOTICE.md"], ["THIRD_PARTY_NOTICES.md", "THIRD_PARTY_NOTICES.md"], ["fonts-OFL.txt", "src/fonts/OFL.txt"],
-].map(([name, src]) => [`pagehold/${name}`, readFileSync(src)]);
+].map(([name, src]) => [`mosspdf/${name}`, readFileSync(src)]);
 
 // Minimal zip writer: deflate every entry, fixed timestamp so builds are reproducible.
 const u16 = (n) => { const b = Buffer.alloc(2); b.writeUInt16LE(n); return b; };
@@ -29,6 +29,6 @@ for (const [name, data] of entries) {
 const cd = Buffer.concat(central);
 const eocd = Buffer.concat([u32(0x06054b50), u16(0), u16(0), u16(entries.length), u16(entries.length), u32(cd.length), u32(offset), u16(0)]);
 mkdirSync("release", { recursive: true });
-const out = `release/pagehold-v${version}.zip`;
+const out = `release/mosspdf-v${version}.zip`;
 writeFileSync(out, Buffer.concat([...parts, cd, eocd]));
 console.log(`${out}: ${entries.length} files, ${(statSync(out).size / 1048576).toFixed(1)} MB`);

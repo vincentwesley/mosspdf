@@ -85,7 +85,7 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
     }
     void store.add(list, kind).then(() => {
       if (tool.accepts !== "pdf-pair" || ofKind().length <= 2) return;
-      store.notice = "Pagehold compares two PDFs at a time. Kept the two newest.";
+      store.notice = "MossPDF compares two PDFs at a time. Kept the two newest.";
       ofKind().slice(0, -2).forEach((f) => store.remove(f.id));
     });
   });
@@ -122,7 +122,7 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
   credit.addEventListener("change", () => { prefs.producerCredit = credit.checked; });
   const settings = h("details", { class: "settings" },
     h("summary", { text: "Output settings" }),
-    h("div", { class: "settings__row" }, credit, h("label", { attrs: { for: "credit" }, text: "Mention Pagehold in the file's details (Producer)" })));
+    h("div", { class: "settings__row" }, credit, h("label", { attrs: { for: "credit" }, text: "Mention MossPDF in the file's details (Producer)" })));
 
   const kbd = h("details", { class: "kbd", attrs: { "data-testid": "kbd-help" } },
     h("summary", { text: "Keyboard shortcuts" }),
@@ -240,7 +240,7 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
     const change = delta > 0 ? `Saved ${delta}%.` : "";
     const single = results.length === 1 && /\.pdf$/i.test(results[0].name);
     const next = single ? nextTools(tool) : [];
-    const zipName = `${stem(ctx.file?.name ?? "pagehold")}-${tool.id}.zip`;
+    const zipName = `${stem(ctx.file?.name ?? "mosspdf")}-${tool.id}.zip`;
     resultBox.append(
       h("h2", { id: "res-h", text: results.length > 1 ? `Done. ${results.length} files are ready.` : "Done. Your file is ready.", attrs: { tabindex: -1 } }),
       ...(tool.summary ? [h("p", { class: "res__sum", text: tool.summary(ctx), attrs: { "data-testid": "result-summary" } })] : inBytes ? [h("p", { class: "res__sum", text: `${fmtSize(inBytes)} → ${fmtSize(outBytes)}. ${change}`.trim(), attrs: { "data-testid": "result-summary" } })] : []),

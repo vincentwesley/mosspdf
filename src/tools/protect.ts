@@ -47,7 +47,7 @@ export const protect: ToolDef = {
     const u = ui(ctx);
     u.box.hidden = !ctx.file;
     const p = problems(ctx);
-    u.strength.textContent = u.f.pw.input.value ? `Strength: ${strengthOf(u.f.pw.input.value)}` : "Choose a password you will remember. Pagehold cannot recover it for you.";
+    u.strength.textContent = u.f.pw.input.value ? `Strength: ${strengthOf(u.f.pw.input.value)}` : "Choose a password you will remember. MossPDF cannot recover it for you.";
     u.f.confirm.setError(p.mismatch ? "The two passwords do not match." : null);
     u.f.owner.setError(p.needOwner ? "Limits only hold with a separate owner password. Set one, or allow everything." : p.sameOwner ? "The owner password must differ from the opening password, or the limits do not apply." : null);
     if ((p.needOwner || p.sameOwner) && !u.more.open) u.more.open = true;

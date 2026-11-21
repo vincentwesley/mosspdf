@@ -72,8 +72,8 @@ const ui = (ctx: Ctx) => ctx.local(() => {
   const ini: Maker = sigMaker({ id: "sg-ini", name: "initials", colour: () => PEN[s.pen.value() as keyof typeof PEN], onChange: () => ctx.refresh() });
   const sigBox = h("div", { class: "sg-make", attrs: { "data-testid": "sg-sig-box" } }, h("h4", { text: "Your signature" }), sig.el);
   const iniBox = h("div", { class: "sg-make", attrs: { "data-testid": "sg-ini-box" } }, h("h4", { text: "Your initials" }), ini.el);
-  const note = h("p", { class: "sg-note", text: "Your signature is not saved anywhere. It stays in this tab until you close it." });
-  const disclaimer = h("p", { class: "hs-banner hs-banner--info", text: "This adds a picture of your signature. It is not a certified digital signature, and some organisations require one.", attrs: { role: "note", "data-testid": "sign-disclaimer" } });
+  const note = h("p", { class: "sg-note", text: "MossPDF does not save your signature. It stays in this tab until you close it." });
+  const disclaimer = h("p", { class: "hs-banner hs-banner--info", text: "This adds a picture of your signature. It is not a certified digital signature, and some organisations require one. It does not prove who signed or that the file has not changed. Whether it is accepted depends on the recipient.", attrs: { role: "note", "data-testid": "sign-disclaimer" } });
   const today = new Date();
   [...s.dateFmt.input.options].forEach((o) => { o.textContent = DATES[o.value](today); });
   const placed = h("section", { class: "sg-placed", attrs: { "aria-labelledby": "sg-placed-h" } }, h("h3", { id: "sg-placed-h", text: "Placed items" }), s.list);

@@ -69,7 +69,7 @@ async function plan(extraSearch?: string, measured = true, f = file, whole = fal
 }
 
 function qdf(bytes: Uint8Array): string {
-  const dir = mkdtempSync(join(tmpdir(), "pagehold-"));
+  const dir = mkdtempSync(join(tmpdir(), "mosspdf-"));
   try {
     writeFileSync(join(dir, "in.pdf"), bytes);
     const r = spawnSync(qpdfBin(), ["--qdf", "--object-streams=disable", join(dir, "in.pdf"), join(dir, "out.pdf")], { encoding: "utf8" });

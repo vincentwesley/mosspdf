@@ -5,7 +5,7 @@ import { test, expect, expectNoOverflow, downloadAndCheck, loadApp, qpdfCheck } 
 test("A-REL-1: the app loads, has a title and heading", async ({ page }) => {
   const res = await page.goto("/");
   expect(res?.status()).toBe(200);
-  await expect(page).toHaveTitle(/Pagehold/i);
+  await expect(page).toHaveTitle(/MossPDF/i);
   await expect(page.locator("h1").first()).toBeVisible();
 });
 

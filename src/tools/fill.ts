@@ -179,7 +179,7 @@ export const fill: ToolDef = {
       ...(!f ? ["Add a PDF form above to start."]
         : u.error ? [u.error]
         : u.loading || !u.info ? ["Reading the form..."]
-        : none ? ["This PDF has no form fields Pagehold can fill. To put your name, a date or a signature anywhere on a page, use ", h("a", { href: "#/sign", text: "Sign", attrs: { "data-testid": "fill-to-sign" } }), "."]
+        : none ? ["This PDF has no form fields MossPDF can fill. To put your name, a date or a signature anywhere on a page, use ", h("a", { href: "#/sign", text: "Sign", attrs: { "data-testid": "fill-to-sign" } }), "."]
         : []));
     u.flatten.el.hidden = u.pv.el.hidden = u.phone.hidden = u.listBox.hidden = !u.info || n === 0;
   },
@@ -188,8 +188,8 @@ export const fill: ToolDef = {
     const w: string[] = [];
     if (u.info?.signed) w.push(SIGNED_WARNING);
     if (u.info?.hasXFA) w.push(editable(u).length
-      ? "This form also contains XFA data (an Adobe-only form layout). Pagehold fills the standard fields and removes the XFA data from the copy it saves."
-      : "This form is built with XFA, an old Adobe-only form format. Pagehold can't fill it in. Open it in Adobe Acrobat Reader, or ask the sender for a standard PDF form.");
+      ? "This form also contains XFA data (an Adobe-only form layout). MossPDF fills the standard fields and removes the XFA data from the copy it saves."
+      : "This form is built with XFA, an old Adobe-only form format. MossPDF can't fill it in. Open it in Adobe Acrobat Reader, or ask the sender for a standard PDF form.");
     return w;
   },
   ready(ctx) { return !!ctx.file && editable(ui(ctx)).some((f) => !f.readOnly); },

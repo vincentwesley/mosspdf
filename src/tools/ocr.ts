@@ -65,11 +65,11 @@ function pageText(words: OcrWord[]): string {
 export const ocr: ToolDef = {
   id: "ocr", title: "OCR", heading: "Make a scan searchable", group: "OCR",
   blurb: "Make scans searchable.",
-  lede: "Read the words on scanned pages and add them to the PDF, so you can search and copy from it. Reading happens on this device.",
+  lede: "Read the words on scanned pages and add them to the PDF, so you can search and copy from it. Reading happens on this device. Results can contain mistakes, especially on blurry, skewed or handwritten pages, so check them.",
   accepts: "pdf",
   options(ctx) {
     const u = ui(ctx);
-    window.addEventListener("pagehold:sealed", () => ctx.refresh(), { once: true }); // the engine finishes loading just before the seal
+    window.addEventListener("mosspdf:sealed", () => ctx.refresh(), { once: true }); // the engine finishes loading just before the seal
     return h("div", { class: "ocropts" }, u.missing, u.lang, u.skip.el, u.clean.el, h("fieldset", { class: "radios" }, h("legend", { text: "Save as" }), u.pdf.el, u.txt.el));
   },
   sync(ctx) {
@@ -78,8 +78,8 @@ export const ocr: ToolDef = {
     const stale = !ocrRpc || !same(sel, ocrLangs);
     u.missing.hidden = !stale;
     u.msg.textContent = ocrRpc
-      ? "These languages are not loaded yet. Pagehold locks itself down after it loads, so they have to load first, and this tab then reloads."
-      : "The OCR engine is not loaded on this page. Pagehold locks itself down after it loads, so the engine has to load first, and this tab then reloads.";
+      ? "These languages are not loaded yet. MossPDF locks itself down after it loads, so they have to load first, and this tab then reloads."
+      : "The OCR engine is not loaded on this page. MossPDF locks itself down after it loads, so the engine has to load first, and this tab then reloads.";
     u.load.textContent = `${ocrRpc ? "Load these languages" : "Load the OCR engine"} (about ${Math.round(loadSize(sel, !ocrRpc))} MB, stays on this device)`;
     u.clears.hidden = store.files.length === 0;
   },

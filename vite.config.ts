@@ -1,6 +1,6 @@
 import { defineConfig } from "vitest/config";
 import type { Plugin } from "vite";
-import { readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { join, relative } from "node:path";
 
@@ -15,7 +15,8 @@ function pdfjsData(): Plugin {
     const parts: { key: string; buf: Buffer }[] = [];
     for (const [kind, dir, ext] of [["cMapUrl", "cmaps", ".bcmap"], ["standardFontDataUrl", "standard_fonts", ""], ["wasmUrl", "wasm", ".wasm"]] as const) {
       for (const f of readdirSync(join(PDFJS, dir)).sort()) {
-        if (/^LICENSE/.test(f) || (ext && !f.endsWith(ext))) continue;
+        // Liberation Sans (GPL-2) is not shipped; pdf.js then draws non-embedded Arial/Helvetica with the system sans-serif (D22).
+        if (/^LICENSE/.test(f) || /^LiberationSans-/.test(f) || (ext && !f.endsWith(ext))) continue;
         parts.push({ key: `${kind}/${f}`, buf: readFileSync(join(PDFJS, dir, f)) });
       }
     }
@@ -29,7 +30,7 @@ function pdfjsData(): Plugin {
   };
   let serve = false;
   return {
-    name: "pagehold-pdfjs-data",
+    name: "mosspdf-pdfjs-data",
     configResolved: (c) => { serve = c.command === "serve"; },
     resolveId: (id) => (id === VIRTUAL ? "\0" + VIRTUAL : undefined),
     load(id) {
@@ -44,11 +45,48 @@ function pdfjsData(): Plugin {
   };
 }
 
+/** Emits licences.txt at the dist root: our own notices, then every third-party licence text (Apache-2.0 s4 and the MIT/BSD/ISC/IJG/zlib/OFL notice duties). Fails the build if a source is missing. */
+function licencesTxt(): Plugin {
+  const nm = (p: string) => `node_modules/${p}`;
+  const P = `${nm("pdfjs-dist")}`;
+  const sources: [string, string][] = [
+    ["MossPDF: LICENSE", "LICENSE"], ["MossPDF: NOTICE.md", "NOTICE.md"], ["Third-party notices: THIRD_PARTY_NOTICES.md", "THIRD_PARTY_NOTICES.md"],
+    ["pdfjs-dist (pdf.js)", `${P}/LICENSE`], ["pdf.js cmaps (Adobe)", `${P}/cmaps/LICENSE`], ["pdf.js standard fonts (Foxit)", `${P}/standard_fonts/LICENSE_FOXIT`],
+    ["pdf.js wasm: JBIG2 (PDFium)", `${P}/wasm/LICENSE_JBIG2`], ["pdf.js wasm: JBIG2 wrapper", `${P}/wasm/LICENSE_PDFJS_JBIG2`],
+    ["pdf.js wasm: OpenJPEG", `${P}/wasm/LICENSE_OPENJPEG`], ["pdf.js wasm: OpenJPEG wrapper", `${P}/wasm/LICENSE_PDFJS_OPENJPEG`],
+    ["pdf.js wasm: qcms", `${P}/wasm/LICENSE_QCMS`], ["pdf.js wasm: qcms wrapper", `${P}/wasm/LICENSE_PDFJS_QCMS`],
+    ["pdf.js wasm: QuickJS", `${P}/wasm/LICENSE_QUICKJS`], ["pdf.js wasm: QuickJS wrapper", `${P}/wasm/LICENSE_PDFJS_QUICKJS`],
+    ["@cantoo/fontkit", nm("@cantoo/fontkit/LICENSE")], ["@cantoo/pdf-lib", nm("@cantoo/pdf-lib/LICENSE.md")], ["fflate", nm("fflate/LICENSE")],
+    ["base64-js", nm("base64-js/LICENSE")], ["culori", nm("culori/LICENSE")], ["html-entities", nm("html-entities/LICENSE")],
+    ["node-html-better-parser", nm("node-html-better-parser/LICENSE")], ["restructure", nm("restructure/LICENSE")],
+    ["brotli.js", "licences/brotli-mit.txt"], ["dfa", "licences/dfa.txt"], ["tslib", nm("tslib/LICENSE.txt")],
+    ["@neslinesli93/qpdf-wasm", nm("@neslinesli93/qpdf-wasm/LICENSE")], ["@jsquash/jpeg", nm("@jsquash/jpeg/LICENSE")],
+    ["@jsquash/jpeg codec (MozJPEG, IJG, libjpeg-turbo)", nm("@jsquash/jpeg/codec/LICENSE.codec.md")], ["tesseract.js-core (and Tesseract)", nm("tesseract.js-core/LICENSE")],
+    ["Tesseract language data (tessdata_best) and Apache-2.0 full text", "licences/Apache-2.0.txt"],
+    ["OCR wasm: libpng", "licences/libpng.txt"], ["OCR wasm: libtiff", "licences/libtiff.txt"], ["OCR wasm: zlib", "licences/zlib.txt"],
+    ["OCR wasm: libjpeg (Independent JPEG Group)", "licences/libjpeg-ijg.txt"], ["OCR wasm: libwebp", "licences/libwebp.txt"],
+    ["OCR wasm: giflib", "licences/giflib.txt"], ["OCR wasm: Leptonica", "licences/leptonica.txt"],
+    ["Fonts: SIL Open Font License 1.1 (Space Grotesk, Inter, Silkscreen, JetBrains Mono, Noto Sans, Caveat)", "src/fonts/OFL.txt"],
+  ];
+  return {
+    name: "mosspdf-licences-txt",
+    apply: "build",
+    buildStart() {
+      const rule = "=".repeat(78), NL = String.fromCharCode(10);
+      const text = sources.map(([title, file]) => {
+        if (!existsSync(file)) this.error(`licences.txt: missing licence source ${file}`);
+        return [rule, title, `(${file})`, rule, "", readFileSync(file, "utf8").trim(), ""].join(NL);
+      }).join(NL);
+      this.emitFile({ type: "asset", fileName: "licences.txt", source: text });
+    },
+  };
+}
+
 /** Stamps public/sw.js (copied into dist) with the precache list of the finished build and a version derived from it. */
 function swPrecache(): Plugin {
   const walk = (d: string): string[] => readdirSync(d).flatMap((n) => (statSync(join(d, n)).isDirectory() ? walk(join(d, n)) : [join(d, n)]));
   return {
-    name: "pagehold-sw-precache",
+    name: "mosspdf-sw-precache",
     apply: "build",
     enforce: "post",
     closeBundle() {
@@ -64,7 +102,7 @@ function swPrecache(): Plugin {
 
 export default defineConfig({
   define: { __APP_VERSION__: JSON.stringify(pkg.version) },
-  plugins: [pdfjsData(), swPrecache()],
+  plugins: [pdfjsData(), licencesTxt(), swPrecache()],
   build: { assetsInlineLimit: 0 }, // CSP script-src 'self': nothing may be inlined
   worker: {
     format: "es",

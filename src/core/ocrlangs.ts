@@ -9,7 +9,7 @@ export const OCR_LANGS: readonly OcrLang[] = [
 ];
 /** The Tesseract engine itself (.wasm), MB. */
 export const OCR_ENGINE_MB = 2.9; // 2.86
-const KEY = "pagehold.ocr-langs";
+const KEY = "mosspdf.ocr-langs";
 
 /** Keeps the allowlisted codes, in list order, no duplicates; an empty result is null. */
 const clean = (codes: string[]): string[] | null => {

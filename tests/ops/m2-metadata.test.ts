@@ -18,13 +18,13 @@ describe("A-COR-10 metadata", () => {
     const r = await writeMetadata(corpus("xmp"), { title: "New & <Title>", author: "New Author", subject: "New Subject", keywords: "a, b" }, opts(), engines);
     qpdfCheck(r.bytes);
     const m = await readMetadata({ name: "x.pdf", bytes: r.bytes }, engines);
-    expect(m).toMatchObject({ title: "New & <Title>", author: "New Author", subject: "New Subject", keywords: "a, b", producer: "Pagehold by Vin's Atelier" });
+    expect(m).toMatchObject({ title: "New & <Title>", author: "New Author", subject: "New Subject", keywords: "a, b", producer: "MossPDF by Vin's Atelier" });
     const x = xmpOf(r.bytes);
     expect(xmpGet(x, "dc:title")).toBe("New & <Title>");
     expect(xmpGet(x, "dc:creator")).toBe("New Author");
     expect(xmpGet(x, "dc:description")).toBe("New Subject");
     expect(xmpGet(x, "pdf:Keywords")).toBe("a, b");
-    expect(xmpGet(x, "pdf:Producer")).toBe("Pagehold by Vin's Atelier");
+    expect(xmpGet(x, "pdf:Producer")).toBe("MossPDF by Vin's Atelier");
     expect(x).not.toContain("Old Producer");
     expect(x).not.toContain("XMP Title");
     expect((await readInfo(r.bytes)).Title).toBe("New & <Title>");
@@ -44,7 +44,7 @@ describe("A-COR-10 metadata", () => {
     const m = await readMetadata({ name: "x.pdf", bytes: r.bytes }, engines);
     expect(m).toMatchObject({ hasXmp: false, title: undefined, author: undefined, producer: undefined, creator: undefined });
     const t = text(r.bytes);
-    for (const s of ["Info Title Old", "Info Author Old", "XMP Title Old", "Old Producer", "Pagehold by Vin", "x:xmpmeta"]) expect(t, s).not.toContain(s);
+    for (const s of ["Info Title Old", "Info Author Old", "XMP Title Old", "Old Producer", "MossPDF by Vin", "x:xmpmeta"]) expect(t, s).not.toContain(s);
     expect((await readPdf(r.bytes)).length).toBe(2);
     const p = await writeMetadata(corpus("plain-3p"), { removeAll: true }, opts(), engines);
     expect(text(p.bytes)).not.toContain("Quarterly notes");
@@ -53,7 +53,7 @@ describe("A-COR-10 metadata", () => {
   it("A-COR-10 file without XMP gets Info only; credit on/off", async () => {
     const on = await writeMetadata(corpus("plain-3p"), { title: "T" }, opts(), engines);
     expect(xmpOf(on.bytes)).toBe("");
-    expect((await readInfo(on.bytes)).Producer).toBe("Pagehold by Vin's Atelier");
+    expect((await readInfo(on.bytes)).Producer).toBe("MossPDF by Vin's Atelier");
     const off = await writeMetadata(corpus("plain-3p"), { title: "T" }, opts({ producerCredit: false }), engines);
     expect((await readInfo(off.bytes)).Producer).toBe("pdf-lib (test default)");
   });

@@ -73,8 +73,8 @@ jobs:
           key: pw-${{ runner.os }}-${{ steps.pw.outputs.v }}-${{ matrix.browser }}
       - name: Make apt retry and wait for its lock
         run: |
-          echo 'Acquire::Retries "5";' | sudo tee /etc/apt/apt.conf.d/80-pagehold-ci
-          echo 'DPkg::Lock::Timeout "300";' | sudo tee -a /etc/apt/apt.conf.d/80-pagehold-ci
+          echo 'Acquire::Retries "5";' | sudo tee /etc/apt/apt.conf.d/80-mosspdf-ci
+          echo 'DPkg::Lock::Timeout "300";' | sudo tee -a /etc/apt/apt.conf.d/80-mosspdf-ci
       - name: Install Playwright browser
         timeout-minutes: 25
         # An Ubuntu mirror sometimes stalls the apt part for 25+ minutes; retry instead of waiting it out.

@@ -7,7 +7,7 @@ const args = process.argv.slice(2);
 const env = { ...process.env, PLAYWRIGHT_BROWSERS_PATH: "0" };
 if (args[0] === "--prod") {
   args.shift();
-  env.BASE_URL ||= "https://pagehold.vwesley.workers.dev";
+  env.BASE_URL ||= "https://mosspdf.pages.dev";
 }
 const cli = createRequire(import.meta.url).resolve("@playwright/test/cli");
 process.exit(spawnSync(process.execPath, [cli, ...args], { stdio: "inherit", env }).status ?? 1);

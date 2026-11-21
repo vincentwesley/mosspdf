@@ -1,8 +1,8 @@
-/* Pagehold service worker. The build stamps PRECACHE and VERSION (vite.config.ts); never edit them here.
+/* MossPDF service worker. The build stamps PRECACHE and VERSION (vite.config.ts); never edit them here.
    Cache-first for build assets, network-first for the page, old caches dropped on activate. It only ever fetches this site. */
 const PRECACHE = __PRECACHE__;
 const VERSION = "__VERSION__";
-const CACHE = "pagehold-" + VERSION;
+const CACHE = "mosspdf-" + VERSION;
 
 self.addEventListener("install", (e) => {
   // No skipWaiting here: the page decides when to switch (never during a job).
@@ -11,7 +11,7 @@ self.addEventListener("install", (e) => {
 
 self.addEventListener("activate", (e) => {
   e.waitUntil(
-    caches.keys().then((keys) => Promise.all(keys.filter((k) => k.startsWith("pagehold-") && k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim()),
+    caches.keys().then((keys) => Promise.all(keys.filter((k) => k.startsWith("mosspdf-") && k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim()),
   );
 });
 
