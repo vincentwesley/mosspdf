@@ -32,5 +32,4 @@ Continue work on **MossPDF** (repo `vincentwesley/mosspdf`). main holds M0-M8 (a
 
 ## Resume point (2026-11-21, late)
 - v1.4.0 released and live at https://mosspdf.pages.dev (D24 Chinese text, D25 tools chunk, D26 design pass). Main bundle 27 KB gzip (budget 28).
-- Local folder is still named `pagehold` (locked by the running session); owner renames it to `mosspdf`.
 - Next: docs/HANDOVER.md section 3.
