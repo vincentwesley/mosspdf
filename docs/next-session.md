@@ -28,12 +28,10 @@ Continue work on **Pagehold** (repo `vincentwesley/pagehold`). main holds M0-M8 
 - CI-only: mobile-safari (Linux WPE) reports an inline `style-src-elem` CSP violation (blank source, line 5) on compare intake after an earlier viewport resize in the same test. M7 tried to reproduce it: 3 runs on local mobile-safari and WebKit pass; all pdf.js documents open through `openDoc` (disableFontFace) and src/ has no style strings. Test stays `fixme` on CI mobile-safari (`e2e/shell.spec.ts`); next step is a CI run with the violation details logged (the fixture already records blockedURI/source/line).
 - Firefox offline test skipped (setOffline broken with service workers, docs/spikes/csp.md); keyboard-only tests skip on touch projects.
 - Liberation Sans (GPL-2 + font exception) ships in the pdf.js data pack; owner may prefer to drop it (D11).
-- Not yet: M9 polish, release zip.
+- Main bundle budget raised to 64 KB gzip (62.2 now).
 
-## Resume point (2026-11-20, night)
-- main = M0-M8, deployed ad62444c, live smoke passed. All 26 tools live (no planned tiles left).
-- Done this session: UX batch, OCR (D16), fill + sign (D15), redact + photo (D17, security-review fixes), compare (D18), command palette, workflows, batch, accessibility check (D19, Safe to share fixes). docs/LEGAL-REVIEW.md, docs/COMPARISON.md, docs/NEEDS-VIN.md written.
-- Next, M9: persona walkthroughs (USABILITY.md) + two polish passes; privacy page wording vs LEGAL-REVIEW (Cloudflare request logs); README screenshots; large-file perf check (500 pages / 200 MB); main bundle is 62 KB gzip (consider preloading tool chunks before the seal); version 1.0.0 + release zip (static build + local server script) + tag; fresh-clone acceptance; final HANDOVER with three lists.
-- Known flaky locally under load: screens sign (light), tools A-COR-3 bad file 'empty'. CI apt installs now retry.
-- `.worktrees/m7` and `.worktrees/m8` folders may linger (locked by the editor); they are no longer git worktrees and are gitignored: delete when unlocked.
-- Local full e2e is unreliable on this 16 GB machine; prefer CI or `--project=<one>` runs locally.
+## Resume point (2026-11-21)
+- v1.0.0 released (tag + GitHub release with zip), main = M0-M9, deployed e113fcd4, live smoke passed. Fresh-clone acceptance passed (install, check, budgets, licences, release).
+- M9 done: USABILITY.md (3 personas, fixes), PERF.md, privacy page hosting note, `npm run release` (+ `scripts/serve.mjs`), README with screenshots, `ToolDef.whyDisabled`, carried-over files notice.
+- Next: docs/HANDOVER.md section 3 (ranked ideas). Top: Unicode text (Latin-ext) via `@cantoo/fontkit` 2.0.12 in the ops worker; call sites src/ops/stamp.ts checkWinAnsi, sign.ts, forms.ts, tools/watermark.ts gate, ocr.ts, report.ts. CJK only route-loaded like OCR.
+- `.worktrees/m7` and `.worktrees/m8` folders may linger (locked); not worktrees; delete when unlocked.
