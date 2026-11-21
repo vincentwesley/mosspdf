@@ -1,8 +1,9 @@
 // The comparison report as a PDF: title, file names, date, summary, then every change with its page references.
-// Helvetica (WinAnsi): other characters print as "?" and the report says so.
+// Helvetica, or Noto Sans (no bold) when the text needs it (D20); characters neither covers print as "?" and the report says so.
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from "@cantoo/pdf-lib";
 import type { ReportData } from "../core/compare";
 import { safeName } from "./assemble";
+import { pickFont } from "./ufont";
 import { applyCredit } from "./metadata";
 import { checkAbort } from "./open";
 import type { OpOptions, OpResult } from "./types";
@@ -11,7 +12,8 @@ const W = 595.28, H = 841.89, M = 50, BODY = 10.5;
 
 export async function compareReport(r: ReportData, o: OpOptions): Promise<OpResult> {
   const doc = await PDFDocument.create({ updateMetadata: false });
-  const font = await doc.embedFont(StandardFonts.Helvetica), bold = await doc.embedFont(StandardFonts.HelveticaBold);
+  const font = await pickFont(doc, [r.nameA, r.nameB, r.date, r.summary, ...r.notes, ...r.changes.flatMap((c) => [c.label, c.removed ?? "", c.added ?? ""])]);
+  const bold = font.name === "Helvetica" ? await doc.embedFont(StandardFonts.HelveticaBold) : font;
   const ok = new Set(font.getCharacterSet());
   let lost = false;
   const safe = (t: string) => [...t.replace(/\s+/g, " ")].map((c) => (ok.has(c.codePointAt(0)!) ? c : ((lost = true), "?"))).join("");

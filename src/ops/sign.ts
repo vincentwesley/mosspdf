@@ -1,12 +1,13 @@
 // Visual signatures, initials, dates and text placed on pages. This is a picture, not a certified digital signature (D15).
 // Positions are fractions of the page as the viewer shows it (after /Rotate and CropBox), measured from the top left, so the same
 // numbers work at any zoom and on pages of different sizes. The op turns them into user space for each page.
-import { PDFDocument, StandardFonts, type PDFImage } from "@cantoo/pdf-lib";
+import { PDFDocument, type PDFImage } from "@cantoo/pdf-lib";
 import { safeName } from "./assemble";
 import { prepare } from "./common";
 import { applyCredit } from "./metadata";
 import { checkAbort } from "./open";
-import { checkWinAnsi, hex, toUser, view } from "./stamp";
+import { hex, toUser, view } from "./stamp";
+import { checkCovered, pickFont } from "./ufont";
 import { PdfError, type Engines, type InFile, type OpOptions, type OpResult } from "./types";
 
 interface Where {
@@ -29,7 +30,7 @@ export async function stampPage(file: InFile, input: StampInput, o: OpOptions, e
   const doc = await PDFDocument.load(p.bytes, { updateMetadata: false });
   const pages = doc.getPages();
   if (!input.items.length) throw new PdfError("unsupported", "Nothing is placed yet. Add a signature or some text to a page first.", file.name);
-  const font = await doc.embedFont(StandardFonts.Helvetica);
+  const font = await pickFont(doc, input.items.flatMap((it) => (it.kind === "text" ? [it.text] : [])));
   const imgs: (PDFImage | undefined)[] = [];
   const img = async (i: number) => {
     const png = input.images[i];
@@ -46,7 +47,7 @@ export async function stampPage(file: InFile, input: StampInput, o: OpOptions, e
       throw new PdfError("unsupported", `A placed item points at a page that doesn't exist in "${file.name}", which has ${pages.length} page${pages.length === 1 ? "" : "s"}.`, file.name);
     if (it.kind === "text") {
       if (!finite(it.size) || it.size < 2 || it.size > 400) throw new PdfError("unsupported", "The text size must be between 2 and 400.", file.name);
-      checkWinAnsi(font, it.text, "The text");
+      checkCovered(font, it.text, "The text");
     } else if (!finite(it.fw) || it.fw <= 0 || it.fw > 4) throw new PdfError("unsupported", "A placed picture has a size that can't be used.", file.name);
     const image = it.kind === "image" ? await img(it.image) : undefined;
     for (const t of targets) {

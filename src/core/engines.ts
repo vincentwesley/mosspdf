@@ -2,6 +2,7 @@
 import qpdfWasmUrl from "@neslinesli93/qpdf-wasm/dist/qpdf.wasm?url";
 import jpegDecUrl from "@jsquash/jpeg/codec/dec/mozjpeg_dec.wasm?url";
 import jpegEncUrl from "@jsquash/jpeg/codec/enc/mozjpeg_enc.wasm?url";
+import unicodeFontUrl from "../fonts/notosans-unicode-400-normal.ttf?url";
 import ocrWasmUrl from "tesseract.js-core/tesseract-core-simd-lstm.wasm?url";
 import ocrLangUrl from "@tesseract.js-data/eng/4.0.0_best_int/eng.traineddata.gz?url";
 import pdfjsDataUrl from "virtual:pdfjs-data";
@@ -22,11 +23,11 @@ export const pdfjsData = new Map<string, Uint8Array>();
 registerEngine({
   name: "qpdf",
   async load() {
-    // The same worker also needs the MozJPEG codecs (compress); both are fetched here, before the seal.
-    const [wasm, jpegDecWasm, jpegEncWasm] = await Promise.all([fetchBytes(qpdfWasmUrl), fetchBytes(jpegDecUrl), fetchBytes(jpegEncUrl)]);
+    // The same worker also needs the MozJPEG codecs (compress) and the Noto Sans subset for text beyond WinAnsi (D20); both are fetched here, before the seal.
+    const [wasm, jpegDecWasm, jpegEncWasm, font] = await Promise.all([fetchBytes(qpdfWasmUrl), fetchBytes(jpegDecUrl), fetchBytes(jpegEncUrl), fetchBytes(unicodeFontUrl)]);
     const worker = new Worker(scriptUrl(opsWorkerUrl), { type: "module" });
     opsRpc = new RpcClient(worker);
-    await opsRpc.call("init", { qpdfWasm: wasm, jpegDecWasm, jpegEncWasm }, { transfer: [wasm.buffer as ArrayBuffer, jpegDecWasm.buffer as ArrayBuffer, jpegEncWasm.buffer as ArrayBuffer] });
+    await opsRpc.call("init", { qpdfWasm: wasm, jpegDecWasm, jpegEncWasm, font }, { transfer: [wasm.buffer as ArrayBuffer, jpegDecWasm.buffer as ArrayBuffer, jpegEncWasm.buffer as ArrayBuffer, font.buffer as ArrayBuffer] });
   },
 });
 

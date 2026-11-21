@@ -1,9 +1,10 @@
-// Reading and filling AcroForm fields. Text goes in with Helvetica (WinAnsi only, like the stamp ops): other characters get a plain error.
-import { PDFCheckBox, PDFDocument, PDFDropdown, PDFOptionList, PDFRadioGroup, PDFSignature, PDFTextField, StandardFonts, type PDFDict } from "@cantoo/pdf-lib";
+// Reading and filling AcroForm fields. Text goes in with Helvetica, or Noto Sans when a value has characters beyond WinAnsi (D20); anything else gets a plain error.
+import { PDFCheckBox, PDFDocument, PDFDropdown, PDFOptionList, PDFRadioGroup, PDFSignature, PDFTextField, type PDFDict } from "@cantoo/pdf-lib";
 import { safeName } from "./assemble";
 import { prepare } from "./common";
 import { applyCredit } from "./metadata";
 import { checkAbort } from "./open";
+import { pickFont } from "./ufont";
 import { PdfError, type Engines, type InFile, type OpOptions, type OpResult } from "./types";
 
 export type FieldType = "text" | "checkbox" | "radio" | "dropdown" | "optionlist" | "signature" | "button";
@@ -76,8 +77,7 @@ export async function fillForm(file: InFile, values: FormValues, opts: { flatten
   const doc = await load(p.bytes);
   const form = doc.getForm();
   const hadXFA = form.hasXFA();
-  const font = await doc.embedFont(StandardFonts.Helvetica);
-  const ok = new Set(font.getCharacterSet());
+  const texts: string[] = [];
   const warnings = [...p.warnings];
   const bad = (name: string, why: string) => new PdfError("unsupported", `The field "${name}" can't take that value: ${why}`, file.name);
   for (const [name, v] of Object.entries(values)) {
@@ -88,8 +88,7 @@ export async function fillForm(file: InFile, values: FormValues, opts: { flatten
     try {
       if (f instanceof PDFTextField) {
         const text = String(v);
-        const odd = [...new Set([...text])].filter((c) => c !== "\n" && c !== "\r" && !ok.has(c.codePointAt(0)!));
-        if (odd.length) throw new PdfError("unsupported", `This form can't take characters like ${odd.slice(0, 3).map((c) => `"${c}"`).join(" ")} yet. Use Western European letters, digits and basic punctuation.`, file.name);
+        texts.push(text);
         if (text) f.setText(text); else f.setText(undefined);
       } else if (f instanceof PDFCheckBox) { if (v) f.check(); else f.uncheck(); }
       else if (f instanceof PDFRadioGroup) { if (v) f.select(String(v)); else f.clear(); }
@@ -99,11 +98,15 @@ export async function fillForm(file: InFile, values: FormValues, opts: { flatten
       throw err instanceof PdfError ? err : bad(name, err instanceof Error ? err.message : "check the value and try again.");
     }
   }
+  const font = await pickFont(doc, texts);
+  const ok = new Set(font.getCharacterSet());
+  const odd = [...new Set(texts.join(""))].filter((c) => c !== "\n" && c !== "\r" && !ok.has(c.codePointAt(0)!));
+  if (odd.length) throw new PdfError("unsupported", `This form can't take characters like ${odd.slice(0, 3).map((c) => `"${c}"`).join(" ")} yet. Use Latin, Greek or Cyrillic letters, digits and basic punctuation.`, file.name);
   try {
     form.updateFieldAppearances(font);
     if (opts.flatten) form.flatten({ updateFieldAppearances: false });
   } catch {
-    throw new PdfError("unsupported", "This form can't take some of those characters yet. Use Western European letters, digits and basic punctuation.", file.name);
+    throw new PdfError("unsupported", "This form can't take some of those characters yet. Use Latin, Greek or Cyrillic letters, digits and basic punctuation.", file.name);
   }
   if (hadXFA) {
     form.deleteXFA();
