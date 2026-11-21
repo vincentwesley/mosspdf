@@ -502,8 +502,8 @@ kbd { font: 600 0.85rem var(--font-mono); padding: 0.1rem 0.4rem; background: va
 .res__tools .hs-btn { gap: var(--s2); padding-left: var(--s2); }
 
 /* choice cards (compress) */
-.radios--cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr)); gap: var(--s3); }
-.radios--cards legend { grid-column: 1 / -1; }
+.radios--cards { display: flex; flex-wrap: wrap; gap: var(--s3); } /* flex, not grid: WebKit sizes a grid fieldset to its content and overflows */
+.radios--cards .radios__opt { flex: 1 1 10.5rem; min-width: 0; }
 .radios--cards .radios__opt { position: relative; align-items: flex-start; gap: var(--s2); padding: var(--s3); background: var(--bg-elev); box-shadow: var(--pix); }
 .radios--cards .radios__opt:has(:checked) { background: var(--accent-soft); box-shadow: var(--fx-card-shadow); }
 .radios--cards .radios__opt:has(:focus-visible) { outline: 2px solid var(--focus); outline-offset: 3px; }
