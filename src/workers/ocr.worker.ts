@@ -6,8 +6,8 @@ import { createOcr, type Ocr } from "../engines/ocr";
 let ocr: Ocr | undefined;
 // Cancel is cooperative: one page is a single synchronous wasm call, so the caller checks its abort flag between pages. The worker is never terminated (a new one could not be created after the seal).
 serve({
-  init: async ({ wasm, lang }: { wasm: Uint8Array; lang: Uint8Array }) => {
-    ocr = await createOcr(wasm, lang);
+  init: async ({ wasm, langs }: { wasm: Uint8Array; langs: { code: string; gz: Uint8Array }[] }) => {
+    ocr = await createOcr(wasm, langs);
     return true;
   },
   page: ({ image }: { image: Uint8Array }) => {

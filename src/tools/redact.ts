@@ -67,7 +67,12 @@ const ui = (ctx: Ctx) => ctx.local(() => {
 
   const active = () => s.hits.filter((x) => !DETECTORS.includes(x.kind as keyof Detect) || s.on[x.kind as keyof Detect]);
   const chosen = () => active().filter((x) => x.checked);
-  function toggle(k: keyof Detect) { s.on[k] = s.kinds[k].input.checked; changed(); }
+  function toggle(k: keyof Detect) {
+    s.on[k] = s.kinds[k].input.checked;
+    // Unticking addresses also unticks postal codes (they read as one thing); the user can re-tick.
+    if (k === "address" && !s.on.address) { s.on.postal = false; s.kinds.postal.input.checked = false; }
+    changed();
+  }
   function changed() { paintAll(); renderList(); ctx.refresh(); }
 
   // ---- boxes on the pages ----

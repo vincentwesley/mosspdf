@@ -10,7 +10,9 @@ import { qpdfCheck } from "../helpers/qpdf";
 
 const req = createRequire(import.meta.url);
 const bytes = (p: string) => new Uint8Array(readFileSync(req.resolve(p)));
-const ocr = await createOcr(bytes("tesseract.js-core/tesseract-core-simd-lstm.wasm"), bytes("@tesseract.js-data/eng/4.0.0_best_int/eng.traineddata.gz"));
+const lang = (code: string) => ({ code, gz: bytes(`@tesseract.js-data/${code}/4.0.0_best_int/${code}.traineddata.gz`) });
+const wasm = bytes("tesseract.js-core/tesseract-core-simd-lstm.wasm");
+const ocr = await createOcr(wasm, [lang("eng")]);
 const scan = scanGray(SCAN_LINES);
 const png = new Uint8Array(grayPng(scan));
 
@@ -21,6 +23,13 @@ describe("OCR", () => {
     for (const want of ["OCR", "FIXTURE", "TOTAL", "SCANNED", "PAGE", "ONE"]) expect(text).toContain(want);
     expect(words.filter((w) => w.eol)).toHaveLength(3); // three lines
   });
+
+  // Chinese and Tamil are not read here: Node has no canvas or CJK/Tamil font to draw a scan with, so only the load of all four models and the Latin-script mix are checked.
+  it("loads every language together and still reads the English scan", async () => {
+    const all = await createOcr(wasm, ["eng", "chi_sim", "msa", "tam"].map(lang));
+    const text = all.recognize(png).map((w) => w.text).join(" ");
+    for (const want of ["OCR", "FIXTURE", "SCANNED"]) expect(text).toContain(want);
+  }, 120_000);
 
   it("adds an invisible, positioned text layer that stays a valid PDF", async () => {
     const words = ocr.recognize(png);

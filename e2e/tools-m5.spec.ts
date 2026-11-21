@@ -64,4 +64,26 @@ test.describe("M5 OCR", () => {
     await expect(page.getByTestId("ocr-missing")).toBeHidden();
     await expect(page.getByTestId("file-row")).toHaveCount(0); // the reload cleared the file, as the note said
   });
+
+  test("A-OCR-4 picking Malay with English reloads with those languages and reads the scan", async ({ page }) => {
+    await loadApp(page, "/#/merge");
+    await page.evaluate(() => { location.hash = "#/ocr"; });
+    await expect(page.getByTestId("ocr-lang-eng")).toBeChecked();
+    await page.getByTestId("ocr-lang-msa").check();
+    await expect(page.getByTestId("ocr-load")).toContainText("Load the OCR engine (about 7 MB");
+    await Promise.all([page.waitForEvent("load"), page.getByTestId("ocr-load").click()]);
+    await waitForSeal(page, 90_000);
+    expect(page.url()).toContain("#/ocr?langs=eng+msa");
+    await expect(page.getByTestId("ocr-missing")).toBeHidden();
+    await expect(page.getByTestId("ocr-lang-msa")).toBeChecked();
+    await page.getByTestId("ocr-lang-tam").check();
+    await expect(page.getByTestId("ocr-load")).toContainText("Load these languages");
+    await page.getByTestId("ocr-lang-tam").uncheck();
+    await add(page, corpus("scan-1p"));
+    await expect(page.locator('[data-testid="file-row"][data-status="ready"]')).toHaveCount(1);
+    await page.getByTestId("primary-action").click();
+    await expect(page.getByTestId("results")).toBeVisible(SLOW);
+    const text = (await readPdf((await savePdf(page)).bytes))[0].text;
+    expect(text).toContain("FIXTURE");
+  });
 });

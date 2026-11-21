@@ -4,6 +4,10 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-11-21
+
+- OCR in Chinese (Simplified), Malay and Tamil as well as English, picked on the OCR page and loaded only when chosen; the hidden text layer now uses a glyphless font, so any script is kept.
+
 ## [1.1.0] - 2026-11-21
 - Unicode text: names like Đặng Thị Hồng, Łukasz, Ş, Greek and Cyrillic now work in fill, page numbers, watermark, sign text, OCR layer and the comparison report (Noto Sans subset, only embedded when needed). CJK, Tamil and emoji are still refused by name.
 

@@ -29,6 +29,6 @@ self.addEventListener("fetch", (e) => {
     return;
   }
   // OCR engine files are not precached (about 6 MB, D16): kept the first time OCR loads, so it then works offline.
-  const keep = /\/assets\/(tesseract-core|eng\.traineddata)-/.test(url.pathname);
+  const keep = /\/assets\/(tesseract-core|(eng|chi_sim|msa|tam)\.traineddata)-/.test(url.pathname);
   e.respondWith(caches.match(req).then((hit) => hit || fetch(req).then((r) => { if (keep && r.ok) { const c = r.clone(); caches.open(CACHE).then((k) => k.put(req, c)); } return r; })));
 });

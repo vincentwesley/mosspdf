@@ -1,13 +1,14 @@
 // OCR (M5). Pages are drawn with pdf.js here on the main thread; the OCR worker reads them one at a time (D16); the ops worker
 // adds the invisible text layer. Cancel is checked between pages: one page is one synchronous wasm call, and the worker is never
 // terminated because a new one could not be created once the page is sealed.
-import { ocrRpc } from "../core/engines";
+import { ocrLangs, ocrRpc } from "../core/engines";
+import { chosenLangs, hashFor, loadSize, OCR_LANGS, saveLangs } from "../core/ocrlangs";
 import { store } from "../core/store";
 import type { OcrPage } from "../ops";
 import type { OcrWord } from "../engines/ocr";
 import { PdfError, type OpResult } from "../ops/types";
 import { h, plural } from "../ui/dom";
-import { checkField, radioGroup } from "../ui/fields";
+import { checkField } from "../ui/fields";
 import type { Ctx, ToolDef } from "./types";
 
 const stem = (name: string) => name.replace(/\.pdf$/i, "");
@@ -15,18 +16,26 @@ const DPI = 200;
 /** Keeps one page bitmap (and its PNG) a few tens of MB. */
 const MAX_PIXELS = 12_000_000;
 
+const same = (a: string[], b: string[]) => a.length === b.length && a.every((c) => b.includes(c));
+
 const ui = (ctx: Ctx) => ctx.local(() => {
-  const load = h("button", { class: "hs-btn hs-btn--secondary", type: "button", text: "Load the OCR engine (about 6 MB, stays on this device)", attrs: { "data-testid": "ocr-load" }, on: { click: () => { location.hash = "#/ocr"; location.reload(); } } });
+  const start = ocrRpc ? ocrLangs : chosenLangs();
+  const langs = OCR_LANGS.map((l) => checkField({
+    id: `ocr-lang-${l.code}`, label: l.label, checked: start.includes(l.code), testid: `ocr-lang-${l.code}`,
+    onChange() { if (!picked().length) langs.find((x) => x.input.id === `ocr-lang-${l.code}`)!.input.checked = true; /* at least one */ ctx.refresh(); },
+  }));
+  const picked = () => OCR_LANGS.map((l) => l.code).filter((_, i) => langs[i].input.checked);
+  const load = h("button", { class: "hs-btn hs-btn--secondary", type: "button", attrs: { "data-testid": "ocr-load" }, on: { click: () => { saveLangs(picked()); location.hash = hashFor(picked()); location.reload(); } } });
+  const msg = h("p");
   const clears = h("p", { class: "field__hint", text: "Files you added in this tab will be cleared.", attrs: { "data-testid": "ocr-load-clears" } });
   return {
-    lang: radioGroup({ name: "ocr-lang", legend: "Language", value: "eng", testid: (v) => `ocr-lang-${v}`, options: [["eng", "English"]] }),
-    more: h("p", { class: "field__hint", text: "More languages later." }),
+    langs, picked, load, msg,
+    lang: h("fieldset", { class: "radios", attrs: { "data-testid": "ocr-langs" } }, h("legend", { text: "Languages" }), ...langs.map((f) => f.el)),
     skip: checkField({ id: "ocr-skip", label: "Skip pages that already have text", checked: true, testid: "ocr-skip", onChange: () => ctx.refresh() }),
     clean: checkField({ id: "ocr-clean", label: "Clean up scans first (grey, stronger contrast)", checked: false, testid: "ocr-clean", onChange: () => ctx.refresh() }),
     pdf: checkField({ id: "ocr-out-pdf", label: "Searchable PDF", checked: true, testid: "ocr-out-pdf", onChange: () => ctx.refresh() }),
     txt: checkField({ id: "ocr-out-txt", label: "Plain text (.txt)", checked: false, testid: "ocr-out-txt", onChange: () => ctx.refresh() }),
-    missing: h("div", { class: "hs-banner hs-banner--info", attrs: { "data-testid": "ocr-missing", role: "note" } },
-      h("p", { text: "The OCR engine is not loaded on this page. Pagehold locks itself down after it loads, so the engine has to load first, and this tab then reloads." }), clears, load),
+    missing: h("div", { class: "hs-banner hs-banner--info", attrs: { "data-testid": "ocr-missing", role: "note" } }, msg, clears, load),
     clears,
   };
 });
@@ -61,14 +70,20 @@ export const ocr: ToolDef = {
   options(ctx) {
     const u = ui(ctx);
     window.addEventListener("pagehold:sealed", () => ctx.refresh(), { once: true }); // the engine finishes loading just before the seal
-    return h("div", { class: "ocropts" }, u.missing, u.lang.el, u.more, u.skip.el, u.clean.el, h("fieldset", { class: "radios" }, h("legend", { text: "Save as" }), u.pdf.el, u.txt.el));
+    return h("div", { class: "ocropts" }, u.missing, u.lang, u.skip.el, u.clean.el, h("fieldset", { class: "radios" }, h("legend", { text: "Save as" }), u.pdf.el, u.txt.el));
   },
   sync(ctx) {
     const u = ui(ctx);
-    u.missing.hidden = !!ocrRpc;
+    const sel = u.picked();
+    const stale = !ocrRpc || !same(sel, ocrLangs);
+    u.missing.hidden = !stale;
+    u.msg.textContent = ocrRpc
+      ? "These languages are not loaded yet. Pagehold locks itself down after it loads, so they have to load first, and this tab then reloads."
+      : "The OCR engine is not loaded on this page. Pagehold locks itself down after it loads, so the engine has to load first, and this tab then reloads.";
+    u.load.textContent = `${ocrRpc ? "Load these languages" : "Load the OCR engine"} (about ${Math.round(loadSize(sel, !ocrRpc))} MB, stays on this device)`;
     u.clears.hidden = store.files.length === 0;
   },
-  ready(ctx) { const u = ui(ctx); return !!ctx.file && !!ocrRpc && (u.pdf.input.checked || u.txt.input.checked); },
+  ready(ctx) { const u = ui(ctx); return !!ctx.file && !!ocrRpc && same(u.picked(), ocrLangs) && (u.pdf.input.checked || u.txt.input.checked); },
   primaryLabel: () => "Read the text",
   async run(ctx) {
     const u = ui(ctx);
