@@ -21,3 +21,14 @@ describe("glyphless OCR text layer (D21)", () => {
     expect(new TextDecoder("latin1").decode(bytes)).not.toMatch(/\/BaseFont\s*\/(Helvetica|NotoSans)/);
   });
 });
+
+describe("glyphless TrueType", () => {
+  it("is a well-formed font: one glyph, one horizontal metric of the stated width", async () => {
+    const { create } = await import("@cantoo/fontkit");
+    const { emptyTtf, GLYPH_WIDTH } = await import("../../src/ops/glyphless");
+    const f = create(Buffer.from(emptyTtf())) as unknown as { numGlyphs: number; hhea: { numberOfMetrics: number }; getGlyph(i: number): { advanceWidth: number } };
+    expect(f.numGlyphs).toBe(1);
+    expect(f.hhea.numberOfMetrics).toBe(1);
+    expect(f.getGlyph(0).advanceWidth).toBe(GLYPH_WIDTH);
+  });
+});

@@ -7,13 +7,13 @@ import { PDFString, type PDFDocument, type PDFRef } from "@cantoo/pdf-lib";
 export const GLYPH_WIDTH = 500;
 
 /** The smallest TrueType that parsers accept: one empty glyph (GID 0), no cmap. */
-function emptyTtf(): Uint8Array {
+export function emptyTtf(): Uint8Array {
   const u16 = (...n: number[]) => n.flatMap((v) => [v >> 8, v & 255]);
   const u32 = (...n: number[]) => n.flatMap((v) => [v >>> 24, (v >> 16) & 255, (v >> 8) & 255, v & 255]);
   const tables: [string, number[]][] = [
     ["glyf", []],
     ["head", [...u32(0x00010000, 0x00010000, 0, 0x5f0f3cf5), ...u16(0, 1000), ...u32(0, 0, 0, 0), ...u16(0, 0, 500, 1000, 0, 8, 2, 0, 0)]],
-    ["hhea", [...u32(0x00010000), ...u16(1000, 0xfd12 /* -750 */, 0, GLYPH_WIDTH, 0, 0, 500, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1)]],
+    ["hhea", [...u32(0x00010000), ...u16(1000, 0xfd12 /* -750 */, 0, GLYPH_WIDTH, 0, 0, 500, 1, 0, 0, 0, 0, 0, 0, 0, 1)]], // ascender..xMaxExtent, caretSlopeRise/Run, caretOffset, 4 reserved, metricDataFormat, numberOfHMetrics
     ["hmtx", u16(GLYPH_WIDTH, 0)],
     ["loca", u16(0, 0)],
     ["maxp", [...u32(0x00010000), ...u16(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0)]],
