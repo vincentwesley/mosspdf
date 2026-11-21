@@ -19,6 +19,7 @@ Everything third-party that ships in the MossPDF build, with author, licence and
 | @cantoo/fontkit 2.0.12 (embeds the Unicode text font in stamps, fill, sign, OCR layer and report; ops worker only) | Devon Govett and contributors (Cantoo fork) | MIT | https://github.com/cantoo-scribe/fontkit |
 | brotli 1.3.3, dfa 1.2.0, restructure 3.0.2 (dependencies of @cantoo/fontkit; the brotli decoder is Copyright 2013 Google Inc., Apache-2.0) | Devon Govett, Google (brotli decoder) | MIT; Apache-2.0 (brotli decoder) | https://github.com/devongovett/brotli.js, https://github.com/devongovett/dfa, https://github.com/devongovett/restructure |
 | base64-js 1.5.1 (dependency of @cantoo/fontkit) | T. Jameson Little | MIT | https://github.com/beatgammit/base64-js |
+| Pixelarticons 2.4.2 (24 tool icon glyph paths in `src/ui/toolicons.ts`, copied as path data; not a dependency; licence in `licences/pixelarticons-mit.txt`) | Gerrit Halfmann | MIT | https://github.com/halfmage/pixelarticons |
 | fflate 0.8.3 (zip downloads in the app; also a dependency of @cantoo/pdf-lib) | Arjun Barrett | MIT | https://github.com/101arrowz/fflate |
 | culori 4.0.2 (dependency of @cantoo/pdf-lib) | Dan Burzo | MIT | https://github.com/Evercoder/culori |
 | html-entities 2.6.0 (dependency of @cantoo/pdf-lib) | Marat Dulin | MIT | https://github.com/mdevils/html-entities |
@@ -51,6 +52,7 @@ All under the SIL Open Font License 1.1, full text in `src/fonts/OFL.txt` (it tr
 - Inter (The Inter Project Authors)
 - Silkscreen (The Silkscreen Project Authors)
 - JetBrains Mono (The JetBrains Mono Project Authors)
+- Noto Sans SC, subset (Adobe and The Noto Project Authors, OFL-1.1; `src/fonts/notosanssc-gb2312-400-normal.ttf`, GB2312 hanzi, CJK punctuation, full-width forms, ASCII and Latin-1 cut from the google/fonts variable TTF with `scripts/subset-cjk.py`; renamed "MossPDF Sans SC" because the original reserves the name "Source"; loaded only when Chinese text is turned on, D24)
 - Noto Sans, subset (The Noto Project Authors; `src/fonts/notosans-unicode-400-normal.ttf`, Latin, Latin Extended, Vietnamese, Greek and Cyrillic cut from NotoSans-Regular of the `@expo-google-fonts/noto-sans` 0.4.2 package with `pyftsubset`; drawn into PDFs by stamps, fill, sign, OCR layer and report when text goes beyond WinAnsi, D20)
 - Caveat (The Caveat Project Authors; the typed-signature handwriting in Sign, from the Fontsource package build https://fontsource.org/fonts/caveat)
 

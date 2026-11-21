@@ -1,10 +1,13 @@
 import { isPdfFile, store } from "../core/store";
 import { getRecent } from "../core/recent";
-import { CATALOG, LIVE, isLive } from "../tools";
+import { CATALOG, TOOLS, type ToolMeta } from "../tools";
 import { matchTool } from "../core/toolsearch";
-import type { ToolDef } from "../tools/types";
 import { h } from "./dom";
 import { dropzone, setFilesHandler } from "./dropzone";
+import { toolBox } from "./toolicons";
+
+/** The last category chip, kept while this tab lives (not stored). */
+let lastChip = "All";
 
 /** Which tool fits the files that were just dropped. */
 function suggest(pdfs: number): string[] {
@@ -19,8 +22,9 @@ export function homeView(navigate: (hash: string) => void): { el: HTMLElement; d
       h("div", { class: "dlg__head" }, h("h2", { id: "chooser-h", text: `What should we do with ${count === 1 ? "this file" : `these ${count} files`}?`, attrs: { tabindex: -1 } }),
         h("button", { class: "dlg__x", type: "button", text: "Close", attrs: { "aria-label": "Close", "data-testid": "chooser-close" }, on: { click: () => chooser.close() } })),
       h("ul", { class: "chooser__list", attrs: { role: "list" } }, ...order.map((id, i) => {
-        const t = LIVE.find((x) => x.id === id)!;
-        return h("li", {}, h("a", { class: `hs-btn${i ? " hs-btn--secondary" : ""}`, text: `${t.title}${i === 0 ? " (suggested)" : ""}`, attrs: { href: `#/${id}`, "data-testid": `choose-${id}` }, on: { click: () => chooser.close() } }));
+        const t = TOOLS.find((x) => x.id === id)!;
+        return h("li", {}, h("a", { class: `hs-btn chooser__opt${i ? " hs-btn--secondary" : ""}`, attrs: { href: `#/${id}`, "data-testid": `choose-${id}` }, on: { click: () => chooser.close() } },
+          toolBox(id), h("span", { class: "chooser__txt" }, h("span", { class: "chooser__title", text: `${t.title}${i === 0 ? " (suggested)" : ""}` }), h("span", { class: "chooser__blurb", text: t.blurb }))));
       })));
     if (!chooser.open) chooser.showModal();
   };
@@ -33,11 +37,8 @@ export function homeView(navigate: (hash: string) => void): { el: HTMLElement; d
   };
   setFilesHandler(intake);
 
-  const tile = (t: ToolDef) => isLive(t)
-    ? h("li", { class: "tile" }, h("a", { class: "tile__in hs-card", attrs: { href: `#/${t.id}`, "data-testid": `tile-${t.id}` } },
-      h("span", { class: "tile__title", text: t.title }), h("span", { class: "tile__blurb", text: t.blurb })))
-    : h("li", { class: "tile" }, h("div", { class: "tile__in hs-card hs-pending", attrs: { "data-testid": `tile-${t.id}`, "data-pending": true } },
-      h("span", { class: "tile__title", text: t.title }), h("span", { class: "tile__blurb", text: t.blurb }), h("span", { class: "tile__soon", text: "Coming soon" })));
+  const tile = (t: ToolMeta) => h("li", { class: "tile" }, h("a", { class: "tile__in hs-card", attrs: { href: `#/${t.id}`, "data-testid": `tile-${t.id}` } },
+    toolBox(t.id), h("span", { class: "tile__txt" }, h("span", { class: "tile__title", text: t.title }), h("span", { class: "tile__blurb", text: t.blurb }))));
 
   const groups = CATALOG.map((g, i) => {
     const items = g.tools.map((t) => ({ t, li: tile(t) }));
@@ -49,20 +50,31 @@ export function homeView(navigate: (hash: string) => void): { el: HTMLElement; d
 
   // "Find a tool": hides non-matching tiles and empty groups as you type.
   const none = h("p", { class: "find__none", text: "No tool matches. Try a different word, like merge or compress.", hidden: true, attrs: { "data-testid": "find-none", role: "status" } });
-  const find = h("input", { class: "hs-input", id: "find", type: "search", attrs: { autocomplete: "off", "data-testid": "find-tool" }, on: { input: () => {
+  // Category chips (toggle buttons) and the search box narrow the same tiles.
+  let chip = lastChip;
+  const apply = () => {
     const q = find.value;
     let any = false;
     for (const [i, g] of groups.entries()) {
       let shown = 0;
-      for (const { t, li } of g.items) { li.hidden = !matchTool({ ...t, group: CATALOG[i].name }, q); if (!li.hidden) shown++; }
+      const inChip = chip === "All" || chip === CATALOG[i].name;
+      for (const { t, li } of g.items) { li.hidden = !inChip || !matchTool({ ...t, group: CATALOG[i].name }, q); if (!li.hidden) shown++; }
       g.el.hidden = !shown;
       any ||= !!shown;
     }
     none.hidden = any;
-  } } });
-  const findRow = h("div", { class: "find" }, h("label", { class: "find__label", text: "Find a tool", attrs: { for: "find" } }), find, none);
+  };
+  const find = h("input", { class: "hs-input", id: "find", type: "search", attrs: { autocomplete: "off", "data-testid": "find-tool" }, on: { input: apply } });
+  const chipBtns = ["All", ...CATALOG.map((g) => g.name)].map((name) => h("button", { class: "hs-btn hs-btn--secondary hs-btn--sm chip", type: "button", text: name, attrs: { "aria-pressed": String(name === chip), "data-testid": `chip-${name}` }, on: { click: () => {
+    chip = lastChip = name;
+    chipBtns.forEach((b) => b.setAttribute("aria-pressed", String(b.textContent === name)));
+    apply();
+  } } }));
+  const chips = h("div", { class: "chips", attrs: { role: "group", "aria-label": "Tool categories" } }, ...chipBtns);
+  if (chip !== "All") apply();
+  const findRow = h("div", { class: "find" }, h("label", { class: "find__label", text: "Find a tool", attrs: { for: "find" } }), find, chips, none);
 
-  const recent = getRecent().map((id) => LIVE.find((t) => t.id === id)).filter((t): t is ToolDef => !!t);
+  const recent = getRecent().map((id) => TOOLS.find((t) => t.id === id)).filter((t): t is ToolMeta => !!t);
   const recentRow = h("section", { class: "recent", hidden: !recent.length, attrs: { "aria-labelledby": "recent-h", "data-testid": "recent" } },
     h("h2", { id: "recent-h", class: "hs-eyebrow", text: "Recently used" }),
     h("ul", { class: "recent__list", attrs: { role: "list" } }, ...recent.map((t) => h("li", {}, h("a", { class: "hs-btn hs-btn--secondary", text: t.title, attrs: { href: `#/${t.id}`, "data-testid": `recent-${t.id}` } })))));
@@ -70,8 +82,10 @@ export function homeView(navigate: (hash: string) => void): { el: HTMLElement; d
   const el = h("div", { class: "view home" },
     h("header", { class: "hero" },
       h("h1", { text: "PDF tools that stay on your device.", attrs: { tabindex: -1, "data-testid": "view-heading" } }),
-      h("p", { class: "hero__lede" }, "Your files stay on this device. ", h("a", { href: "#/privacy", text: "See how to check" }), ".")),
-    dropzone({}),
+      h("p", { class: "hero__lede" }, "Your files stay on this device. ", h("a", { href: "#/privacy", text: "See how to check" }), "."),
+      h("ol", { class: "steps3", attrs: { "data-testid": "three-steps" } }, ...["Pick a tool.", "Add your file.", "Download."].map((t) => h("li", { text: t })))),
+    dropzone({ hint: "Or paste them. They stay on this device." }),
+    h("p", { class: "trust" }, h("a", { href: "#/privacy", text: "Files stay on this device · No account · Works offline after the first visit", attrs: { "data-testid": "trust-strip" } })),
     findRow,
     recentRow,
     groups[0].el,

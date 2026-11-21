@@ -66,7 +66,8 @@ function licencesTxt(): Plugin {
     ["OCR wasm: libpng", "licences/libpng.txt"], ["OCR wasm: libtiff", "licences/libtiff.txt"], ["OCR wasm: zlib", "licences/zlib.txt"],
     ["OCR wasm: libjpeg (Independent JPEG Group)", "licences/libjpeg-ijg.txt"], ["OCR wasm: libwebp", "licences/libwebp.txt"],
     ["OCR wasm: giflib", "licences/giflib.txt"], ["OCR wasm: Leptonica", "licences/leptonica.txt"],
-    ["Fonts: SIL Open Font License 1.1 (Space Grotesk, Inter, Silkscreen, JetBrains Mono, Noto Sans, Caveat)", "src/fonts/OFL.txt"],
+    ["Pixelarticons (tool icons, MIT)", "licences/pixelarticons-mit.txt"],
+    ["Fonts: SIL Open Font License 1.1 (Space Grotesk, Inter, Silkscreen, JetBrains Mono, Noto Sans, Caveat, Noto Sans SC)", "src/fonts/OFL.txt"],
   ];
   return {
     name: "mosspdf-licences-txt",
@@ -91,7 +92,7 @@ function swPrecache(): Plugin {
     enforce: "post",
     closeBundle() {
       const dist = "dist";
-      const files = walk(dist).map((f) => "/" + relative(dist, f).split("\\").join("/")).filter((f) => f !== "/sw.js" && f !== "/_headers" && f !== "/index.html" && !/^\/assets\/(tesseract-core|(eng|chi_sim|msa|tam)\.traineddata)-/.test(f)).sort(); // OCR engine: cached on first use instead (D16)
+      const files = walk(dist).map((f) => "/" + relative(dist, f).split("\\").join("/")).filter((f) => f !== "/sw.js" && f !== "/_headers" && f !== "/index.html" && !/^\/assets\/(tesseract-core|notosanssc-gb2312-400-normal|(eng|chi_sim|msa|tam)\.traineddata)-/.test(f)).sort(); // OCR engine and Chinese font: cached on first use instead (D16, D24)
       const list = ["/", ...files];
       const hash = createHash("sha256").update(JSON.stringify(list)).update(readFileSync(join(dist, "index.html"))).digest("hex").slice(0, 10);
       const sw = readFileSync(join(dist, "sw.js"), "utf8").replace("__PRECACHE__", JSON.stringify(list)).replace("__VERSION__", `${pkg.version}-${hash}`);

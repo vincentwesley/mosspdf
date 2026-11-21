@@ -4,16 +4,18 @@ import "./credits/credits.js";
 import "./brand/logo-resize";
 import "./core/engines";
 import { applyTheme, nextTheme, type Theme } from "./theme";
-import { bootAndSeal, seal } from "./core/seal";
+import { bootAndSeal, registerEngine, seal } from "./core/seal";
 import { netlog } from "./core/netlog";
 import { badgeText, privacyDialog, privacyPage, VERSION } from "./ui/privacy";
 import { homeView } from "./ui/home";
 import { workspace } from "./ui/workspace";
 import { toolById } from "./tools";
+import type { ToolDef } from "./tools/types";
 import { live } from "./ui/dom";
 import { initGlobalIntake } from "./ui/dropzone";
 import { initPalette, MOD } from "./ui/palette";
 import { routeOf } from "./core/ocrlangs";
+import { setZh, zhOn } from "./core/zhfont";
 
 const KEY = "theme";
 const store = {
@@ -45,6 +47,13 @@ btn.addEventListener("click", () => {
   sync(t);
 });
 
+// ---- optional Chinese font (D24): switching reloads the tab so the font loads before the seal ----
+const zh = document.querySelector<HTMLButtonElement>("#zh-toggle")!;
+zh.textContent = zhOn() ? "Chinese text: on" : "Chinese text: off";
+document.querySelector<HTMLElement>("#zh-hint")!.textContent = zhOn() ? "Switching off reloads the page." : "Adds 2 MB, reloads the page.";
+zh.setAttribute("aria-pressed", String(zhOn()));
+zh.addEventListener("click", () => { setZh(!zhOn()); location.reload(); });
+
 // ---- seal badge + privacy dialog ----
 document.querySelector<HTMLElement>("#app-version")!.textContent = VERSION;
 document.body.append(live);
@@ -70,16 +79,22 @@ const app = document.querySelector<HTMLElement>("#app")!;
 let current: { destroy: () => void } | null = null;
 initGlobalIntake();
 
+// D25: tool code is one chunk, imported before the seal (an engine entry) so nothing loads afterwards.
+let defs: Map<string, ToolDef> | undefined;
+const toolsReady = import("./tools/all").then((m) => { defs = new Map(m.DEFS.map((d) => [d.id, d])); });
+registerEngine({ name: "tools", load: () => toolsReady });
+
 function resolve(): { el: HTMLElement; destroy: () => void } {
   const route = routeOf(location.hash);
   if (route === "privacy") return privacyPage();
-  const tool = toolById(route);
+  const tool = defs?.get(route);
   if (tool) return workspace(tool);
   return homeView((h) => { location.hash = h; });
 }
 
 let first = true;
 function render(): void {
+  if (!defs && toolById(routeOf(location.hash))) { void toolsReady.then(render, () => { location.hash = "#/"; }); return; } // on failure the tool code is missing: show home (the seal badge reports the failure)
   const swap = () => {
     current?.destroy();
     const v = resolve();

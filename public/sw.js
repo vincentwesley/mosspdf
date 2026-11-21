@@ -28,7 +28,7 @@ self.addEventListener("fetch", (e) => {
     e.respondWith(fetch(req).then((r) => { if (r.ok) caches.open(CACHE).then((c) => c.put("/", r.clone())); return r; }).catch(() => caches.match("/").then((r) => r || Response.error())));
     return;
   }
-  // OCR engine files are not precached (about 6 MB, D16): kept the first time OCR loads, so it then works offline.
-  const keep = /\/assets\/(tesseract-core|(eng|chi_sim|msa|tam)\.traineddata)-/.test(url.pathname);
+  // OCR engine files and the optional Chinese font (D24) are not precached (about 6 MB, D16): kept the first time OCR loads, so it then works offline.
+  const keep = /\/assets\/(tesseract-core|notosanssc-gb2312-400-normal|(eng|chi_sim|msa|tam)\.traineddata)-/.test(url.pathname);
   e.respondWith(caches.match(req).then((hit) => hit || fetch(req).then((r) => { if (keep && r.ok) { const c = r.clone(); caches.open(CACHE).then((k) => k.put(req, c)); } return r; })));
 });

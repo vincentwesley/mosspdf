@@ -74,7 +74,7 @@ export const metadata: ToolDef = {
     u.info.hidden = wipe || !u.info.childElementCount;
     u.credit.textContent = wipe
       ? "Nothing is added to the file."
-      : ctx.producerCredit ? "MossPDF will note itself in the Producer field (\"MossPDF by Vin's Atelier\"). You can switch that off under Output settings." : "MossPDF will not add its name to the file.";
+      : ctx.producerCredit ? "MossPDF will note itself in the Producer field (\"MossPDF by Vin's Atelier\"). You can switch that off under More settings." : "MossPDF will not add its name to the file.";
   },
   ready(ctx) { const u = ui(ctx); return !!ctx.file && u.state === "ready" && (u.wipe.input.checked || changed(ctx).length > 0); },
   primaryLabel(ctx) { return ui(ctx).wipe.input.checked ? "Remove all details" : "Save details"; },

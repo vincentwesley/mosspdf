@@ -24,7 +24,7 @@ for (const [key, maxKb] of Object.entries(budgets).filter(([k]) => k !== "main-g
   console.log(`${over ? "FAIL" : "ok  "} ${key}: ${(size / KB).toFixed(1)} KB / ${maxKb} KB`);
 }
 // Main-thread bundle: small, and pdf-lib (ops worker only) must not leak into it (A-BLD-5).
-const main = files.filter((f) => /[\\/]assets[\\/](index|pdf|sw-update)-[\w-]+\.js$/.test(f));
+const main = files.filter((f) => /[\\/]assets[\\/](index|pdf|sw-update|all)-[\w-]+\.js$/.test(f));
 const gz = main.filter((f) => /index-/.test(f)).reduce((n, f) => n + gzipSync(readFileSync(f)).length, 0);
 const leak = main.filter((f) => /setProducer|embedFont|updateMetadata/.test(readFileSync(f, "utf8")));
 const gzMax = budgets["main-gzip"] ?? 40;

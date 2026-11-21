@@ -1,9 +1,10 @@
 // Command palette (Ctrl/Cmd+K) and the shortcuts list ("?"). Native <dialog>; the search box is an ARIA 1.2 combobox over a listbox.
 import { store } from "../core/store";
 import { scoreTool } from "../core/toolsearch";
-import { CATALOG, isLive } from "../tools";
+import { CATALOG } from "../tools";
 import { h } from "./dom";
 import { icon } from "./icons";
+import { toolBox } from "./toolicons";
 import { toast } from "./toast";
 
 interface Cmd { id: string; label: string; hint: string; blurb: string; run: () => void }
@@ -31,7 +32,7 @@ export function initPalette(act: PaletteActions): { open(opener?: HTMLElement): 
 
   const go = (id: string) => () => { skipRefocus = true; location.hash = `#/${id}`; };
   const all: Cmd[] = [
-    ...CATALOG.flatMap((g) => g.tools.filter(isLive).map((t): Cmd => ({ id: `tool-${t.id}`, label: t.title, hint: g.name, blurb: `${t.blurb} ${g.name}`, run: go(t.id) }))),
+    ...CATALOG.flatMap((g) => g.tools.map((t): Cmd => ({ id: `tool-${t.id}`, label: t.title, hint: g.name, blurb: `${t.blurb} ${g.name}`, run: go(t.id) }))),
     { id: "cmd-theme", label: "Switch theme", hint: "Command", blurb: "dark light appearance", run: () => act.switchTheme() },
     { id: "cmd-privacy", label: "Privacy log", hint: "Command", blurb: "requests seal network", run: () => { skipRefocus = true; act.openPrivacy(opener ?? document.body); } },
     { id: "cmd-clear", label: "Clear all files", hint: "Command", blurb: "remove delete files", run: () => {
@@ -58,7 +59,7 @@ export function initPalette(act: PaletteActions): { open(opener?: HTMLElement): 
       : all;
     active = 0;
     list.replaceChildren(...shown.map((c, i) => h("li", { class: "pal__opt", id: `pal-o-${i}`, attrs: { role: "option", "data-testid": "palette-option", "data-id": c.id }, on: { click: () => pick(c) } },
-      h("span", { text: c.label }), h("span", { class: "pal__hint", text: c.hint }))));
+      c.id.startsWith("tool-") ? toolBox(c.id.slice(5)) : h("span", { class: "ibox ibox--blank" }), h("span", { class: "pal__label", text: c.label }), h("span", { class: "pal__hint", text: c.hint }))));
     list.hidden = !shown.length;
     none.hidden = !!shown.length;
     mark();

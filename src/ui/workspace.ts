@@ -13,8 +13,10 @@ import { dropzone, setFilesHandler } from "./dropzone";
 import { fileList } from "./filelist";
 import { newItem, pageGrid } from "./pagegrid";
 import { saveResult, saveZip } from "./download";
+import { toolBox } from "./toolicons";
 
 const DROP_TITLE = { pdf: "Drop a PDF here", pdfs: "Drop PDFs here", images: "Drop images here", "pdf-pair": "Drop the two PDFs here" } as const;
+const CHOOSE = { pdf: "Choose a PDF", pdfs: "Choose PDF files", images: "Choose images", "pdf-pair": "Choose two PDFs" } as const;
 const ACCEPT = {
   pdf: ".pdf,application/pdf",
   images: "image/jpeg,image/png,image/webp,image/heic,image/heif,.jpg,.jpeg,.png,.webp,.heic,.heif",
@@ -89,7 +91,7 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
       ofKind().slice(0, -2).forEach((f) => store.remove(f.id));
     });
   });
-  const dz = dropzone({ title: tool.dropTitle ?? DROP_TITLE[tool.accepts], accept: ACCEPT[kind === "image" ? "images" : "pdf"] });
+  const dz = dropzone({ title: tool.dropTitle ?? DROP_TITLE[tool.accepts], accept: ACCEPT[kind === "image" ? "images" : "pdf"], label: CHOOSE[tool.accepts], hint: "They stay on this device." });
   const soon = h("p", { class: "hs-banner hs-banner--info", text: "Coming soon. This tool is not built yet, so nothing here will run.", hidden: !!tool.run, attrs: { "data-testid": "coming-soon" } });
   const notice = h("p", { class: "hs-banner hs-banner--info", attrs: { role: "status", "data-testid": "notice" }, hidden: true });
   const fl = fileList({
@@ -121,7 +123,7 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
   credit.checked = prefs.producerCredit;
   credit.addEventListener("change", () => { prefs.producerCredit = credit.checked; });
   const settings = h("details", { class: "settings" },
-    h("summary", { text: "Output settings" }),
+    h("summary", { text: "More settings" }),
     h("div", { class: "settings__row" }, credit, h("label", { attrs: { for: "credit" }, text: "Mention MossPDF in the file's details (Producer)" })));
 
   const kbd = h("details", { class: "kbd", attrs: { "data-testid": "kbd-help" } },
@@ -248,12 +250,12 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
         h("li", { class: "out", attrs: { "data-testid": "result-row" } },
           h("span", { class: "out__name", text: r.name }),
           h("span", { class: "out__size", text: fmtSize(r.bytes.length) }),
-          h("button", { class: "hs-btn", type: "button", text: "Download", attrs: { "aria-label": `Download ${r.name}`, "data-testid": "result-download" }, on: { click: () => void saveResult(r) } })))),
+          h("button", { class: "hs-btn out__dl", type: "button", text: "Download", attrs: { "aria-label": `Download ${r.name}`, "data-testid": "result-download" }, on: { click: () => void saveResult(r) } })))),
       ...(results.length > 1 ? [h("div", { class: "outs__all" }, h("button", { class: "hs-btn hs-btn--secondary", type: "button", text: "Download all (.zip)", attrs: { "data-testid": "download-zip" }, on: { click: () => void saveZip(results, zipName) } }))] : []),
       ...warns.map((w) => h("p", { class: "hs-banner hs-banner--warn", text: w.message, attrs: { role: "note" } })),
       h("div", { class: "res__next" },
-        ...(next.length ? [h("h3", { id: "next-h", text: "Use in another tool" }), h("ul", { class: "res__tools", attrs: { role: "list", "aria-labelledby": "next-h" } }, ...next.map((t) =>
-          h("li", {}, h("button", { class: "hs-btn hs-btn--secondary", type: "button", text: t.title, attrs: { "data-testid": `next-${t.id}` }, on: { click: () => void useIn(results[0], t.id) } }))))] : []),
+        ...(next.length ? [h("h3", { id: "next-h", text: "Continue with" }), h("ul", { class: "res__tools", attrs: { role: "list", "aria-labelledby": "next-h" } }, ...next.map((t) =>
+          h("li", {}, h("button", { class: "hs-btn hs-btn--secondary", type: "button", attrs: { "data-testid": `next-${t.id}` }, on: { click: () => void useIn(results[0], t.id) } }, toolBox(t.id), t.title))))] : []),
         h("button", { class: "hs-btn hs-btn--ghost", type: "button", text: "Start over", attrs: { "data-testid": "start-over" }, on: { click: startOver } })));
   }
 
@@ -275,7 +277,7 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
   const unsub = store.subscribe(() => update());
 
   const el = h("div", { class: "view tool" },
-    h("header", { class: "view__head" }, h1, h("p", { class: "view__lede", text: tool.lede })),
+    h("header", { class: "view__head" }, toolBox(tool.id, true), h1, h("p", { class: "view__lede", text: tool.lede })),
     dz, soon, notice, carryBox, fl.el, tip, warnBox, optBox, gridBox, settings, resultBox, bar);
   update();
   return { el, destroy: () => { unsub(); grid?.destroy(); abort?.abort(); tool.destroy?.(ctx); } };
