@@ -27,7 +27,7 @@ Continue work on **Pagehold** (repo `vincentwesley/pagehold`). main holds M0-M8 
 ## Known gaps
 - CI-only: mobile-safari (Linux WPE) reports an inline `style-src-elem` CSP violation (blank source, line 5) on compare intake after an earlier viewport resize in the same test. M7 tried to reproduce it: 3 runs on local mobile-safari and WebKit pass; all pdf.js documents open through `openDoc` (disableFontFace) and src/ has no style strings. Test stays `fixme` on CI mobile-safari (`e2e/shell.spec.ts`); next step is a CI run with the violation details logged (the fixture already records blockedURI/source/line).
 - Firefox offline test skipped (setOffline broken with service workers, docs/spikes/csp.md); keyboard-only tests skip on touch projects.
-- Liberation Sans (GPL-2 + font exception) ships in the pdf.js data pack; owner may prefer to drop it (D11).
+- Liberation Sans dropped from the pdf.js data pack (D22).
 - Main bundle budget raised to 64 KB gzip (62.2 now).
 
 ## Resume point (2026-11-21, evening)

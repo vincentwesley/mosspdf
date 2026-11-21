@@ -205,8 +205,8 @@ const toJpeg = (c: HTMLCanvasElement) => new Promise<Blob>((res, rej) => c.toBlo
 
 export const redact: ToolDef = {
   id: "redact", title: "Redact", heading: "Redact a PDF", group: "Privacy",
-  blurb: "Remove text for good.",
-  lede: "Find NRIC and FIN numbers, phone numbers, emails and addresses, or search for words, then remove them from the file for good, not just cover them.",
+  blurb: "Remove text, not just cover it.",
+  lede: "Find NRIC and FIN numbers, phone numbers, emails and addresses, or search for words, then remove the boxed text from the file. Automatic search can miss items, so review the boxes and check the result.",
   accepts: "pdf",
   options(ctx) { return ui(ctx).root; },
   sync(ctx) {
@@ -232,7 +232,7 @@ export const redact: ToolDef = {
     u.hint.textContent = "Add a PDF above to start.";
     u.root.querySelectorAll<HTMLElement>(".sg-side, .vw").forEach((e) => (e.hidden = !f));
   },
-  warnings(ctx) { return ui(ctx).signed ? [SIGNED_WARNING] : []; },
+  warnings(ctx) { const u = ui(ctx); return [...(u.signed ? [SIGNED_WARNING] : []), ...(u.chosen().length ? ["Automatic search can miss items, and redacted pages become pictures. Your original file is not changed. Check the result before you share it."] : [])]; },
   ready(ctx) { const u = ui(ctx); return !!ctx.file && !u.scanning && u.chosen().length > 0; },
   primaryLabel(ctx) { const n = ui(ctx).chosen().length; return n ? `Redact ${plural(n, "item")}` : "Redact"; },
   destroy(ctx) { ui(ctx).pv.destroy(); },

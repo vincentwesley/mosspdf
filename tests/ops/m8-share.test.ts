@@ -39,7 +39,7 @@ const qdf = async (bytes: Uint8Array) => {
   return new TextDecoder("latin1").decode(r.files["/out.pdf"]);
 };
 
-describe("Safe to share clean copy", () => {
+describe("Clean copy to share clean copy", () => {
   it("@A-SHARE-1 scrubPersonal removes annotation authors, dates and every XMP packet", async () => {
     const r = await cleanCopy(await fixture(), { keepLinks: true, scrubPersonal: true }, opts(), engines);
     const text = await qdf(r.bytes);

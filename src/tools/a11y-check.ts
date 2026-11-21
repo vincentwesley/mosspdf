@@ -36,7 +36,7 @@ function draw(ctx: Ctx) {
 
 export const a11yCheck: ToolDef = {
   id: "a11y-check", title: "Accessibility check", group: "Edit",
-  blurb: "See how well screen readers can use a PDF.",
+  blurb: "Basic check of screen-reader signals in a PDF.",
   lede: "Checks tags, language, title, picture descriptions, fonts, real text and bookmarks, with a plain note on how to fix each.",
   accepts: "pdf",
   options(ctx) { draw(ctx); return ui(ctx).box; },

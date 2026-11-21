@@ -14,9 +14,8 @@ Resume here. Plan: `docs/PLAN.md`. Checks: `docs/ACCEPTANCE.md`. Why things are 
 - Docs: USABILITY (3 personas, fixes), PERF (large files), LEGAL-REVIEW, COMPARISON, DECISIONS D1-D19.
 
 ## 2. Needs the owner (never blocks; see NEEDS-VIN.md)
-1. Liberation Sans keep or drop (D11).
-2. Formal trademark check on "Pagehold" before commercial use.
-3. Optional custom domain (Cloudflare dashboard → Workers → pagehold → Domains & Routes).
+1. Formal trademark check on "Pagehold" before commercial use.
+2. Optional custom domain (Cloudflare dashboard → Workers → pagehold → Domains & Routes).
 
 ## 3. Next most valuable ideas (ranked)
 1. **Repair memory**: scan fixed in v1.2.1 (+69 MB at 193 MB); repair still about 3x (qpdf output in MEMFS, no streaming in this build).

@@ -93,7 +93,7 @@ test.describe("Workflows", () => {
     expect(dl.bytes.length).toBeLessThan(5 * 1024 * 1024);
   });
 
-  test("A-E2E-4 Safe to share removes scripts, attachments and details, and says what it removed", async ({ page }) => {
+  test("A-E2E-4 Clean copy to share removes scripts, attachments and details, and says what it removed", async ({ page }) => {
     await loadApp(page, "/#/wf-share");
     await add(page, "risk-everything");
     await readyRows(page, 1);
@@ -109,7 +109,7 @@ test.describe("Workflows", () => {
     expect(json).not.toMatch(/"\/JS"|"\/JavaScript"|"\/EF"|"\/Launch"/);
   });
 
-  test("A-E2E-5 Safe to share strips title, author and the Pagehold credit", async ({ page }) => {
+  test("A-E2E-5 Clean copy to share strips title, author and the Pagehold credit", async ({ page }) => {
     await loadApp(page, "/#/wf-share");
     await add(page, "plain-3p");
     await readyRows(page, 1);

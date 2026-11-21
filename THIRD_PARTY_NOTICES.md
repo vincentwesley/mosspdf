@@ -9,20 +9,23 @@ Everything third-party that ships in the Pagehold build, with author, licence an
 | pdfjs-dist 6.5.438 (pdf.js: rendering, thumbnails; also the pdf.js worker) | Mozilla and contributors | Apache-2.0 | https://github.com/mozilla/pdf.js |
 | @cantoo/pdf-lib 2.11.1 (repair and metadata pass, runs in the ops worker only) | Cantoo (fork), Andrew Dillon (original pdf-lib) | MIT | https://github.com/cantoo-scribe/pdf-lib |
 | @neslinesli93/qpdf-wasm 0.3.1 (qpdf compiled to WebAssembly: page assembly, inspection) | Tommaso Pifferi | ISC (wrapper); the bundled qpdf is Apache-2.0, Copyright Jay Berkenbilt | https://github.com/neslinesli93/qpdf-wasm, https://github.com/qpdf/qpdf |
-| @jsquash/jpeg 1.6.0 (MozJPEG compiled to WebAssembly: image recompression in compress, ops worker only; its codec/LICENSE.codec.md covers MozJPEG, IJG and libjpeg-turbo terms: BSD-3-Clause, IJG, Zlib) | Jamie Sinclair (repackaged from Squoosh by Google) | Apache-2.0 | https://github.com/jamsinclair/jSquash |
+| @jsquash/jpeg 1.6.0 (MozJPEG compiled to WebAssembly: image recompression in compress, ops worker only; its codec/LICENSE.codec.md covers MozJPEG, IJG and libjpeg-turbo terms: BSD-3-Clause, IJG, Zlib. This software is based in part on the work of the Independent JPEG Group.) | Jamie Sinclair (repackaged from Squoosh by Google) | Apache-2.0 | https://github.com/jamsinclair/jSquash |
 | tesseract.js-core 7.0.0 (Tesseract OCR compiled to WebAssembly, SIMD + LSTM build; its JS glue is bundled into the OCR worker, the .wasm is loaded only on the OCR page; bundles Tesseract (Apache-2.0, Google and contributors) and Leptonica (BSD-2-Clause, Dan Bloomberg) among other libraries) | Jerome Wu and contributors | Apache-2.0 | https://github.com/naptha/tesseract.js-core, https://github.com/tesseract-ocr/tesseract |
+| libpng, libtiff, zlib, libjpeg (Independent JPEG Group), libwebp, giflib (compiled into the OCR wasm above, with Leptonica; this software is based in part on the work of the Independent JPEG Group) | Glenn Randers-Pehrson and the libpng authors; Sam Leffler and Silicon Graphics; Jean-loup Gailly and Mark Adler; Independent JPEG Group; Google (libwebp); Eric S. Raymond (giflib) | libpng-2.0; libtiff licence (BSD-style); Zlib; IJG; BSD-3-Clause; MIT | https://github.com/pnggroup/libpng, https://libtiff.gitlab.io/libtiff/, https://github.com/madler/zlib, https://www.ijg.org/, https://github.com/webmproject/libwebp, https://giflib.sourceforge.net/ |
 | @tesseract.js-data/eng 1.0.0 (English language data, the 4.0.0_best_int model: tessdata_best, integer-quantised; shipped gzipped as `assets/eng.traineddata-*.gz`, OCR page only) | tesseract.js contributors (data from the Tesseract project, Google and contributors) | MIT (package); the model is Apache-2.0 | https://github.com/naptha/tessdata, https://github.com/tesseract-ocr/tessdata_best |
 | @tesseract.js-data/chi_sim 1.0.0 (Simplified Chinese language data, the 4.0.0_best_int model, gzipped as `assets/chi_sim.traineddata-*.gz`, loaded only when that language is chosen on the OCR page) | tesseract.js contributors (data from the Tesseract project, Google and contributors) | MIT (package); the model is Apache-2.0 | https://github.com/naptha/tessdata, https://github.com/tesseract-ocr/tessdata_best |
 | @tesseract.js-data/msa 1.0.0 (Malay language data, the 4.0.0_best_int model, gzipped as `assets/msa.traineddata-*.gz`, loaded only when that language is chosen on the OCR page) | tesseract.js contributors (data from the Tesseract project, Google and contributors) | MIT (package); the model is Apache-2.0 | https://github.com/naptha/tessdata, https://github.com/tesseract-ocr/tessdata_best |
 | @tesseract.js-data/tam 1.0.0 (Tamil language data, the 4.0.0_best_int model, gzipped as `assets/tam.traineddata-*.gz`, loaded only when that language is chosen on the OCR page) | tesseract.js contributors (data from the Tesseract project, Google and contributors) | MIT (package); the model is Apache-2.0 | https://github.com/naptha/tessdata, https://github.com/tesseract-ocr/tessdata_best |
 | @cantoo/fontkit 2.0.12 (embeds the Unicode text font in stamps, fill, sign, OCR layer and report; ops worker only) | Devon Govett and contributors (Cantoo fork) | MIT | https://github.com/cantoo-scribe/fontkit |
-| brotli 1.3.3, dfa 1.2.0, restructure 3.0.2 (dependencies of @cantoo/fontkit) | Devon Govett | MIT | https://github.com/devongovett/brotli.js, https://github.com/devongovett/dfa, https://github.com/devongovett/restructure |
+| brotli 1.3.3, dfa 1.2.0, restructure 3.0.2 (dependencies of @cantoo/fontkit; the brotli decoder is Copyright 2013 Google Inc., Apache-2.0) | Devon Govett, Google (brotli decoder) | MIT; Apache-2.0 (brotli decoder) | https://github.com/devongovett/brotli.js, https://github.com/devongovett/dfa, https://github.com/devongovett/restructure |
 | base64-js 1.5.1 (dependency of @cantoo/fontkit) | T. Jameson Little | MIT | https://github.com/beatgammit/base64-js |
 | fflate 0.8.3 (zip downloads in the app; also a dependency of @cantoo/pdf-lib) | Arjun Barrett | MIT | https://github.com/101arrowz/fflate |
 | culori 4.0.2 (dependency of @cantoo/pdf-lib) | Dan Burzo | MIT | https://github.com/Evercoder/culori |
 | html-entities 2.6.0 (dependency of @cantoo/pdf-lib) | Marat Dulin | MIT | https://github.com/mdevils/html-entities |
 | node-html-better-parser 1.5.9 (dependency of @cantoo/pdf-lib) | Xiaoyi Shi and contributors | MIT | https://github.com/Rexxars/node-html-better-parser |
 | tslib 2.8.1 (dependency of @cantoo/pdf-lib) | Microsoft | 0BSD | https://github.com/Microsoft/tslib |
+
+Full licence texts: /licences.txt on the site and licences.txt in the release zip.
 
 `@napi-rs/canvas` 1.1.1 and its platform packages (`@napi-rs/canvas-android-arm64`, `@napi-rs/canvas-darwin-arm64`, `@napi-rs/canvas-darwin-x64`, `@napi-rs/canvas-linux-arm-gnueabihf`, `@napi-rs/canvas-linux-arm64-gnu`, `@napi-rs/canvas-linux-arm64-musl`, `@napi-rs/canvas-linux-riscv64-gnu`, `@napi-rs/canvas-linux-x64-gnu`, `@napi-rs/canvas-linux-x64-musl`, `@napi-rs/canvas-win32-arm64-msvc`, `@napi-rs/canvas-win32-x64-msvc`) are optional dependencies of pdfjs-dist, MIT, Brooooooklyn (https://github.com/Brooooooklyn/canvas). They are only used by Node tests and are not in the browser build.
 
@@ -34,11 +37,12 @@ pdf.js itself is Apache-2.0. These binary files come with their own licences, sh
 |------|--------|---------|--------|
 | `cmaps/*.bcmap` (Adobe CJK character maps) | Adobe Systems Incorporated | BSD-3-Clause (Adobe, 1990-2009) | https://github.com/mozilla/pdf.js/tree/master/external/bcmaps |
 | `standard_fonts/Foxit*.pfb` (substitutes for the 14 standard PDF fonts) | Foxit Software, PDFium authors | BSD-3-Clause (PDFium, 2014) | https://github.com/mozilla/pdf.js/tree/master/external/standard_fonts |
-| `standard_fonts/LiberationSans-*.ttf` (fallback for non-embedded Arial-like fonts) | Red Hat, Inc. (Liberation fonts 1.x) | GNU GPL v2 with the Liberation font exception: documents that embed the font are not covered by the GPL. The fonts are shipped unmodified as data and are not linked into Pagehold's code. | https://github.com/mozilla/pdf.js/tree/master/external/standard_fonts |
 | `wasm/jbig2.wasm` (JBIG2 image decoder) | PDFium authors, Mozilla | BSD-3-Clause | https://pdfium.googlesource.com/pdfium/ |
 | `wasm/openjpeg.wasm` (JPEG 2000 decoder) | OpenJPEG contributors, Mozilla | BSD-2-Clause | https://github.com/uclouvain/openjpeg |
 | `wasm/qcms_bg.wasm` (colour management) | Mozilla (qcms) | MIT | https://github.com/FirefoxGraphics/qcms |
-| `wasm/quickjs-eval.wasm` (JavaScript in PDF forms; not used by the M1 tools) | Fabrice Bellard, Charlie Gordon | MIT | https://bellard.org/quickjs/ |
+| `wasm/quickjs-eval.wasm` (JavaScript in PDF forms engine; packed into the data file) | Fabrice Bellard, Charlie Gordon | MIT | https://bellard.org/quickjs/ |
+
+pdf.js's Liberation Sans fonts (GPL-2) are deliberately not shipped (D22).
 
 ## Fonts (`src/fonts/`)
 

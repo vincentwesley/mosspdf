@@ -148,7 +148,7 @@ const ui = (ctx: Ctx) => ctx.local(() => {
     return s.exif.get(f.id)!;
   }
   function describe(e: ExifSummary & { jpeg: boolean }) {
-    if (!e.hasExif) return e.jpeg ? "No camera, date or location details were found in this photo. The saved copy has none either." : "This is not a JPG, so there is no EXIF block to read. The saved copy still carries no hidden details.";
+    if (!e.hasExif) return e.jpeg ? "No camera, date or location details were found in this photo. The saved copy has none either." : "This is not a JPG, so there is no EXIF block to read. The saved copy should carry no camera or location details.";
     const parts = [e.camera && `camera ${e.camera}`, e.date && `taken ${e.date}`, `location (GPS): ${e.gps ? "yes" : "no"}`].filter(Boolean);
     return `Found in this photo: ${parts.join(", ")}. All of it is left out of the saved copy.`;
   }
@@ -173,7 +173,7 @@ const ui = (ctx: Ctx) => ctx.local(() => {
 export const photo: ToolDef = {
   id: "photo", title: "Photo clean", heading: "Clean a photo", group: "Privacy",
   blurb: "Strip location and details.",
-  lede: "Remove location and camera details from photos, and blur parts. Draw boxes over faces, number plates or screens. Pagehold doesn't detect them automatically.",
+  lede: "Remove location and camera details from photos, and pixelate or blur parts. Draw boxes over faces, number plates or screens. Pagehold doesn't detect them automatically.",
   accepts: "images",
   options(ctx) { return ui(ctx).root; },
   sync(ctx) {

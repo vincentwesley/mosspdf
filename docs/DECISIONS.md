@@ -53,7 +53,7 @@ D10 follow-up (same day): checked whether the wasm failures were exit code 3 mis
 - The favicon SVG may not carry a `<style>` element: WebKit applies the page CSP to it (`style-src 'self'`).
 - Playwright's iPhone WebKit on a display-scaled Windows machine reports `clientWidth` 312 for a 390 layout (a bare page shows it too), so `expectNoOverflow` compares `scrollWidth` with the layout width of `<html>` (1px tolerance).
 - Playwright runs 3 workers locally: six parallel browsers with WASM and pdf.js crash Firefox content processes on a 16 GB machine.
-- The pdf.js data pack includes Liberation Sans (GPL-2 with the font exception) as the fallback for non-embedded fonts; see THIRD_PARTY_NOTICES.md. Dropping it is possible if that is unwanted (non-embedded Arial-like fonts would then fall back to the Foxit set).
+- Liberation Sans was dropped from the pdf.js data pack: see D22.
 
 ## D12. Image recompression: MozJPEG WASM passed as bytes (2026-11-19)
 `compress` (balanced/strong) re-encodes embedded images as JPEG, so it needs an image codec in the ops worker and in Node tests. Chosen: `@jsquash/jpeg` 1.6.0 (Apache-2.0, MozJPEG compiled to WASM, from Squoosh). Its `init(WebAssembly.Module)` takes a compiled module, so both binaries (decoder 163 KB, encoder 246 KB) are fetched before the seal with the qpdf wasm and sent to the worker in the same `init` message; nothing is fetched afterwards (unlike qpdf-wasm, no fetch patch is needed). The same code runs in Node (tests read the wasm from node_modules). Rejected: an injected OffscreenCanvas codec (not isomorphic, so the Node tests would exercise a stand-in, and canvas colour management can alter pixels). `Engines` gains `jpeg: Jpeg` (`src/engines/jpeg.ts`).
@@ -135,3 +135,8 @@ Symptom: a `worker-src` CSP violation on page load in Firefox, seen twice in a f
 - **Hidden layer.** `src/ops/glyphless.ts`: Type0 / Identity-H / CIDFontType2 with a hand-built TrueType holding one empty glyph (`CIDToGIDMap` Identity), `DW` 500, one CID per distinct code point, ToUnicode CMap per CID (UTF-16BE, so astral characters work). Used by `drawLayer` for OCR and redaction, so the layer needs no Helvetica/Noto and drops nothing; Tamil and CJK come back from pdf.js code point for code point. Words are stretched to their box with `Tz` from `n * 0.5 * size`, mode 3 as before.
 - **Budgets.** `.gz` 3100 to 7400 KB (all four models, 7.3 MB); they are fetched only when chosen, so the default load is unchanged.
 - **Tests.** Chinese/Tamil scans are not generated (no canvas or CJK font in Node); unit tests cover the layer round trip and loading all four models. The e2e picks Malay + English and reads the scan fixture.
+
+## D22. Liberation Sans dropped (2026-11-21)
+- Why: it was the only GPL item in the build; dropping it gives commercial clarity and a ~560 KB smaller data pack.
+- Effect: non-embedded Arial/Helvetica is drawn with the system sans-serif in previews. Saved PDFs are unaffected, since Pagehold never embeds Liberation Sans.
+- How: `pdfjsData()` in `vite.config.ts` skips `standard_fonts/LiberationSans-*`; pdf.js catches the failed font fetch and falls back quietly (verbosity 0).

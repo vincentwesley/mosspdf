@@ -65,7 +65,7 @@ function pageText(words: OcrWord[]): string {
 export const ocr: ToolDef = {
   id: "ocr", title: "OCR", heading: "Make a scan searchable", group: "OCR",
   blurb: "Make scans searchable.",
-  lede: "Read the words on scanned pages and add them to the PDF, so you can search and copy from it. Reading happens on this device.",
+  lede: "Read the words on scanned pages and add them to the PDF, so you can search and copy from it. Reading happens on this device. Results can contain mistakes, especially on blurry, skewed or handwritten pages, so check them.",
   accepts: "pdf",
   options(ctx) {
     const u = ui(ctx);
