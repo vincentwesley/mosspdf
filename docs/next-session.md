@@ -30,8 +30,8 @@ Continue work on **Pagehold** (repo `vincentwesley/pagehold`). main holds M0-M8 
 - Liberation Sans (GPL-2 + font exception) ships in the pdf.js data pack; owner may prefer to drop it (D11).
 - Main bundle budget raised to 64 KB gzip (62.2 now).
 
-## Resume point (2026-11-21)
-- v1.0.0 released (tag + GitHub release with zip), main = M0-M9, deployed e113fcd4, live smoke passed. Fresh-clone acceptance passed (install, check, budgets, licences, release).
-- M9 done: USABILITY.md (3 personas, fixes), PERF.md, privacy page hosting note, `npm run release` (+ `scripts/serve.mjs`), README with screenshots, `ToolDef.whyDisabled`, carried-over files notice.
-- Next: docs/HANDOVER.md section 3 (ranked ideas). Top: Unicode text (Latin-ext) via `@cantoo/fontkit` 2.0.12 in the ops worker; call sites src/ops/stamp.ts checkWinAnsi, sign.ts, forms.ts, tools/watermark.ts gate, ocr.ts, report.ts. CJK only route-loaded like OCR.
+## Resume point (2026-11-21, evening)
+- v1.2.0 released and deployed (79e1a848), live smoke passed. Releases v1.0.0, v1.1.0, v1.2.0 each have a zip (`npm run release`).
+- v1.1.0 Unicode text (D20: `src/ops/ufont.ts`, `src/core/winansi.ts`, `@cantoo/fontkit`, Noto Sans subset fetched before the seal). v1.2.0 OCR languages (D21: `src/core/ocrlangs.ts`, `#/ocr?langs=eng+chi_sim`, reload to change) and glyphless hidden text layer (`src/ops/glyphless.ts`, also used by redaction).
+- Next: docs/HANDOVER.md section 3.
 - `.worktrees/m7` and `.worktrees/m8` folders may linger (locked); not worktrees; delete when unlocked.
