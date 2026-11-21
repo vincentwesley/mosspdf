@@ -28,7 +28,7 @@ Friction (ranked):
 2. Postal codes are a separate tick box from street addresses; a user removing the address may not realise the postal code is still ticked. FIXED: unticking Street addresses also unticks Postal codes (re-tick if wanted).
 3. Sticky action bar overlaps the review panel in full-page screenshots only (artifact of capture, not a user issue).
 
-## 3. Power user, keyboard only (1280px): Ctrl+K, Safe to share, batch page numbers
+## 3. Power user, keyboard only (1280px): Ctrl+K, Clean copy to share, batch page numbers
 
 Steps: Ctrl+K, type "safe", Enter (focus lands on the page heading), Tab to Choose files, add file, Run, Ctrl+K "page numbers", Enter, add two files, run batch. Machine time about 16 s.
 

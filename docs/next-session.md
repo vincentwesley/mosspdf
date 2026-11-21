@@ -30,8 +30,7 @@ Continue work on **MossPDF** (repo `vincentwesley/mosspdf`). main holds M0-M8 (a
 - Liberation Sans dropped from the pdf.js data pack (D22).
 - Main bundle budget raised to 64 KB gzip (62.2 now).
 
-## Resume point (2026-11-21, evening)
-- v1.2.1 (scan memory) released; v1.2.0 released and deployed (79e1a848), live smoke passed. Releases v1.0.0, v1.1.0, v1.2.0 each have a zip (`npm run release`).
-- v1.1.0 Unicode text (D20: `src/ops/ufont.ts`, `src/core/winansi.ts`, `@cantoo/fontkit`, Noto Sans subset fetched before the seal). v1.2.0 OCR languages (D21: `src/core/ocrlangs.ts`, `#/ocr?langs=eng+chi_sim`, reload to change) and glyphless hidden text layer (`src/ops/glyphless.ts`, also used by redaction).
+## Resume point (2026-11-21, night)
+- v1.3.0: legal audit (D22 Liberation dropped, licences.txt, Terms, softened claims) and rename to MossPDF (D23). Live on Cloudflare Pages: https://mosspdf.pages.dev (`npm run deploy` = `wrangler pages deploy`). Old workers.dev addresses 301 there.
+- Local e2e server config: `scripts/wrangler.dev.jsonc`.
 - Next: docs/HANDOVER.md section 3.
-- `.worktrees/m7` and `.worktrees/m8` folders may linger (locked); not worktrees; delete when unlocked.

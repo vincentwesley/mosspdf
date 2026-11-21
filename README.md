@@ -49,7 +49,7 @@ Architecture, decisions and plans live in `docs/` (start with [docs/PLAN.md](doc
 
 ## Deploy
 
-Cloudflare Workers static assets, deployed locally: `npm run deploy`, then `npm run smoke:prod`.
+Cloudflare Pages (https://mosspdf.pages.dev), deployed locally: `npm run deploy`, then `npm run smoke:prod`.
 
 ## Secrets and network
 
