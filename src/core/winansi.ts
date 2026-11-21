@@ -9,6 +9,11 @@ export const UNICODE_OK = /^[\x20-\x7e\xa0-\u024f\u0259\u02b0-\u036f\u0370-\u03f
 export const ZH_OK = /^[\x20-\x7e\xa0-\xff\u2000-\u206f\u3000-\u303f\u4e00-\u9fff\uff00-\uffef]$/;
 export const ZH_HINT = ' To use Chinese text, press "Chinese text" at the bottom of the page. It loads a 2 MB font and reloads the tab, so add your files again afterwards.';
 /** Characters of `text` that no font we ship can draw (newlines are ignored). With `zh` the Chinese font counts too (D24). */
-export const badChars = (text: string, zh = zhOn()) => [...new Set([...text])].filter((c) => c !== "\n" && c !== "\r" && !UNICODE_OK.test(c) && !(zh && ZH_OK.test(c)));
+export const badChars = (text: string, zh = zhOn()) => {
+  const cs = [...new Set([...text])].filter((c) => c !== "\n" && c !== "\r");
+  // One font per text: once a character needs the Chinese font, everything must be in it (Greek or Cyrillic next to hanzi is refused).
+  const needZh = zh && cs.some((c) => !UNICODE_OK.test(c) && ZH_OK.test(c));
+  return cs.filter((c) => (needZh ? !ZH_OK.test(c) : !UNICODE_OK.test(c) && !(zh && ZH_OK.test(c))));
+};
 /** True when `bad` has characters the Chinese font would draw, i.e. turning it on helps. */
 export const zhWouldHelp = (bad: string[]) => !zhOn() && bad.some((c) => ZH_OK.test(c));

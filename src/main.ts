@@ -94,7 +94,7 @@ function resolve(): { el: HTMLElement; destroy: () => void } {
 
 let first = true;
 function render(): void {
-  if (!defs && toolById(routeOf(location.hash))) { void toolsReady.then(render, () => undefined); return; }
+  if (!defs && toolById(routeOf(location.hash))) { void toolsReady.then(render, () => { location.hash = "#/"; }); return; } // on failure the tool code is missing: show home (the seal badge reports the failure)
   const swap = () => {
     current?.destroy();
     const v = resolve();
