@@ -14,7 +14,7 @@ export type Qpdf = (args: string[], inputs?: Record<string, Bytes>, outputs?: st
 
 interface FsLike {
   init: (i: null, o: (c: number | null) => void, e: (c: number | null) => void) => void;
-  writeFile: (p: string, d: Bytes) => void;
+  writeFile: (p: string, d: Bytes, o?: { Cb?: boolean }) => void;
   readFile: (p: string) => Bytes;
 }
 
@@ -40,7 +40,7 @@ export function createQpdf(wasmBinary: Bytes): Qpdf {
     const err: number[] = [];
     // The package ignores print/printErr, so hook the stdio devices directly (Module.noFSInit + FS.init).
     q.FS.init(null, (c) => c !== null && out.push(c & 255), (c) => c !== null && err.push(c & 255));
-    for (const [p, d] of Object.entries(inputs)) q.FS.writeFile(p, d);
+    for (const [p, d] of Object.entries(inputs)) q.FS.writeFile(p, d, { Cb: true }); // Cb = canOwn (minified in qpdf-wasm 0.3.1, pinned): inputs are only read, so the virtual file borrows the caller's buffer instead of copying it
     let code: number;
     try {
       code = q.callMain(args);

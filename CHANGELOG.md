@@ -4,6 +4,9 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-11-21
+- Safety scan uses far less memory on large files (+593 MB to +69 MB on a 193 MB file); repair one input copy less (+772 MB to +578 MB). Results unchanged (docs/PERF.md).
+
 ## [1.2.0] - 2026-11-21
 
 - OCR in Chinese (Simplified), Malay and Tamil as well as English, picked on the OCR page and loaded only when chosen; the hidden text layer now uses a glyphless font, so any script is kept.
