@@ -34,7 +34,7 @@ export function dropzone(o: { compact?: boolean; title?: string; accept?: string
   return h("div", { class: `dz hs-card${o.compact ? " dz--compact" : ""}`, attrs: { "data-testid": "dropzone" } },
     h("div", { class: "dz__text" },
       h("p", { class: "dz__title", text: o.title ?? "Drop PDFs or images here" }),
-      h("p", { class: "dz__hint", text: o.hint ?? "or drop them here." })),
+      h("p", { class: "dz__hint", text: o.hint ?? "They stay on this device." })),
     input,
     btn(o.label ?? "Choose files", () => input.click(), { class: "hs-btn", attrs: { "data-testid": "choose-files" } }));
 }

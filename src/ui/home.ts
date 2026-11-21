@@ -84,7 +84,7 @@ export function homeView(navigate: (hash: string) => void): { el: HTMLElement; d
       h("h1", { text: "PDF tools that stay on your device.", attrs: { tabindex: -1, "data-testid": "view-heading" } }),
       h("p", { class: "hero__lede" }, "Your files stay on this device. ", h("a", { href: "#/privacy", text: "See how to check" }), "."),
       h("ol", { class: "steps3", attrs: { "data-testid": "three-steps" } }, ...["Pick a tool.", "Add your file.", "Download."].map((t) => h("li", { text: t })))),
-    dropzone({ hint: "or drop them here. You can also paste." }),
+    dropzone({ hint: "Or paste them. They stay on this device." }),
     h("p", { class: "trust" }, h("a", { href: "#/privacy", text: "Files stay on this device · No account · Works offline after the first visit", attrs: { "data-testid": "trust-strip" } })),
     findRow,
     recentRow,

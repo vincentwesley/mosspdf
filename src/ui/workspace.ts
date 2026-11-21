@@ -91,7 +91,7 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
       ofKind().slice(0, -2).forEach((f) => store.remove(f.id));
     });
   });
-  const dz = dropzone({ title: tool.dropTitle ?? DROP_TITLE[tool.accepts], accept: ACCEPT[kind === "image" ? "images" : "pdf"], label: CHOOSE[tool.accepts], hint: "or drop them here." });
+  const dz = dropzone({ title: tool.dropTitle ?? DROP_TITLE[tool.accepts], accept: ACCEPT[kind === "image" ? "images" : "pdf"], label: CHOOSE[tool.accepts], hint: "They stay on this device." });
   const soon = h("p", { class: "hs-banner hs-banner--info", text: "Coming soon. This tool is not built yet, so nothing here will run.", hidden: !!tool.run, attrs: { "data-testid": "coming-soon" } });
   const notice = h("p", { class: "hs-banner hs-banner--info", attrs: { role: "status", "data-testid": "notice" }, hidden: true });
   const fl = fileList({
@@ -123,7 +123,7 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
   credit.checked = prefs.producerCredit;
   credit.addEventListener("change", () => { prefs.producerCredit = credit.checked; });
   const settings = h("details", { class: "settings" },
-    h("summary", { text: "Options" }),
+    h("summary", { text: "More settings" }),
     h("div", { class: "settings__row" }, credit, h("label", { attrs: { for: "credit" }, text: "Mention MossPDF in the file's details (Producer)" })));
 
   const kbd = h("details", { class: "kbd", attrs: { "data-testid": "kbd-help" } },
