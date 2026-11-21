@@ -4,12 +4,16 @@ import jpegDecUrl from "@jsquash/jpeg/codec/dec/mozjpeg_dec.wasm?url";
 import jpegEncUrl from "@jsquash/jpeg/codec/enc/mozjpeg_enc.wasm?url";
 import unicodeFontUrl from "../fonts/notosans-unicode-400-normal.ttf?url";
 import ocrWasmUrl from "tesseract.js-core/tesseract-core-simd-lstm.wasm?url";
-import ocrLangUrl from "@tesseract.js-data/eng/4.0.0_best_int/eng.traineddata.gz?url";
+import engUrl from "@tesseract.js-data/eng/4.0.0_best_int/eng.traineddata.gz?url";
+import chiSimUrl from "@tesseract.js-data/chi_sim/4.0.0_best_int/chi_sim.traineddata.gz?url";
+import msaUrl from "@tesseract.js-data/msa/4.0.0_best_int/msa.traineddata.gz?url";
+import tamUrl from "@tesseract.js-data/tam/4.0.0_best_int/tam.traineddata.gz?url";
 import pdfjsDataUrl from "virtual:pdfjs-data";
 import opsWorkerUrl from "../workers/ops.worker.ts?worker&url";
 import ocrWorkerUrl from "../workers/ocr.worker.ts?worker&url";
 import pdfWorkerUrl from "pdfjs-dist/build/pdf.worker.mjs?worker&url";
 import type * as PdfJs from "pdfjs-dist/build/pdf.mjs";
+import { chosenLangs, routeOf } from "./ocrlangs";
 import { RpcClient } from "./rpc";
 import { fetchBytes, registerEngine } from "./seal";
 import { scriptUrl } from "./tt";
@@ -51,17 +55,24 @@ registerEngine({
   },
 });
 
-// OCR (D16): ~6 MB, so only a page that boots on #/ocr loads it. A sealed page cannot start it later (no new worker, no fetch).
+// OCR (D16, D21): the engine (~3 MB) plus the chosen languages (1 to 3 MB each), so only a page that boots on #/ocr loads them, and only
+// the languages in the route (or this viewer's last choice). A sealed page cannot start it later (no new worker, no fetch).
+const LANG_URL: Record<string, string> = { eng: engUrl, chi_sim: chiSimUrl, msa: msaUrl, tam: tamUrl };
 export let ocrRpc: RpcClient | undefined;
+/** The language codes the loaded OCR engine was started with. */
+export let ocrLangs: string[] = [];
 registerEngine({
   name: "ocr",
   async load() {
-    if (location.hash.replace(/^#\/?/, "") !== "ocr") return;
-    const [wasm, lang] = await Promise.all([fetchBytes(ocrWasmUrl), fetchBytes(ocrLangUrl)]);
+    if (routeOf(location.hash) !== "ocr") return;
+    const codes = chosenLangs();
+    const [wasm, ...gzs] = await Promise.all([fetchBytes(ocrWasmUrl), ...codes.map((c) => fetchBytes(LANG_URL[c]))]);
+    const langs = codes.map((code, i) => ({ code, gz: gzs[i] }));
     const rpc = new RpcClient(new Worker(scriptUrl(ocrWorkerUrl), { type: "module" }));
     // Like the ops worker: init only returns once the worker script is running, i.e. before the seal (D14).
-    await rpc.call("init", { wasm, lang }, { transfer: [wasm.buffer as ArrayBuffer, lang.buffer as ArrayBuffer] });
+    await rpc.call("init", { wasm, langs }, { transfer: [wasm.buffer as ArrayBuffer, ...langs.map((l) => l.gz.buffer as ArrayBuffer)] });
     ocrRpc = rpc;
+    ocrLangs = codes;
   },
 });
 

@@ -1,6 +1,6 @@
 {
   "name": "pagehold",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "private": true,
   "description": "Private PDF tools that run entirely in the browser.",
   "type": "module",
@@ -51,7 +51,10 @@
     "@cantoo/pdf-lib": "2.11.1",
     "@jsquash/jpeg": "1.6.0",
     "@neslinesli93/qpdf-wasm": "0.3.1",
+    "@tesseract.js-data/chi_sim": "1.0.0",
     "@tesseract.js-data/eng": "1.0.0",
+    "@tesseract.js-data/msa": "1.0.0",
+    "@tesseract.js-data/tam": "1.0.0",
     "fflate": "0.8.3",
     "pdfjs-dist": "6.5.438",
     "tesseract.js-core": "7.0.0"

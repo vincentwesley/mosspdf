@@ -13,6 +13,7 @@ import { toolById } from "./tools";
 import { live } from "./ui/dom";
 import { initGlobalIntake } from "./ui/dropzone";
 import { initPalette, MOD } from "./ui/palette";
+import { routeOf } from "./core/ocrlangs";
 
 const KEY = "theme";
 const store = {
@@ -70,7 +71,7 @@ let current: { destroy: () => void } | null = null;
 initGlobalIntake();
 
 function resolve(): { el: HTMLElement; destroy: () => void } {
-  const route = location.hash.replace(/^#\/?/, "");
+  const route = routeOf(location.hash);
   if (route === "privacy") return privacyPage();
   const tool = toolById(route);
   if (tool) return workspace(tool);

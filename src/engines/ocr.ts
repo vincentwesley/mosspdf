@@ -1,4 +1,4 @@
-// OCR: Tesseract (LSTM, English) driven directly through tesseract.js-core, not through the tesseract.js worker wrapper.
+// OCR: Tesseract (LSTM, one or more languages) driven directly through tesseract.js-core, not through the tesseract.js worker wrapper.
 // Isomorphic like the other engines: the caller passes the .wasm and the gzipped language data as bytes, nothing is fetched.
 import TesseractCore from "tesseract.js-core/tesseract-core-simd-lstm.js";
 import type { Bytes } from "./jpeg";
@@ -33,11 +33,12 @@ const WORD = 3; // RIL_WORD
 const LINE = 2; // RIL_TEXTLINE
 const PARA = 1; // RIL_PARA
 
-export async function createOcr(wasm: Bytes, langGz: Bytes): Promise<Ocr> {
+/** `langs`: Tesseract language codes with their gzipped traineddata; they are initialised together ("eng+chi_sim"). */
+export async function createOcr(wasm: Bytes, langs: { code: string; gz: Bytes }[]): Promise<Ocr> {
   const core = await TesseractCore({ wasmBinary: wasm, print() {}, printErr() {} });
-  core.FS.writeFile("/eng.traineddata", await gunzip(langGz));
+  for (const l of langs) core.FS.writeFile(`/${l.code}.traineddata`, await gunzip(l.gz));
   const api = new core.TessBaseAPI();
-  if (api.Init(null, "eng", 1) !== 0) throw new Error("The OCR language data could not be loaded.");
+  if (api.Init(null, langs.map((l) => l.code).join("+"), 1) !== 0) throw new Error("The OCR language data could not be loaded.");
   return {
     recognize(image) {
       core.FS.writeFile("/input", image);
