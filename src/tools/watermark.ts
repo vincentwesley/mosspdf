@@ -1,15 +1,12 @@
 import type { WatermarkOptions } from "../ops/stamp";
 import type { OpResult } from "../ops/types";
+import { badChars } from "../core/winansi";
 import { h } from "../ui/dom";
 import { colourField, numberField, radioGroup, textField } from "../ui/fields";
 import { pdfLossWarnings } from "./pages";
 import { pageChoice } from "./pagesel";
 import type { Ctx, ToolDef } from "./types";
 
-// The op draws in Helvetica (WinAnsi). This is the same rule, duplicated because importing stamp.ts would pull pdf-lib into the main bundle.
-// Printable ASCII, Latin-1 and the extra WinAnsi characters in 0x80-0x9F.
-const WIN_ANSI = /^[\x20-\x7e\xa0-\xff€‚ƒ„…†‡ˆ‰Š‹ŒŽ‘’“”•–—˜™š›œžŸ]$/;
-export const badChars = (text: string) => [...new Set([...text])].filter((c) => !WIN_ANSI.test(c));
 
 const ui = (ctx: Ctx) => ctx.local(() => ({
   text: textField({ id: "wm-text", label: "Watermark text", placeholder: "CONFIDENTIAL", testid: "wm-text", msgTestId: "wm-text-msg", reserve: true, onInput: () => ctx.refresh() }),
@@ -52,7 +49,7 @@ export const watermark: ToolDef = {
     const p = plan(ctx);
     u.custom.el.hidden = u.angle.value() !== "custom";
     u.text.setMessage(
-      p.bad.length ? `These characters cannot be used yet: ${p.bad.map((c) => `"${c}"`).join(" ")}. Use Western European letters, digits and basic punctuation.` : p.text.trim() ? "" : "Type the text to stamp on each page.",
+      p.bad.length ? `These characters cannot be used yet: ${p.bad.map((c) => `"${c}"`).join(" ")}. Use Latin, Greek or Cyrillic letters, digits and basic punctuation.` : p.text.trim() ? "" : "Type the text to stamp on each page.",
       p.bad.length > 0,
     );
     u.opacity.setError(p.opacityOk ? null : "Use a number from 1 to 100.");

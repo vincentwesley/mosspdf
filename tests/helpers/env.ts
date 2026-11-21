@@ -9,6 +9,7 @@ export const engines = await createEngines({
   qpdf: wasm("@neslinesli93/qpdf-wasm/dist/qpdf.wasm"),
   jpegDec: wasm("@jsquash/jpeg/codec/dec/mozjpeg_dec.wasm"),
   jpegEnc: wasm("@jsquash/jpeg/codec/enc/mozjpeg_enc.wasm"),
+  font: new Uint8Array(readFileSync(new URL("../../src/fonts/notosans-unicode-400-normal.ttf", import.meta.url))),
 });
 export const opts = (o: Partial<OpOptions> = {}): OpOptions => ({ producerCredit: true, ...o });
 

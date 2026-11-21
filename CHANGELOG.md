@@ -4,6 +4,9 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-11-21
+- Unicode text: names like Đặng Thị Hồng, Łukasz, Ş, Greek and Cyrillic now work in fill, page numbers, watermark, sign text, OCR layer and the comparison report (Noto Sans subset, only embedded when needed). CJK, Tamil and emoji are still refused by name.
+
 ## [1.0.0] - 2026-11-21
 - M9: persona walkthroughs (docs/USABILITY.md) and two polish passes: Sign offered after Merge, 48px file-row and footer tap targets, a reason line when the main button is disabled, placed signatures scroll into view, a carried-over files notice with Clear, a large-file notice while working.
 - Privacy page names Cloudflare's standard request logs and lists recently used tools as stored.

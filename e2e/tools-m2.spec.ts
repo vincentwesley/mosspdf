@@ -193,6 +193,18 @@ test.describe("M2 tools", () => {
     expect(pages.map((p) => /PAGE-MARKER (\S+)/.exec(p.text)?.[1])).toEqual(["p1", "p2", "p3"]);
   });
 
+  test("D20 watermark: Vietnamese text downloads and re-opens", async ({ page }) => {
+    await loadApp(page, "/#/watermark");
+    await add(page, corpus("plain-3p"));
+    await readyRows(page, 1);
+    await page.getByTestId("wm-text").fill("Bản nháp");
+    await expect(page.getByTestId("wm-text-msg")).toHaveText("");
+    await run(page);
+    const pages = await readPdf((await savePdf(page)).bytes);
+    expect(pages).toHaveLength(3);
+    for (const p of pages) expect(p.text).toContain("Bản nháp");
+  });
+
   test("A-COR-6 watermark: characters the PDF font cannot draw are explained before running", async ({ page }) => {
     await loadApp(page, "/#/watermark");
     await add(page, corpus("plain-3p"));

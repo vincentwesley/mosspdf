@@ -1,9 +1,10 @@
-// Page numbers and text watermarks. Text is drawn in Helvetica (WinAnsi only; Unicode fonts are a later improvement),
+// Page numbers and text watermarks. Text is drawn in Helvetica, or in Noto Sans when it has characters beyond WinAnsi (D20, ufont.ts),
 // positioned in the page as the viewer shows it: /Rotate and CropBox are honoured so the text is always upright.
-import { PDFArray, PDFDocument, PDFFont, PDFPage, PDFRef, StandardFonts } from "@cantoo/pdf-lib";
+import { PDFArray, PDFDocument, PDFFont, PDFPage, PDFRef } from "@cantoo/pdf-lib";
 import { prepare, selectPages } from "./common";
 import { applyCredit } from "./metadata";
 import { checkAbort } from "./open";
+import { checkCovered, pickFont } from "./ufont";
 import { PdfError, type Engines, type InFile, type OpOptions, type OpResult } from "./types";
 
 export type NumberPosition = "bottom-left" | "bottom-center" | "bottom-right" | "top-left" | "top-center" | "top-right";
@@ -59,13 +60,6 @@ export function toUser(v: View, u: number, vv: number): [number, number] {
   }
 }
 
-export function checkWinAnsi(font: PDFFont, text: string, what: string) {
-  const ok = new Set(font.getCharacterSet());
-  const bad = [...new Set([...text])].filter((c) => !ok.has(c.codePointAt(0)!));
-  if (bad.length)
-    throw new PdfError("unsupported", `${what} has characters that can't be used yet: ${bad.map((c) => `"${c}"`).join(" ")}. Use Western European letters, digits and basic punctuation.`);
-}
-
 export const hex = (c: string) => {
   const m = /^#([0-9a-f]{6})$/i.exec(c);
   if (!m) throw new PdfError("unsupported", `"${c}" isn't a colour. Use the form #rrggbb.`);
@@ -109,12 +103,13 @@ function stampPage(doc: PDFDocument, page: PDFPage, font: PDFFont, s: Stamp) {
   }
 }
 
-async function run(file: InFile, pages: number[] | undefined, o: OpOptions, e: Engines, make: (doc: PDFDocument, font: PDFFont, n: number) => (i: number) => Stamp): Promise<OpResult> {
+async function run(file: InFile, pages: number[] | undefined, text: string, what: string, o: OpOptions, e: Engines, make: (doc: PDFDocument, n: number) => (i: number) => Stamp): Promise<OpResult> {
   const p = await prepare(file, o, e);
   const sel = selectPages(pages, p.info, file);
   const doc = await PDFDocument.load(p.bytes, { updateMetadata: false });
-  const font = await doc.embedFont(StandardFonts.Helvetica);
-  const stamp = make(doc, font, sel.length);
+  const font = await pickFont(doc, [text]);
+  checkCovered(font, text, what);
+  const stamp = make(doc, sel.length);
   const all = doc.getPages();
   for (const [k, i] of sel.entries()) {
     if (k % 25 === 0) checkAbort(o.signal);
@@ -134,8 +129,7 @@ export async function addPageNumbers(file: InFile, opts: PageNumberOptions, o: O
   if (!Number.isInteger(start)) throw new PdfError("unsupported", "The first number must be a whole number.");
   if (!/\{n\}|\{total\}/.test(format)) throw new PdfError("unsupported", "The format needs {n} in it, for example \"Page {n} of {total}\".");
   const [vert, horiz] = position.split("-") as ["top" | "bottom", "left" | "center" | "right"];
-  return await run(file, opts.pages, o, e, (_doc, font, count) => {
-    checkWinAnsi(font, format.replace(/\{n\}|\{total\}/g, "0"), "The format");
+  return await run(file, opts.pages, format.replace(/\{n\}|\{total\}/g, "0"), "The format", o, e, (_doc, count) => {
     return (k) => ({
       text: format.replace(/\{n\}/g, String(start + k)).replace(/\{total\}/g, String(start + count - 1)),
       size,
@@ -155,8 +149,7 @@ export async function watermark(file: InFile, opts: WatermarkOptions, o: OpOptio
   const angle = num(opts.angle, 45, -360, 360, "The angle");
   const size = num(opts.fontSize, 64, 4, 400, "The font size");
   const rgb = hex(opts.color ?? "#808080");
-  return await run(file, opts.pages, o, e, (doc, font) => {
-    checkWinAnsi(font, opts.text, "The watermark text");
+  return await run(file, opts.pages, opts.text, "The watermark text", o, e, (doc) => {
     const gs = opacity < 1 ? doc.context.register(doc.context.obj({ Type: "ExtGState", ca: opacity, CA: opacity })) : undefined;
     return () => ({
       text: opts.text,

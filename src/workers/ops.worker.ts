@@ -55,8 +55,8 @@ serve({
   ...m6,
   ...m4,
   ...m3,
-  init: async ({ qpdfWasm, jpegDecWasm, jpegEncWasm }: { qpdfWasm: Uint8Array; jpegDecWasm: Uint8Array; jpegEncWasm: Uint8Array }) => {
-    engines = await createEngines({ qpdf: qpdfWasm, jpegDec: jpegDecWasm, jpegEnc: jpegEncWasm });
+  init: async ({ qpdfWasm, jpegDecWasm, jpegEncWasm, font }: { qpdfWasm: Uint8Array; jpegDecWasm: Uint8Array; jpegEncWasm: Uint8Array; font: Uint8Array }) => {
+    engines = await createEngines({ qpdf: qpdfWasm, jpegDec: jpegDecWasm, jpegEnc: jpegEncWasm, font });
     return true;
   },
   inspect: ({ file }: { file: InFile }) => inspect(file, eng()),

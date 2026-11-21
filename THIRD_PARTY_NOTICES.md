@@ -12,6 +12,9 @@ Everything third-party that ships in the Pagehold build, with author, licence an
 | @jsquash/jpeg 1.6.0 (MozJPEG compiled to WebAssembly: image recompression in compress, ops worker only; its codec/LICENSE.codec.md covers MozJPEG, IJG and libjpeg-turbo terms: BSD-3-Clause, IJG, Zlib) | Jamie Sinclair (repackaged from Squoosh by Google) | Apache-2.0 | https://github.com/jamsinclair/jSquash |
 | tesseract.js-core 7.0.0 (Tesseract OCR compiled to WebAssembly, SIMD + LSTM build; its JS glue is bundled into the OCR worker, the .wasm is loaded only on the OCR page; bundles Tesseract (Apache-2.0, Google and contributors) and Leptonica (BSD-2-Clause, Dan Bloomberg) among other libraries) | Jerome Wu and contributors | Apache-2.0 | https://github.com/naptha/tesseract.js-core, https://github.com/tesseract-ocr/tesseract |
 | @tesseract.js-data/eng 1.0.0 (English language data, the 4.0.0_best_int model: tessdata_best, integer-quantised; shipped gzipped as `assets/eng.traineddata-*.gz`, OCR page only) | tesseract.js contributors (data from the Tesseract project, Google and contributors) | MIT (package); the model is Apache-2.0 | https://github.com/naptha/tessdata, https://github.com/tesseract-ocr/tessdata_best |
+| @cantoo/fontkit 2.0.12 (embeds the Unicode text font in stamps, fill, sign, OCR layer and report; ops worker only) | Devon Govett and contributors (Cantoo fork) | MIT | https://github.com/cantoo-scribe/fontkit |
+| brotli 1.3.3, dfa 1.2.0, restructure 3.0.2 (dependencies of @cantoo/fontkit) | Devon Govett | MIT | https://github.com/devongovett/brotli.js, https://github.com/devongovett/dfa, https://github.com/devongovett/restructure |
+| base64-js 1.5.1 (dependency of @cantoo/fontkit) | T. Jameson Little | MIT | https://github.com/beatgammit/base64-js |
 | fflate 0.8.3 (zip downloads in the app; also a dependency of @cantoo/pdf-lib) | Arjun Barrett | MIT | https://github.com/101arrowz/fflate |
 | culori 4.0.2 (dependency of @cantoo/pdf-lib) | Dan Burzo | MIT | https://github.com/Evercoder/culori |
 | html-entities 2.6.0 (dependency of @cantoo/pdf-lib) | Marat Dulin | MIT | https://github.com/mdevils/html-entities |
@@ -41,6 +44,7 @@ All under the SIL Open Font License 1.1, full text in `src/fonts/OFL.txt` (it tr
 - Inter (The Inter Project Authors)
 - Silkscreen (The Silkscreen Project Authors)
 - JetBrains Mono (The JetBrains Mono Project Authors)
+- Noto Sans, subset (The Noto Project Authors; `src/fonts/notosans-unicode-400-normal.ttf`, Latin, Latin Extended, Vietnamese, Greek and Cyrillic cut from NotoSans-Regular of the `@expo-google-fonts/noto-sans` 0.4.2 package with `pyftsubset`; drawn into PDFs by stamps, fill, sign, OCR layer and report when text goes beyond WinAnsi, D20)
 - Caveat (The Caveat Project Authors; the typed-signature handwriting in Sign, from the Fontsource package build https://fontsource.org/fonts/caveat)
 
 ## Art and brand
