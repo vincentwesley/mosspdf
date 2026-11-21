@@ -45,5 +45,5 @@ Every PR runs the full gate, because users get every tool. Script checks are lis
 
 ## Hosting and release
 
-- `npm run deploy` runs `wrangler deploy` from a verified local build. The live smoke test runs straight after.
+- `npm run deploy` runs `wrangler pages deploy` from a verified local build. The live smoke test runs straight after.
 - Release: `git tag vX.Y.Z` plus a GitHub release with `mosspdf-vX.Y.Z.zip`, a static build that runs offline from the user's own computer. The zip includes a one-file local server script for Node, and alternatives are documented in its README.

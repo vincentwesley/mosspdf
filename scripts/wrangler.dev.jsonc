@@ -1,11 +1,11 @@
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
+  "$schema": "../node_modules/wrangler/config-schema.json",
   "name": "mosspdf",
   "compatibility_date": "2026-11-19",
   // Pure static site, no Worker script. Deployed to Cloudflare Pages with `npm run deploy`.
   // dist/_headers (copied from public/) applies to assets.
   "assets": {
-    "directory": "dist",
+    "directory": "../dist",
     "not_found_handling": "404-page",
     "html_handling": "drop-trailing-slash"
   }

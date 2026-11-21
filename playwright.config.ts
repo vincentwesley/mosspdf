@@ -31,7 +31,7 @@ export default defineConfig({
   webServer: process.env.BASE_URL
     ? undefined
     : {
-        command: `npm run build && npx --yes wrangler@4.165.0 dev --ip 127.0.0.1 --port ${PORT}`,
+        command: `npm run build && npx --yes wrangler@4.165.0 dev -c scripts/wrangler.dev.jsonc --ip 127.0.0.1 --port ${PORT}`,
         url: BASE_URL,
         reuseExistingServer: !process.env.CI,
         timeout: 180_000,

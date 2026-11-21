@@ -1,4 +1,4 @@
-# Strict Cloudflare headers (Workers static assets). No external hosts. COOP/COEP for WASM/SharedArrayBuffer-capable pdf tooling.
+# Strict Cloudflare headers (Cloudflare Pages; also read by wrangler dev for e2e). No external hosts. COOP/COEP for WASM/SharedArrayBuffer-capable pdf tooling.
 /*
   Content-Security-Policy: default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; font-src 'self'; img-src 'self' blob: data:; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; require-trusted-types-for 'script'; trusted-types mosspdf
   Cross-Origin-Opener-Policy: same-origin
