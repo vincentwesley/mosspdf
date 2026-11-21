@@ -86,7 +86,7 @@ function render(): void {
     current = v;
     app.replaceChildren(v.el);
     const h1 = app.querySelector<HTMLElement>("h1");
-    document.title = h1 && location.hash.length > 2 ? `${h1.textContent} · Pagehold` : "Pagehold";
+    document.title = h1 && location.hash.length > 2 ? `${h1.textContent} · MossPDF` : "MossPDF";
     if (!first) { scrollTo(0, 0); h1?.focus({ preventScroll: true }); }
     first = false;
   };

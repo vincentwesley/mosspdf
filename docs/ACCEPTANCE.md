@@ -10,7 +10,7 @@
 - A-BLD-5 The bundle stays within `budgets.json` (shell JS/CSS gzip, total precache size).
 
 ## Privacy and network
-- A-NET-1 E2E: after the `pagehold:sealed` event, zero requests reach the network in Chromium, Firefox and WebKit, measured with `context.route` and service workers blocked, while every tool flow runs.
+- A-NET-1 E2E: after the `mosspdf:sealed` event, zero requests reach the network in Chromium, Firefox and WebKit, measured with `context.route` and service workers blocked, while every tool flow runs.
 - A-NET-2 E2E: no request ever goes to an origin other than the app's own, from first byte to the end of every flow.
 - A-NET-3 The response headers (CSP, COOP, COEP, CORP, Referrer-Policy, Permissions-Policy, X-Content-Type-Options) match `tests/headers.expected.json`. Checked locally against `wrangler dev` and against the live URL in the release smoke test.
 - A-NET-4 The privacy panel shows the seal time and the request count, and the count matches what the test saw.
@@ -26,7 +26,7 @@
 - A-COR-7 Forms: filled values read back; flattened output has no AcroForm fields; XFA files are detected.
 - A-COR-8 OCR: on the scan fixture, at least 95% of the words in the known text are found in the output's text layer, and the page images are unchanged.
 - A-COR-9 Compare finds every planted change on the diff fixtures and reports nothing on identical files.
-- A-COR-10 Output metadata: Producer/Creator credit "Pagehold by Vin's Atelier" by default; when switched off, these fields are absent.
+- A-COR-10 Output metadata: Producer/Creator credit "MossPDF by Vin's Atelier" by default; when switched off, these fields are absent.
 
 ## Redaction
 - A-RED-1 Each redacted string is absent from pdf.js text, from a raw `qpdf --qdf` byte scan (ASCII, UTF-16BE, hex) and from Info, XMP, annotations, form values, outlines and attachments.

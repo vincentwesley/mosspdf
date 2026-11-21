@@ -5,7 +5,7 @@ import { corpus, engines, opts } from "../helpers/env";
 import { findText, qpdfCheck, readInfo, readPdf } from "../helpers/qpdf";
 
 const noMarker = (t: string) => t.replace(/PAGE-MARKER \S+/, "").trim();
-const CREDIT = "Pagehold by Vin's Atelier";
+const CREDIT = "MossPDF by Vin's Atelier";
 
 describe("A-COR-6 page numbers", () => {
   it("A-COR-6 numbers every selected page (and only those), file is valid", async () => {

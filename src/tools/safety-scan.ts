@@ -24,7 +24,7 @@ interface State { key: string; status: "idle" | "scanning" | "done" | "error"; r
 
 const ui = (ctx: Ctx) => ctx.local(() => {
   const keep = checkField({ id: "keep-links", label: "Keep web links", testid: "keep-links", onChange: () => ctx.refresh() });
-  const owner = passwordField({ id: "pw-owner", label: "Owner password", hint: "This file has restrictions, so a cleaned copy needs its owner password. Pagehold can only use a password you know.", autocomplete: "current-password", testid: "pw-input", msgTestId: "pw-msg", onInput: () => { owner.setError(null); ctx.refresh(); } });
+  const owner = passwordField({ id: "pw-owner", label: "Owner password", hint: "This file has restrictions, so a cleaned copy needs its owner password. MossPDF can only use a password you know.", autocomplete: "current-password", testid: "pw-input", msgTestId: "pw-msg", onInput: () => { owner.setError(null); ctx.refresh(); } });
   owner.el.hidden = true;
   const out = h("div", { class: "scan", attrs: { "data-testid": "scan-result" } });
   const box = h("div", { class: "scanbox" }, out, keep.el, owner.el);

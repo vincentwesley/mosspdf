@@ -135,10 +135,10 @@ export const toIn = (f: LoadedFile): InFile => ({ name: f.name, bytes: f.bytes, 
 
 export const prefs = {
   get producerCredit(): boolean {
-    try { return localStorage.getItem("pagehold:producerCredit") !== "false"; } catch { return true; }
+    try { return localStorage.getItem("mosspdf:producerCredit") !== "false"; } catch { return true; }
   },
   set producerCredit(v: boolean) {
-    try { localStorage.setItem("pagehold:producerCredit", String(v)); } catch { /* not remembered */ }
+    try { localStorage.setItem("mosspdf:producerCredit", String(v)); } catch { /* not remembered */ }
   },
 };
 
@@ -161,7 +161,7 @@ export function errorMessage(e: unknown): string {
       corrupt: "Try opening it in another app and saving a fresh copy, then add it again.",
       encrypted: "Enter its password to open it.",
       "wrong-password": "Check the password and try again.",
-      unsupported: "Pagehold cannot handle this kind of file yet.",
+      unsupported: "MossPDF cannot handle this kind of file yet.",
       "too-large": "Try a smaller file, or split it elsewhere first.",
       cancelled: "Nothing was changed.",
     };

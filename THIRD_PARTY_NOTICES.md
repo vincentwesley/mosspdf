@@ -1,6 +1,6 @@
 # Third-party notices
 
-Everything third-party that ships in the Pagehold build, with author, licence and source. `npm run licences` checks that every production dependency is allowlisted and named here.
+Everything third-party that ships in the MossPDF build, with author, licence and source. `npm run licences` checks that every production dependency is allowlisted and named here.
 
 ## Code that ships in the app (production dependencies)
 

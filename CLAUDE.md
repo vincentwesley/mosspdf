@@ -1,6 +1,6 @@
-# pagehold
+# mosspdf
 
-Pagehold: Vite + TypeScript app, house style kit, runs entirely in the browser.
+MossPDF: Vite + TypeScript app, house style kit, runs entirely in the browser.
 
 ## Rules
 - Read `docs/next-session.md` first; update it when state changes.

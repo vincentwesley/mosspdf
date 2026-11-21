@@ -1,5 +1,5 @@
 ﻿// Every spec imports { test, expect } from here. The extended context fails a test on: console.error, page error, unhandled rejection,
-// CSP violation, any cross-origin request (A-NET-2), and any request after `pagehold:sealed` (A-NET-1, measured per docs/spikes/csp.md:
+// CSP violation, any cross-origin request (A-NET-2), and any request after `mosspdf:sealed` (A-NET-1, measured per docs/spikes/csp.md:
 // context.route + serviceWorkers "block"; page.on('request') is unreliable in Chromium).
 import { test as base, expect, type BrowserContext, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
@@ -37,7 +37,7 @@ export const test = base.extend<{ allowedErrors: RegExp[] }>({
       if (window.top === window) w.__phReport("doc-start", "");
       document.addEventListener("securitypolicyviolation", (e) => w.__phReport("csp-violation", `${e.violatedDirective} ${e.blockedURI} @${e.sourceFile}:${e.lineNumber} sealed=${(w as unknown as {__phSealed?: boolean}).__phSealed ?? false} t=${Math.round(performance.now())}`), true);
       window.addEventListener("unhandledrejection", (e) => w.__phReport("unhandled-rejection", String(e.reason)));
-      window.addEventListener("pagehold:sealed", () => {
+      window.addEventListener("mosspdf:sealed", () => {
         w.__phSealed = true;
         w.__phReport("sealed", "");
       });
@@ -70,7 +70,7 @@ export const test = base.extend<{ allowedErrors: RegExp[] }>({
   },
 });
 
-/** Resolves once the page has fired `pagehold:sealed` (and the fixture has recorded it). Requests from then on fail the test. */
+/** Resolves once the page has fired `mosspdf:sealed` (and the fixture has recorded it). Requests from then on fail the test. */
 export async function waitForSeal(page: Page, timeout = 45_000): Promise<void> {
   await page.waitForFunction(() => (window as unknown as Win).__phSealed === true, undefined, { timeout });
   await expect.poll(() => states.get(page.context())!.sealed.has(page), { timeout }).toBe(true);
@@ -123,7 +123,7 @@ export async function shot(page: Page, name: string): Promise<string> {
 /** Runs `trigger` (the click that starts a download), saves the file to a fresh temp dir. */
 export async function downloadAndCheck(page: Page, trigger: () => Promise<unknown>): Promise<{ path: string; bytes: Buffer; name: string }> {
   const [dl] = await Promise.all([page.waitForEvent("download"), trigger()]);
-  const path = join(mkdtempSync(join(tmpdir(), "pagehold-dl-")), dl.suggestedFilename());
+  const path = join(mkdtempSync(join(tmpdir(), "mosspdf-dl-")), dl.suggestedFilename());
   await dl.saveAs(path);
   return { path, bytes: readFileSync(path), name: dl.suggestedFilename() };
 }

@@ -65,7 +65,7 @@ export const split: ToolDef = {
     u.size.el.hidden = mode !== "size";
     const s = plan(ctx);
     u.preview.replaceChildren(...(mode === "size"
-      ? [h("li", { text: "Pagehold picks the page breaks so each file stays under this size." })]
+      ? [h("li", { text: "MossPDF picks the page breaks so each file stays under this size." })]
       : (s?.parts ?? []).map((g) => h("li", { text: `${compress(g)} (${plural(g.length, "page")})`, attrs: { "data-testid": "split-part" } }))));
   },
   warnings: pdfLossWarnings,

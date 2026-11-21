@@ -8,7 +8,7 @@ import { afterAll, beforeAll, expect, it } from "vitest";
 let dir: string, proc: ChildProcess, port: number;
 
 beforeAll(async () => {
-  dir = mkdtempSync(join(tmpdir(), "pagehold-serve-"));
+  dir = mkdtempSync(join(tmpdir(), "mosspdf-serve-"));
   copyFileSync(resolve("scripts/serve.mjs"), join(dir, "serve.mjs"));
   mkdirSync(join(dir, "assets/workers"), { recursive: true });
   writeFileSync(join(dir, "_headers"), "/*\n  X-Test: global\n  Content-Security-Policy: default-src 'self'\n\n/assets/workers/*\n  Content-Security-Policy: default-src 'none'\n");

@@ -78,7 +78,7 @@ describe("A-COR-5 compress", () => {
   });
   it("A-COR-10 credit on/off", async () => {
     const f = corpus("image-heavy");
-    expect((await readInfo((await compress(f, { level: "balanced" }, opts(), engines)).bytes)).Producer).toBe("Pagehold by Vin's Atelier");
+    expect((await readInfo((await compress(f, { level: "balanced" }, opts(), engines)).bytes)).Producer).toBe("MossPDF by Vin's Atelier");
     expect((await readInfo((await compress(f, { level: "balanced" }, opts({ producerCredit: false }), engines)).bytes)).Producer).toBeUndefined();
   });
   it("A-COR-5 bad inputs, password, cancellation", async () => {
@@ -166,7 +166,7 @@ describe("A-COR-4 images to PDF", () => {
   });
   it("A-COR-10 credit on/off", async () => {
     const on = await readInfo((await imagesToPdf([png], {}, opts())).bytes);
-    expect([on.Producer, on.Creator]).toEqual(["Pagehold by Vin's Atelier", "Pagehold"]);
+    expect([on.Producer, on.Creator]).toEqual(["MossPDF by Vin's Atelier", "MossPDF"]);
     const off = await readInfo((await imagesToPdf([png], {}, opts({ producerCredit: false }))).bytes);
     expect([off.Producer, off.Creator]).toEqual([undefined, undefined]);
   });

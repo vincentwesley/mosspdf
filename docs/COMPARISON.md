@@ -1,8 +1,8 @@
-# Pagehold compared with popular PDF tools
+# MossPDF compared with popular PDF tools
 
 Based on each tool's public pages and reviews, checked 2026-11-20 (RESEARCH §12). Other products change often, so treat their columns as a snapshot. "Server" means files are uploaded for processing.
 
-| | Pagehold | iLovePDF | Smallpdf | PDF24 Tools (online) | Stirling-PDF | BentoPDF |
+| | MossPDF | iLovePDF | Smallpdf | PDF24 Tools (online) | Stirling-PDF | BentoPDF |
 |---|---|---|---|---|---|---|
 | Where files are processed | In your browser; page sealed against the network | Server | Server | Server | Your own server (self-hosted) | In your browser |
 | Account needed | No | No for basics | No for basics | No | No (you host it) | No |
@@ -24,16 +24,16 @@ Based on each tool's public pages and reviews, checked 2026-11-20 (RESEARCH §12
 
 Competitor columns reflect their public pages as checked on 2026-11-20 and may have changed; "No" means not stated there.
 
-## Where Pagehold is ahead
+## Where MossPDF is ahead
 
-- **Privacy you can check:** most "local" tools only say so. Pagehold seals the page and shows a request log.
+- **Privacy you can check:** most "local" tools only say so. MossPDF seals the page and shows a request log.
 - **Singapore details:** NRIC/FIN detection with checksum, SG phone formats and addresses in redaction.
 - **Safety:** a scan for risky PDF parts with a cleaned copy, and a "Clean copy to share" workflow.
 - **No limits, ads, accounts or watermarks.**
 
 ## Where others are ahead
 
-- **Breadth:** Stirling-PDF and BentoPDF have more tools (PDF to Word or Excel, HTML to PDF, and others). Pagehold has no Office conversion, because that needs large engines or a server.
+- **Breadth:** Stirling-PDF and BentoPDF have more tools (PDF to Word or Excel, HTML to PDF, and others). MossPDF has no Office conversion, because that needs large engines or a server.
 - **OCR languages:** four so far (English, Chinese (Simplified), Malay, Tamil); others have more.
 - **Multi-signer flows:** iLovePDF supports them, but it needs accounts and a server.
-- **Desktop apps:** PDF24 has one. Pagehold installs as a web app instead.
+- **Desktop apps:** PDF24 has one. MossPDF installs as a web app instead.

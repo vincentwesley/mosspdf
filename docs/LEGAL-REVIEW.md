@@ -1,10 +1,10 @@
 # Legal review
 
-A plain checklist of the legal and licensing points for Pagehold, as of 2026-11-20. It is an engineering review, not legal advice. Items that need the owner's decision are marked **Owner**.
+A plain checklist of the legal and licensing points for MossPDF, as of 2026-11-20. It is an engineering review, not legal advice. Items that need the owner's decision are marked **Owner**.
 
 ## Licences
 
-- Pagehold's own code: MIT, `Copyright (c) 2026 Vin's Atelier` (the owner chose this line for this project).
+- MossPDF's own code: MIT, `Copyright (c) 2026 Vin's Atelier` (the owner chose this line for this project).
 - The logo and the credits art are all rights reserved (`NOTICE.md`), not MIT.
 - Every shipped third-party item is listed in `THIRD_PARTY_NOTICES.md` with its licence. `npm run licences` fails the build if a production dependency is not allowlisted and named there.
 - Licences in the build: Apache-2.0, MIT, ISC, BSD-2/3-Clause, 0BSD, Zlib, IJG, SIL OFL 1.1. All of them allow commercial and non-commercial use, with attribution.
@@ -31,7 +31,7 @@ A plain checklist of the legal and licensing points for Pagehold, as of 2026-11-
 
 ## Names and marks
 
-- "Pagehold" was chosen over "Paper Desk", which an existing iPad app uses (D1). A basic web and app-store search found no PDF product with this name. This is not a formal trademark clearance. **Owner:** run one before any commercial use.
+- "MossPDF" is the current name. The product was renamed on 2026-11-21 because another app uses its earlier name (D1, D23); "Paper Desk" was rejected earlier because an existing iPad app uses it. A basic web and app-store search found no PDF product with this name. This is not a formal trademark clearance. **Owner:** run one before any commercial use.
 - Competitor names in `docs/COMPARISON.md` are used only to describe them factually.
 
 ## Test material

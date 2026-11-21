@@ -224,7 +224,7 @@ test.describe("M2 tools", () => {
     await readyRows(page, 1);
     await expect(page.getByTestId("md-title")).toHaveValue("Quarterly notes (made up)");
     await expect(page.getByTestId("md-author")).toHaveValue("Sample Author");
-    await expect(page.getByTestId("md-credit")).toContainText("Pagehold by Vin's Atelier");
+    await expect(page.getByTestId("md-credit")).toContainText("MossPDF by Vin's Atelier");
     await expect(page.getByTestId("primary-action")).toBeDisabled(); // nothing changed yet
     await page.getByTestId("md-title").fill("Board notes");
     await page.getByTestId("md-keywords").fill("one, two");
@@ -234,7 +234,7 @@ test.describe("M2 tools", () => {
     expect(info.Title).toBe("Board notes");
     expect(info.Author).toBe("Sample Author");
     expect(info.Keywords).toBe("one, two");
-    expect(info.Producer).toBe("Pagehold by Vin's Atelier");
+    expect(info.Producer).toBe("MossPDF by Vin's Atelier");
   });
 
   test("A-COR-10 A-E2E-1 metadata: 'Remove all details' leaves no title, author or credit", async ({ page }) => {

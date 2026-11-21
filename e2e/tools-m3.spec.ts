@@ -98,7 +98,7 @@ test.describe("passwords", () => {
     await unlock(page, "test-pass");
     await expect(page.getByTestId("pw-input")).toHaveValue("test-pass");
     await expect(page.getByTestId("pw-input")).toHaveAttribute("autocomplete", "current-password");
-    await expect(page.locator(".protect")).toContainText("Pagehold can only remove a password you know.");
+    await expect(page.locator(".protect")).toContainText("MossPDF can only remove a password you know.");
     await primary(page).click();
     const dl = await downloadAndCheck(page, () => page.getByTestId("result-download").click());
     expect(showEncryption(dl.bytes).out).toMatch(/not encrypted/);

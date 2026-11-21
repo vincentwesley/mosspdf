@@ -7,7 +7,7 @@ import * as pdfjs from "pdfjs-dist/legacy/build/pdf.mjs";
 import { qpdfBin } from "../../scripts/qpdf-bin.mjs";
 
 function cli(bytes: Uint8Array, args: string[]) {
-  const dir = mkdtempSync(join(tmpdir(), "pagehold-"));
+  const dir = mkdtempSync(join(tmpdir(), "mosspdf-"));
   try {
     const f = join(dir, "x.pdf");
     writeFileSync(f, bytes);

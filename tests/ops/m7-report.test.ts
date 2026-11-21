@@ -17,7 +17,7 @@ describe("M7 compareReport", () => {
     const pages = await readPdf(r.bytes);
     expect(pages.length).toBeGreaterThan(1); // 60 changes need more than one page
     const text = pages.map((p) => p.text).join(" ");
-    expect(text).toContain("Pagehold comparison report");
+    expect(text).toContain("MossPDF comparison report");
     expect(text).toContain("60 changes on 2 pages");
     expect(text).toContain("Change 60:");
     expect(text).toContain("Removed:");

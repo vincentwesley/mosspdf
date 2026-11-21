@@ -1,5 +1,5 @@
 // "Recently used" tools on the home page: tool ids in localStorage, newest first. Storage may be blocked, so every access is guarded.
-const KEY = "pagehold:recent";
+const KEY = "mosspdf:recent";
 const MAX = 4;
 
 export function getRecent(): string[] {

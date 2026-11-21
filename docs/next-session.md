@@ -1,9 +1,9 @@
 > Update at the end of any session that changed state. Keep it lean.
 
-Continue work on **Pagehold** (repo `vincentwesley/pagehold`). main holds M0-M8 (all tools live).
+Continue work on **MossPDF** (repo `vincentwesley/mosspdf`). main holds M0-M8 (all tools live).
 
 ## Before anything
-1. Work in `C:\Coding Projects\pagehold`; read this file, `docs/PLAN.md`, `docs/DECISIONS.md` (D7, D10, D11).
+1. Work in `C:\Coding Projects\mosspdf`; read this file, `docs/PLAN.md`, `docs/DECISIONS.md` (D7, D10, D11).
 2. `npm ci --ignore-scripts`, `npm run pw -- install chromium firefox webkit`, then `npm run check`.
 
 ## How to work here

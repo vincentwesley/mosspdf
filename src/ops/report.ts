@@ -17,7 +17,7 @@ export async function compareReport(r: ReportData, o: OpOptions): Promise<OpResu
   const ok = new Set(font.getCharacterSet());
   let lost = false;
   const safe = (t: string) => [...t.replace(/\s+/g, " ")].map((c) => (ok.has(c.codePointAt(0)!) ? c : ((lost = true), "?"))).join("");
-  doc.setTitle("Pagehold comparison report");
+  doc.setTitle("MossPDF comparison report");
   doc.setCreationDate(new Date()); doc.setModificationDate(new Date());
 
   let page!: PDFPage, y = 0;
@@ -53,7 +53,7 @@ export async function compareReport(r: ReportData, o: OpOptions): Promise<OpResu
   };
 
   fresh();
-  para("Pagehold comparison report", { size: 20, bold: true, gap: 10 });
+  para("MossPDF comparison report", { size: 20, bold: true, gap: 10 });
   para(r.nameA, { label: "Original:" });
   para(r.nameB, { label: "Changed:" });
   para(r.date, { label: "Date:", gap: 12 });

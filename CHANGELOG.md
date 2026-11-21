@@ -4,6 +4,12 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-11-21
+- Renamed to MossPDF; new address https://mosspdf.pages.dev.
+- Liberation Sans is no longer shipped (D22).
+- licences.txt is linked from the footer; Terms added to the privacy page.
+- Clearer wording on redaction, OCR, signatures, the accessibility check and the clean-copy workflow.
+
 ## [1.2.1] - 2026-11-21
 - Safety scan uses far less memory on large files (+593 MB to +69 MB on a 193 MB file); repair one input copy less (+772 MB to +578 MB). Results unchanged (docs/PERF.md).
 

@@ -76,7 +76,7 @@ const ui = (ctx: Ctx) => ctx.local(() => {
       h("div", { class: "sg-side" },
         step(1, "What is in the photo", s.info, s.total),
         step(2, "Hide faces, plates or screens",
-          h("p", { class: "sg-help", text: "Draw boxes over faces, number plates or screens. Pagehold doesn't detect them automatically." }),
+          h("p", { class: "sg-help", text: "Draw boxes over faces, number plates or screens. MossPDF doesn't detect them automatically." }),
           h("p", { class: "sg-help", text: "Drag on the photo to draw a box (mouse or pen). With the keyboard or on a phone, press Add box, then move it: arrow keys or drag; plus and minus resize it; Alt with the arrow keys makes it wider, narrower, taller or shorter; Delete removes it." }),
           s.pick.el, h("div", { class: "sg-where" }, s.add), s.mode.el, s.level.el, s.list)),
       stage));
@@ -173,7 +173,7 @@ const ui = (ctx: Ctx) => ctx.local(() => {
 export const photo: ToolDef = {
   id: "photo", title: "Photo clean", heading: "Clean a photo", group: "Privacy",
   blurb: "Strip location and details.",
-  lede: "Remove location and camera details from photos, and pixelate or blur parts. Draw boxes over faces, number plates or screens. Pagehold doesn't detect them automatically.",
+  lede: "Remove location and camera details from photos, and pixelate or blur parts. Draw boxes over faces, number plates or screens. MossPDF doesn't detect them automatically.",
   accepts: "images",
   options(ctx) { return ui(ctx).root; },
   sync(ctx) {

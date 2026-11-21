@@ -15,7 +15,7 @@ Living notes. Every claim links to its source. Revisit when a hard problem comes
 | BentoPDF | Client-side, but loads WASM from jsDelivr CDN at runtime ([GitHub](https://github.com/alam00000/bentopdf)) | Free | AGPL-3.0 (we can't reuse its code) |
 | PDFgear, Xodo | Desktop/app; Xodo free tier is view/annotate only | — | Proprietary |
 
-Takeaways: the market splits into "upload to us" (caps, paywalls, accounts) and "run a server yourself" (Stirling). Browser-only tools exist but either phone home to a CDN (BentoPDF) or are AGPL. Pagehold's position: browser-only **and** provably no network, permissive licence, no caps.
+Takeaways: the market splits into "upload to us" (caps, paywalls, accounts) and "run a server yourself" (Stirling). Browser-only tools exist but either phone home to a CDN (BentoPDF) or are AGPL. MossPDF's position: browser-only **and** provably no network, permissive licence, no caps.
 
 ## 2. User pain points (ranked)
 
@@ -93,7 +93,7 @@ Drawn/typed marks are simple electronic signatures at most; validity depends on 
 
 ## 12. UX teardown and brainstorm (2026-11-20)
 
-Sources: iLovePDF sign and tools pages, Smallpdf sign, PDF24 home, BentoPDF review (itsfoss.com/bentopdf), Capterra/G2/Trustpilot reviews of Smallpdf and iLovePDF, a self-audit of Pagehold's code and screenshots. Reddit was not reachable; complaint evidence is secondhand.
+Sources: iLovePDF sign and tools pages, Smallpdf sign, PDF24 home, BentoPDF review (itsfoss.com/bentopdf), Capterra/G2/Trustpilot reviews of Smallpdf and iLovePDF, a self-audit of MossPDF's code and screenshots. Reddit was not reachable; complaint evidence is secondhand.
 
 What users complain about elsewhere: task caps, ads that misfire, watermarks on free output, upload to servers, login or upgrade walls at download, slow OCR, poor compression quality. What they praise: free with no account, ease of use, local processing, offline after first load.
 

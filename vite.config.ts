@@ -30,7 +30,7 @@ function pdfjsData(): Plugin {
   };
   let serve = false;
   return {
-    name: "pagehold-pdfjs-data",
+    name: "mosspdf-pdfjs-data",
     configResolved: (c) => { serve = c.command === "serve"; },
     resolveId: (id) => (id === VIRTUAL ? "\0" + VIRTUAL : undefined),
     load(id) {
@@ -50,7 +50,7 @@ function licencesTxt(): Plugin {
   const nm = (p: string) => `node_modules/${p}`;
   const P = `${nm("pdfjs-dist")}`;
   const sources: [string, string][] = [
-    ["Pagehold: LICENSE", "LICENSE"], ["Pagehold: NOTICE.md", "NOTICE.md"], ["Third-party notices: THIRD_PARTY_NOTICES.md", "THIRD_PARTY_NOTICES.md"],
+    ["MossPDF: LICENSE", "LICENSE"], ["MossPDF: NOTICE.md", "NOTICE.md"], ["Third-party notices: THIRD_PARTY_NOTICES.md", "THIRD_PARTY_NOTICES.md"],
     ["pdfjs-dist (pdf.js)", `${P}/LICENSE`], ["pdf.js cmaps (Adobe)", `${P}/cmaps/LICENSE`], ["pdf.js standard fonts (Foxit)", `${P}/standard_fonts/LICENSE_FOXIT`],
     ["pdf.js wasm: JBIG2 (PDFium)", `${P}/wasm/LICENSE_JBIG2`], ["pdf.js wasm: JBIG2 wrapper", `${P}/wasm/LICENSE_PDFJS_JBIG2`],
     ["pdf.js wasm: OpenJPEG", `${P}/wasm/LICENSE_OPENJPEG`], ["pdf.js wasm: OpenJPEG wrapper", `${P}/wasm/LICENSE_PDFJS_OPENJPEG`],
@@ -69,7 +69,7 @@ function licencesTxt(): Plugin {
     ["Fonts: SIL Open Font License 1.1 (Space Grotesk, Inter, Silkscreen, JetBrains Mono, Noto Sans, Caveat)", "src/fonts/OFL.txt"],
   ];
   return {
-    name: "pagehold-licences-txt",
+    name: "mosspdf-licences-txt",
     apply: "build",
     buildStart() {
       const rule = "=".repeat(78), NL = String.fromCharCode(10);
@@ -86,7 +86,7 @@ function licencesTxt(): Plugin {
 function swPrecache(): Plugin {
   const walk = (d: string): string[] => readdirSync(d).flatMap((n) => (statSync(join(d, n)).isDirectory() ? walk(join(d, n)) : [join(d, n)]));
   return {
-    name: "pagehold-sw-precache",
+    name: "mosspdf-sw-precache",
     apply: "build",
     enforce: "post",
     closeBundle() {

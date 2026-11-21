@@ -5,7 +5,7 @@ import type { Ctx, ToolDef } from "./types";
 
 const ui = (ctx: Ctx) => ctx.local(() => {
   const pw = passwordField({ id: "pw-current", label: "Password", autocomplete: "current-password", testid: "pw-input", msgTestId: "pw-msg", reserve: true, onInput: () => { pw.setError(null); ctx.refresh(); } });
-  const note = h("p", { class: "field__hint" }, "Pagehold can only remove a password you know. It never guesses or breaks passwords. If the file opens but will not let you print, copy or edit, enter its owner password here.");
+  const note = h("p", { class: "field__hint" }, "MossPDF can only remove a password you know. It never guesses or breaks passwords. If the file opens but will not let you print, copy or edit, enter its owner password here.");
   return { pw, box: h("div", { class: "protect" }, note, pw.el), prefilled: 0 };
 });
 

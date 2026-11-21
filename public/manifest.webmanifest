@@ -1,6 +1,6 @@
 {
-  "name": "Pagehold",
-  "short_name": "Pagehold",
+  "name": "MossPDF",
+  "short_name": "MossPDF",
   "description": "Private PDF tools that run entirely on your device.",
   "start_url": "/",
   "scope": "/",

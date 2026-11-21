@@ -1,4 +1,4 @@
-// Pagehold local server: Node 18+ stdlib only, offline, 127.0.0.1 only. Usage: node serve.mjs [--port 8080]
+// MossPDF local server: Node 18+ stdlib only, offline, 127.0.0.1 only. Usage: node serve.mjs [--port 8080]
 import { createServer } from "node:http";
 import { createReadStream, readFileSync, statSync } from "node:fs";
 import { dirname, extname, join, resolve, sep } from "node:path";
@@ -70,4 +70,4 @@ const i = process.argv.indexOf("--port");
 const port = i > 0 ? Number(process.argv[i + 1]) : 8080;
 if (!Number.isInteger(port) || port < 0 || port > 65535) { console.error("Invalid --port"); process.exit(1); }
 server.on("error", (e) => { console.error(e.code === "EADDRINUSE" ? `Port ${port} is in use. Try: node serve.mjs --port ${port + 1}` : e.message); process.exit(1); });
-server.listen(port, "127.0.0.1", () => console.log(`Pagehold running at http://127.0.0.1:${server.address().port}/  (Ctrl+C to stop)`));
+server.listen(port, "127.0.0.1", () => console.log(`MossPDF running at http://127.0.0.1:${server.address().port}/  (Ctrl+C to stop)`));

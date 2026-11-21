@@ -6,7 +6,7 @@ import { qpdfBin } from "../../scripts/qpdf-bin.mjs";
 
 /** Runs the real qpdf CLI on bytes (independent of the wasm engine under test). */
 export function qpdfCli(bytes: Uint8Array, args: string[]) {
-  const dir = mkdtempSync(join(tmpdir(), "pagehold-"));
+  const dir = mkdtempSync(join(tmpdir(), "mosspdf-"));
   try {
     const f = join(dir, "x.pdf");
     writeFileSync(f, bytes);

@@ -139,7 +139,7 @@ export function reportData(c: Comparison, nameA: string, nameB: string, date: st
 
 /** The same report as plain text (UTF-8). */
 export function reportText(r: ReportData): string {
-  const lines = ["Pagehold comparison", `Original: ${r.nameA}`, `Changed: ${r.nameB}`, `Date: ${r.date}`, "", r.summary, ...r.notes.map((n) => `Note: ${n}`)];
+  const lines = ["MossPDF comparison", `Original: ${r.nameA}`, `Changed: ${r.nameB}`, `Date: ${r.date}`, "", r.summary, ...r.notes.map((n) => `Note: ${n}`)];
   for (const c of r.changes) lines.push("", c.label, ...(c.removed ? [`  Removed: ${c.removed}`] : []), ...(c.added ? [`  Added: ${c.added}`] : []));
   return lines.join("\n") + "\n";
 }

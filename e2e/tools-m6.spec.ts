@@ -17,7 +17,7 @@ const primary = (page: Page) => page.getByTestId("primary-action");
 
 /** `qpdf --qdf` of a file: streams decompressed, object streams off, so a plain byte search sees everything but picture data. */
 function qdf(path: string): string {
-  const dir = mkdtempSync(join(tmpdir(), "pagehold-qdf-"));
+  const dir = mkdtempSync(join(tmpdir(), "mosspdf-qdf-"));
   try {
     const r = spawnSync(qpdfBin(), ["--qdf", "--object-streams=disable", path, join(dir, "o.pdf")], { encoding: "utf8" });
     if (r.status !== 0 && r.status !== 3) throw new Error(r.stderr);

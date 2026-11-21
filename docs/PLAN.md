@@ -1,6 +1,6 @@
-# Pagehold plan
+# MossPDF plan
 
-Pagehold is a free, open-source PDF toolkit that runs entirely in the browser. Files never leave the device, and a sealed page with a request log proves it. Live on Cloudflare Workers (static assets), installable as an offline app.
+MossPDF is a free, open-source PDF toolkit that runs entirely in the browser. Files never leave the device, and a sealed page with a request log proves it. Live on Cloudflare Workers (static assets), installable as an offline app.
 
 Who it's for: someone who has never used a PDF tool should finish a common task (merge two files, redact a phone number, sign a form) in under a minute without instructions, on a laptop or a phone. Power users get batch, workflows and keyboard control.
 
@@ -46,4 +46,4 @@ Every PR runs the full gate, because users get every tool. Script checks are lis
 ## Hosting and release
 
 - `npm run deploy` runs `wrangler deploy` from a verified local build. The live smoke test runs straight after.
-- Release: `git tag vX.Y.Z` plus a GitHub release with `pagehold-vX.Y.Z.zip`, a static build that runs offline from the user's own computer. The zip includes a one-file local server script for Node, and alternatives are documented in its README.
+- Release: `git tag vX.Y.Z` plus a GitHub release with `mosspdf-vX.Y.Z.zip`, a static build that runs offline from the user's own computer. The zip includes a one-file local server script for Node, and alternatives are documented in its README.

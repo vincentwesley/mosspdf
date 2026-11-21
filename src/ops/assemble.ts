@@ -5,8 +5,8 @@ import { parseRanges } from "./ranges";
 import { PdfError, type Bytes, type Engines, type InFile, type OpOptions, type OpResult, type PageSpec, type SplitMode, type Warning } from "./types";
 
 const MAX_TOTAL_BYTES = 700 * 1024 * 1024;
-export const PRODUCER = "Pagehold by Vin's Atelier";
-export const CREATOR = "Pagehold";
+export const PRODUCER = "MossPDF by Vin's Atelier";
+export const CREATOR = "MossPDF";
 
 export function safeName(name: string, fallback: string): string {
   const base = name

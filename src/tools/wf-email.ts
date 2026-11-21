@@ -38,7 +38,7 @@ export const wfEmail: ToolDef = {
       } },
       { label: "check", async run(cur) {
         const over = cur.bytes.length > limit * 1024 * 1024;
-        if (over) warnings.push({ code: "oversize", message: `This file is still ${fmtSize(cur.bytes.length)}, over your ${limit} MB limit. Strong compression is the most Pagehold does. Try Split (by size) to send it in parts, or share a link instead.` });
+        if (over) warnings.push({ code: "oversize", message: `This file is still ${fmtSize(cur.bytes.length)}, over your ${limit} MB limit. Strong compression is the most MossPDF does. Try Split (by size) to send it in parts, or share a link instead.` });
         return { file: cur, detail: over ? `${fmtSize(cur.bytes.length)}: still over ${limit} MB.` : `${fmtSize(cur.bytes.length)}: fits under ${limit} MB.` };
       } },
     ], ctx.input(f), u.steps.on, ctx.o.signal);

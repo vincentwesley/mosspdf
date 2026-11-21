@@ -1,8 +1,8 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "pagehold",
+  "name": "mosspdf",
   "compatibility_date": "2026-11-19",
-  // Pure static site (Workers static assets), no Worker script. Deploy locally: `npm run build && npx wrangler deploy`.
+  // Pure static site, no Worker script. Deployed to Cloudflare Pages with `npm run deploy`.
   // dist/_headers (copied from public/) applies to assets.
   "assets": {
     "directory": "dist",

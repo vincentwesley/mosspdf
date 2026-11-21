@@ -63,4 +63,4 @@ export function grayPng({ w, h, gray }) {
   return Buffer.concat([Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]), chunk("IHDR", ihdr), chunk("IDAT", deflateSync(raw)), chunk("IEND", Buffer.alloc(0))]);
 }
 
-export const SCAN_LINES = ["PAGEHOLD OCR FIXTURE", "INVOICE 2026 TOTAL 480", "SCANNED PAGE ONE"];
+export const SCAN_LINES = ["MOSSPDF OCR FIXTURE", "INVOICE 2026 TOTAL 480", "SCANNED PAGE ONE"];

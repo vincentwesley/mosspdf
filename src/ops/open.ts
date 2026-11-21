@@ -28,7 +28,7 @@ export function classify(stderr: string, f: InFile): PdfError {
       : new PdfError("encrypted", `"${f.name}" is password-protected. Enter its password to continue.`, f.name);
   }
   if (/memory|alloc|enlarge/i.test(stderr)) return new PdfError("too-large", `"${f.name}" is too big to handle in this browser. Try splitting it first or closing other tabs.`, f.name);
-  if (/unsupported|not supported/i.test(stderr)) return new PdfError("unsupported", `"${f.name}" uses a feature Pagehold can't handle yet.`, f.name);
+  if (/unsupported|not supported/i.test(stderr)) return new PdfError("unsupported", `"${f.name}" uses a feature MossPDF can't handle yet.`, f.name);
   return new PdfError("corrupt", `"${f.name}" looks damaged and couldn't be repaired. Try re-downloading or re-exporting it from the original program.`, f.name);
 }
 

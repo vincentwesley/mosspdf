@@ -1,10 +1,10 @@
-# Pagehold
+# MossPDF
 
 Free, private PDF tools that run entirely in your browser. Files never leave your device, and the page proves it: after loading, it locks itself against the network and shows a log of the requests it made.
 
-**Live:** https://pagehold.vwesley.workers.dev (installable, works offline after the first visit)
+**Live:** https://mosspdf.pages.dev (installable, works offline after the first visit)
 
-![Pagehold home: 26 tools grouped by task](docs/media/home-1280.png)
+![MossPDF home: 26 tools grouped by task](docs/media/home-1280.png)
 
 ## Tools
 
@@ -32,7 +32,7 @@ Free, private PDF tools that run entirely in your browser. Files never leave you
 
 ## Run it offline from a release
 
-Download `pagehold-vX.Y.Z.zip` from [Releases](https://github.com/vincentwesley/pagehold/releases), unzip it, then run `node serve.mjs` inside the folder (Node 18+) and open the address it prints. The bundled server applies the same security headers as the live site.
+Download `mosspdf-vX.Y.Z.zip` from [Releases](https://github.com/vincentwesley/mosspdf/releases), unzip it, then run `node serve.mjs` inside the folder (Node 18+) and open the address it prints. The bundled server applies the same security headers as the live site.
 
 ## Develop
 
@@ -42,7 +42,7 @@ npm run pw -- install chromium firefox webkit   # browsers for e2e
 npm run dev            # local dev server
 npm run check          # typecheck + lint + unit + build
 npm run test:e2e       # Playwright, headless, 5 browser projects
-npm run release        # after build: release/pagehold-vX.Y.Z.zip
+npm run release        # after build: release/mosspdf-vX.Y.Z.zip
 ```
 
 Architecture, decisions and plans live in `docs/` (start with [docs/PLAN.md](docs/PLAN.md)). Large-file timings: [docs/PERF.md](docs/PERF.md). Usability walkthroughs: [docs/USABILITY.md](docs/USABILITY.md).
