@@ -1,6 +1,6 @@
 {
   "name": "pagehold",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "private": true,
   "description": "Private PDF tools that run entirely in the browser.",
   "type": "module",

@@ -122,7 +122,17 @@ function analyse(j: J, rawObjStm: number): Omit<SafetyReport, "repaired"> {
   return { items, risky: items.some((i) => i.severity !== "info"), pageCount: pageRefs.length, encrypted: !!j.encrypt?.encrypted };
 }
 
-const countObjStm = (b: Bytes) => (new TextDecoder("latin1").decode(b).match(/\/Type\s*\/ObjStm/g) ?? []).length;
+// Chunked so a huge file is never decoded to one giant string; a match must start in the chunk proper, the tail only lets it finish.
+const countObjStm = (b: Bytes) => {
+  const CHUNK = 8 << 20;
+  const TAIL = 4096;
+  const dec = new TextDecoder("latin1");
+  let n = 0;
+  for (let s = 0; s < b.length; s += CHUNK) {
+    for (const m of dec.decode(b.subarray(s, s + CHUNK + TAIL)).matchAll(/\/Type\s*\/ObjStm/g)) if (m.index! < CHUNK) n++;
+  }
+  return n;
+};
 
 async function scanBytes(f: InFile, e: Engines): Promise<{ r?: Omit<SafetyReport, "repaired">; err: string }> {
   const run = await e.qpdf(["--json=2", "--json-key=qpdf", "--json-key=pages", "--json-key=encrypt", ...(f.password ? [`--password=${f.password}`] : []), "/f.pdf"], { "/f.pdf": f.bytes });
