@@ -1,7 +1,7 @@
 // Command palette (Ctrl/Cmd+K) and the shortcuts list ("?"). Native <dialog>; the search box is an ARIA 1.2 combobox over a listbox.
 import { store } from "../core/store";
 import { scoreTool } from "../core/toolsearch";
-import { CATALOG, isLive } from "../tools";
+import { CATALOG } from "../tools";
 import { h } from "./dom";
 import { icon } from "./icons";
 import { toast } from "./toast";
@@ -31,7 +31,7 @@ export function initPalette(act: PaletteActions): { open(opener?: HTMLElement): 
 
   const go = (id: string) => () => { skipRefocus = true; location.hash = `#/${id}`; };
   const all: Cmd[] = [
-    ...CATALOG.flatMap((g) => g.tools.filter(isLive).map((t): Cmd => ({ id: `tool-${t.id}`, label: t.title, hint: g.name, blurb: `${t.blurb} ${g.name}`, run: go(t.id) }))),
+    ...CATALOG.flatMap((g) => g.tools.map((t): Cmd => ({ id: `tool-${t.id}`, label: t.title, hint: g.name, blurb: `${t.blurb} ${g.name}`, run: go(t.id) }))),
     { id: "cmd-theme", label: "Switch theme", hint: "Command", blurb: "dark light appearance", run: () => act.switchTheme() },
     { id: "cmd-privacy", label: "Privacy log", hint: "Command", blurb: "requests seal network", run: () => { skipRefocus = true; act.openPrivacy(opener ?? document.body); } },
     { id: "cmd-clear", label: "Clear all files", hint: "Command", blurb: "remove delete files", run: () => {

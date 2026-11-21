@@ -1,0 +1,28 @@
+// The code of every tool, one chunk. Loaded by main.ts before the seal so nothing is fetched afterwards (D25).
+import { merge } from "./merge";
+import { split } from "./split";
+import { organize } from "./organize";
+import { extract } from "./extract";
+import { imagesToPdf } from "./images-to-pdf";
+import { pdfToImages } from "./pdf-to-images";
+import { compress } from "./compress";
+import { pageNumbers } from "./page-numbers";
+import { watermark } from "./watermark";
+import { metadata } from "./metadata";
+import { protect } from "./protect";
+import { unprotect } from "./unprotect";
+import { safetyScan } from "./safety-scan";
+import { repair } from "./repair";
+import { fill } from "./fill";
+import { sign } from "./sign";
+import { ocr } from "./ocr";
+import { redact } from "./redact";
+import { photo } from "./photo";
+import { compare } from "./compare";
+import { wfEmail } from "./wf-email";
+import { wfShare } from "./wf-share";
+import { wfApply } from "./wf-apply";
+import { a11yCheck } from "./a11y-check";
+import type { ToolDef } from "./types";
+
+export const DEFS: ToolDef[] = [wfEmail, wfShare, wfApply, merge, split, organize, extract, imagesToPdf, pdfToImages, compress, pageNumbers, watermark, metadata, protect, unprotect, safetyScan, repair, fill, sign, ocr, redact, photo, compare, a11yCheck];

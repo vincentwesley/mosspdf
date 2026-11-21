@@ -48,6 +48,6 @@ Friction (ranked):
 | P1-3 | Footer credit links min 48px tall | fixed | `src/style.css` (`footer > p a`) |
 | P1-4 | Disabled Save reason | fixed | `src/tools/sign.ts` (`whyDisabled`), `src/ui/workspace.ts` |
 | P1-5 | 24px checkbox visual | left (house kit) | |
-| P1-6 | Long sign page on phone | fixed | `src/tools/sign.ts` (`add` scrolls the placed box into view and focuses it) |
+| P1-6 | Long sign page on phone | fixed | `src/tools/sign.ts` (`add` scrolls the placed box into view and focuses it; on phones the signature maker is a `<details>` that folds after placing, and CSS orders steps, page, placed list) |
 | P3-1 | Carried-over files unflagged | fixed | `src/ui/workspace.ts` (`carryBox`; not shown after "Use in another tool") |
 | P3-2 | Keyboard Enter on Choose files | not a bug | Choose files is a real button calling input.click(); headless artifact, not a bug |

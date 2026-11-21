@@ -1,8 +1,7 @@
 import { isPdfFile, store } from "../core/store";
 import { getRecent } from "../core/recent";
-import { CATALOG, LIVE, isLive } from "../tools";
+import { CATALOG, TOOLS, type ToolMeta } from "../tools";
 import { matchTool } from "../core/toolsearch";
-import type { ToolDef } from "../tools/types";
 import { h } from "./dom";
 import { dropzone, setFilesHandler } from "./dropzone";
 
@@ -19,7 +18,7 @@ export function homeView(navigate: (hash: string) => void): { el: HTMLElement; d
       h("div", { class: "dlg__head" }, h("h2", { id: "chooser-h", text: `What should we do with ${count === 1 ? "this file" : `these ${count} files`}?`, attrs: { tabindex: -1 } }),
         h("button", { class: "dlg__x", type: "button", text: "Close", attrs: { "aria-label": "Close", "data-testid": "chooser-close" }, on: { click: () => chooser.close() } })),
       h("ul", { class: "chooser__list", attrs: { role: "list" } }, ...order.map((id, i) => {
-        const t = LIVE.find((x) => x.id === id)!;
+        const t = TOOLS.find((x) => x.id === id)!;
         return h("li", {}, h("a", { class: `hs-btn${i ? " hs-btn--secondary" : ""}`, text: `${t.title}${i === 0 ? " (suggested)" : ""}`, attrs: { href: `#/${id}`, "data-testid": `choose-${id}` }, on: { click: () => chooser.close() } }));
       })));
     if (!chooser.open) chooser.showModal();
@@ -33,11 +32,8 @@ export function homeView(navigate: (hash: string) => void): { el: HTMLElement; d
   };
   setFilesHandler(intake);
 
-  const tile = (t: ToolDef) => isLive(t)
-    ? h("li", { class: "tile" }, h("a", { class: "tile__in hs-card", attrs: { href: `#/${t.id}`, "data-testid": `tile-${t.id}` } },
-      h("span", { class: "tile__title", text: t.title }), h("span", { class: "tile__blurb", text: t.blurb })))
-    : h("li", { class: "tile" }, h("div", { class: "tile__in hs-card hs-pending", attrs: { "data-testid": `tile-${t.id}`, "data-pending": true } },
-      h("span", { class: "tile__title", text: t.title }), h("span", { class: "tile__blurb", text: t.blurb }), h("span", { class: "tile__soon", text: "Coming soon" })));
+  const tile = (t: ToolMeta) => h("li", { class: "tile" }, h("a", { class: "tile__in hs-card", attrs: { href: `#/${t.id}`, "data-testid": `tile-${t.id}` } },
+    h("span", { class: "tile__title", text: t.title }), h("span", { class: "tile__blurb", text: t.blurb })));
 
   const groups = CATALOG.map((g, i) => {
     const items = g.tools.map((t) => ({ t, li: tile(t) }));
@@ -62,7 +58,7 @@ export function homeView(navigate: (hash: string) => void): { el: HTMLElement; d
   } } });
   const findRow = h("div", { class: "find" }, h("label", { class: "find__label", text: "Find a tool", attrs: { for: "find" } }), find, none);
 
-  const recent = getRecent().map((id) => LIVE.find((t) => t.id === id)).filter((t): t is ToolDef => !!t);
+  const recent = getRecent().map((id) => TOOLS.find((t) => t.id === id)).filter((t): t is ToolMeta => !!t);
   const recentRow = h("section", { class: "recent", hidden: !recent.length, attrs: { "aria-labelledby": "recent-h", "data-testid": "recent" } },
     h("h2", { id: "recent-h", class: "hs-eyebrow", text: "Recently used" }),
     h("ul", { class: "recent__list", attrs: { role: "list" } }, ...recent.map((t) => h("li", {}, h("a", { class: "hs-btn hs-btn--secondary", text: t.title, attrs: { href: `#/${t.id}`, "data-testid": `recent-${t.id}` } })))));
