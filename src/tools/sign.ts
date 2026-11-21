@@ -210,7 +210,9 @@ const ui = (ctx: Ctx) => ctx.local(() => {
     layout(it, s.els.get(it.id)!);
     renderList();
     announce(`${it.what} placed on page ${it.page + 1}.`);
-    s.els.get(it.id)!.focus({ preventScroll: true });
+    const placedEl = s.els.get(it.id)!;
+    placedEl.scrollIntoView({ block: "center", behavior: "auto" }); // instant: no motion to gate, and no scroll in flight under keyboard nudges
+    placedEl.focus({ preventScroll: true });
     ctx.refresh();
   }
 
@@ -272,6 +274,7 @@ export const sign: ToolDef = {
   },
   warnings(ctx) { return ui(ctx).signed ? [SIGNED_WARNING] : []; },
   ready(ctx) { return !!ctx.file && ui(ctx).items.length > 0; },
+  whyDisabled: (ctx) => (ctx.file && !ui(ctx).items.length ? "Place a signature on a page first." : ""),
   primaryLabel: () => "Save signed copy",
   destroy(ctx) { ui(ctx).pv.destroy(); },
   async run(ctx) {

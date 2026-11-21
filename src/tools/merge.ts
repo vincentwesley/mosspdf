@@ -13,6 +13,7 @@ export const merge: ToolDef = {
   blurb: "Combine PDFs into one.",
   lede: "Put your PDFs in the order you want, then combine them into one file.",
   accepts: "pdfs", grid: { showFile: true, open: false }, dropTitle: "Drop PDFs to merge",
+  next: ["sign", "compress", "protect", "page-numbers", "watermark"],
   options(ctx) {
     const { bar, toggle } = ui(ctx);
     bar.append(toggle);

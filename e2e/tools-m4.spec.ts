@@ -127,6 +127,8 @@ test.describe("Sign", () => {
     await ready(page);
     await expect(page.getByTestId("sign-disclaimer")).toContainText("not a certified digital signature");
     await expect(primary(page)).toBeDisabled();
+    await expect(page.getByTestId("primary-why")).toHaveText("Place a signature on a page first.");
+    await expect(primary(page)).toHaveAttribute("aria-describedby", "primary-why");
     await typeSignature(page);
     // the handwriting font was loaded before the seal (a late load would be a request after the seal and fail this test)
     expect(await page.evaluate(() => [...document.fonts].some((f) => f.family.includes("Caveat") && f.status === "loaded"))).toBe(true);
@@ -134,6 +136,7 @@ test.describe("Sign", () => {
     await expect(page.getByTestId("sg-item")).toHaveCount(1);
     await expect(page.getByTestId("sg-row")).toContainText("Signature, page 1");
     await expect(primary(page)).toBeEnabled();
+    await expect(page.getByTestId("primary-why")).toBeHidden();
     await primary(page).click();
     const dl = await save(page);
     expect(dl.name).toBe("plain-3p-signed.pdf");

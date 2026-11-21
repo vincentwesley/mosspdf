@@ -21,7 +21,15 @@ const ACCEPT = {
 } as const;
 const stem = (name: string) => name.replace(/\.[^.]+$/, "");
 
+/** Tool title last opened, and whether the next open follows a "Use in another tool" hand-off (then carried files are expected). */
+let lastTool = "";
+let handoff = false;
+
 export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void } {
+  const prevTool = lastTool;
+  lastTool = tool.title;
+  const carried = handoff || prevTool === tool.title ? "" : store.files.map((f) => f.id).join();
+  handoff = false;
   const kind: LoadedFile["kind"] = tool.accepts === "images" ? "image" : "pdf";
   const multi = tool.accepts !== "pdf";
   /** One PDF at a time (new replaces old) unless the tool is a batch tool. */
@@ -89,6 +97,9 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
     visible: () => (single ? ofKind().slice(-1) : ofKind()),
     label: tool.accepts === "pdf-pair" ? (_f, i) => (i === 0 ? "Original" : "Changed") : undefined,
   });
+  const carryTxt = h("span", { attrs: { "data-testid": "carry-text" } });
+  const carryBox = h("p", { class: "hs-banner hs-banner--info", hidden: true, attrs: { role: "status", "data-testid": "carry-over" } }, carryTxt,
+    h("button", { class: "hs-btn hs-btn--ghost", type: "button", text: "Clear", attrs: { "data-testid": "carry-clear" }, on: { click: () => startOver() } }));
   const tip = h("p", { class: "tip", hidden: multi }, "Want to combine files? ", h("a", { href: "#/merge", text: "Use Merge", attrs: { "data-testid": "tip-merge" } }));
   const warnBox = h("div", { class: "warns", attrs: { "data-testid": "warnings" } });
   const optSet = h("fieldset", { class: "opts__set" });
@@ -99,10 +110,11 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
   const status = h("p", { class: "job__status", attrs: { role: "status" } });
   const errBox = h("p", { class: "job__status job__status--err", attrs: { role: "alert", "data-testid": "job-error" } });
   const prog = h("progress", { class: "hs-progress", attrs: { max: 100, value: 0, "aria-label": "Progress" }, hidden: true });
+  const why = h("p", { class: "tip", id: "primary-why", hidden: true, attrs: { "data-testid": "primary-why" } });
   const primary = h("button", { class: "hs-btn", type: "button", attrs: { "data-testid": "primary-action" } });
   const cancel = h("button", { class: "hs-btn hs-btn--secondary", type: "button", text: "Cancel", hidden: true, attrs: { "data-testid": "cancel-job" } });
   const clearAll = h("button", { class: "hs-btn hs-btn--ghost", type: "button", text: "Clear all", attrs: { "data-testid": "clear-all" } });
-  const bar = h("div", { class: "actionbar" }, h("div", { class: "actionbar__in" }, prog, status, errBox, h("div", { class: "actionbar__btns" }, primary, cancel, clearAll)));
+  const bar = h("div", { class: "actionbar" }, h("div", { class: "actionbar__in" }, prog, status, errBox, why, h("div", { class: "actionbar__btns" }, primary, cancel, clearAll)));
 
   // output settings
   const credit = h("input", { class: "hs-check", id: "credit", type: "checkbox", attrs: { "data-testid": "producer-credit" } });
@@ -154,6 +166,14 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
     primaryEnabled = !!tool.run && (tool.ready ? tool.ready(ctx) : tool.accepts === "pdf-pair" ? ctx.files.length === 2 : ctx.files.length > 0);
     primary.textContent = tool.run ? (tool.primaryLabel?.(ctx) ?? tool.title) + (tool.batch && ctx.files.length > 1 ? ` (${ctx.files.length} files)` : "") : "Coming soon";
     primary.disabled = !primaryEnabled || busy;
+    why.textContent = primaryEnabled || busy ? "" : (tool.whyDisabled?.(ctx) ?? "");
+    why.hidden = !why.textContent;
+    if (why.hidden) primary.removeAttribute("aria-describedby"); else primary.setAttribute("aria-describedby", "primary-why");
+    // Files from another tool stay flagged until the user adds or removes any (the hand-off button is the intended carry-over).
+    const n = ofKind().length;
+    const stillCarried = !!carried && n > 0 && store.files.map((f) => f.id).join() === carried;
+    carryBox.hidden = !stillCarried;
+    if (stillCarried) carryTxt.textContent = `${n === 1 ? "1 file" : `${n} files`} carried over from ${prevTool}. `;
     cancel.hidden = !busy;
     clearAll.disabled = busy;
     prog.hidden = !busy;
@@ -174,7 +194,7 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
     inBytes = ctx.files.reduce((n, f) => n + f.size, 0);
     abort = new AbortController();
     o = { signal: abort.signal, onProgress: (d, t) => { prog.max = t; prog.value = d; jobNote = `${batchNote}Working… ${d} of ${t}`; status.textContent = jobNote; } };
-    jobNote = "Working…";
+    jobNote = inBytes > 50 * 1024 * 1024 ? "Working… Large files can take a minute or more." : "Working…";
     prog.removeAttribute("value");
     store.setBusy(true);
     try {
@@ -240,6 +260,7 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
   /** Replaces the loaded files with a result and opens another tool on it. The store is global, so it survives the route change. */
   async function useIn(r: OpResult, id: string) {
     store.clear();
+    handoff = true;
     await store.add([new File([r.bytes as BlobPart], r.name, { type: "application/pdf" })]);
     location.hash = `#/${id}`;
   }
@@ -255,7 +276,7 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
 
   const el = h("div", { class: "view tool" },
     h("header", { class: "view__head" }, h1, h("p", { class: "view__lede", text: tool.lede })),
-    dz, soon, notice, fl.el, tip, warnBox, optBox, gridBox, settings, resultBox, bar);
+    dz, soon, notice, carryBox, fl.el, tip, warnBox, optBox, gridBox, settings, resultBox, bar);
   update();
   return { el, destroy: () => { unsub(); grid?.destroy(); abort?.abort(); tool.destroy?.(ctx); } };
 }
