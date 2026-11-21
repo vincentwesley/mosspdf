@@ -3,6 +3,7 @@
 All notable changes to this project are documented here. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
+- Optional Simplified Chinese text (D24): the "Chinese text" switch in the footer loads a 2.2 MB font (about 6,700 common hanzi) before the page seals; fill forms, watermark, page numbers, sign text and the compare report can then use it.
 
 ## [1.3.0] - 2026-11-21
 - Renamed to MossPDF; new address https://mosspdf.pages.dev.

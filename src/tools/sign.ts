@@ -9,7 +9,7 @@ import { pageView, type Slot } from "../ui/pageview";
 import { PEN, sigMaker, toPng } from "../ui/sigmaker";
 type Maker = ReturnType<typeof sigMaker>;
 import { formInfo, SIGNED_WARNING } from "../ui/formstate";
-import { badChars } from "../core/winansi";
+import { badChars, ZH_HINT, zhWouldHelp } from "../core/winansi";
 import type { Ctx, ToolDef } from "./types";
 
 interface Item {
@@ -200,7 +200,7 @@ const ui = (ctx: Ctx) => ctx.local(() => {
     } else {
       const text = kind === "date" ? DATES[s.dateFmt.input.value](new Date()) : s.text.input.value.trim();
       if (!text) { s.msg.textContent = "Type the text to place first."; return; }
-      if (badChars(text).length) { s.msg.textContent = "That text has characters that can't be used yet. Use Latin, Greek or Cyrillic letters, digits and basic punctuation."; return; }
+      { const bad = badChars(text); if (bad.length) { s.msg.textContent = "That text has characters that can't be used yet. Use Latin, Greek or Cyrillic letters, digits and basic punctuation." + (zhWouldHelp(bad) ? ZH_HINT : ""); return; } }
       const size = kind === "date" ? 12 : 14;
       it = { ...base, what: kind === "date" ? "Date" : "Text", text, size, fx: clamp(cx, 0, 0.95), fy: clamp(cy - (size * 0.6) / vp.height, 0, 0.97) };
     }
@@ -270,7 +270,7 @@ export const sign: ToolDef = {
     u.dateFmt.el.hidden = k !== "date";
     u.text.el.hidden = k !== "text";
     const bad = badChars(u.text.input.value);
-    u.text.setMessage(k === "text" && bad.length ? `These characters cannot be used yet: ${bad.map((c) => `"${c}"`).join(" ")}. Use Latin, Greek or Cyrillic letters, digits and basic punctuation.` : "", k === "text" && bad.length > 0);
+    u.text.setMessage(k === "text" && bad.length ? `These characters cannot be used yet: ${bad.map((c) => `"${c}"`).join(" ")}. Use Latin, Greek or Cyrillic letters, digits and basic punctuation.${zhWouldHelp(bad) ? ZH_HINT : ""}` : "", k === "text" && bad.length > 0);
   },
   warnings(ctx) { return ui(ctx).signed ? [SIGNED_WARNING] : []; },
   ready(ctx) { return !!ctx.file && ui(ctx).items.length > 0; },

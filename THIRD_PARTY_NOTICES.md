@@ -51,6 +51,7 @@ All under the SIL Open Font License 1.1, full text in `src/fonts/OFL.txt` (it tr
 - Inter (The Inter Project Authors)
 - Silkscreen (The Silkscreen Project Authors)
 - JetBrains Mono (The JetBrains Mono Project Authors)
+- Noto Sans SC, subset (Adobe and The Noto Project Authors, OFL-1.1; `src/fonts/notosanssc-gb2312-400-normal.ttf`, GB2312 hanzi, CJK punctuation, full-width forms, ASCII and Latin-1 cut from the google/fonts variable TTF with `scripts/subset-cjk.py`; renamed "MossPDF Sans SC" because the original reserves the name "Source"; loaded only when Chinese text is turned on, D24)
 - Noto Sans, subset (The Noto Project Authors; `src/fonts/notosans-unicode-400-normal.ttf`, Latin, Latin Extended, Vietnamese, Greek and Cyrillic cut from NotoSans-Regular of the `@expo-google-fonts/noto-sans` 0.4.2 package with `pyftsubset`; drawn into PDFs by stamps, fill, sign, OCR layer and report when text goes beyond WinAnsi, D20)
 - Caveat (The Caveat Project Authors; the typed-signature handwriting in Sign, from the Fontsource package build https://fontsource.org/fonts/caveat)
 

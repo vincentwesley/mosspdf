@@ -14,6 +14,7 @@ import { live } from "./ui/dom";
 import { initGlobalIntake } from "./ui/dropzone";
 import { initPalette, MOD } from "./ui/palette";
 import { routeOf } from "./core/ocrlangs";
+import { setZh, zhOn } from "./core/zhfont";
 
 const KEY = "theme";
 const store = {
@@ -44,6 +45,12 @@ btn.addEventListener("click", () => {
   store.set(t);
   sync(t);
 });
+
+// ---- optional Chinese font (D24): switching reloads the tab so the font loads before the seal ----
+const zh = document.querySelector<HTMLButtonElement>("#zh-toggle")!;
+zh.textContent = zhOn() ? "Chinese text: on" : "Chinese text: off (adds 2 MB)";
+zh.setAttribute("aria-pressed", String(zhOn()));
+zh.addEventListener("click", () => { setZh(!zhOn()); location.reload(); });
 
 // ---- seal badge + privacy dialog ----
 document.querySelector<HTMLElement>("#app-version")!.textContent = VERSION;

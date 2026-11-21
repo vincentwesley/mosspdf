@@ -34,6 +34,8 @@ a { color: var(--accent); text-underline-offset: 0.2em; }
 .top .hs-btn { min-height: 48px; }
 main { min-height: 60vh; padding-bottom: var(--s6); outline: none; }
 .appfoot { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s5); align-items: center; color: var(--fg-muted); font-size: 0.9rem; margin-bottom: var(--s4); }
+.appfoot button { all: unset; cursor: pointer; text-decoration: underline; display: inline-flex; align-items: center; min-height: 48px; }
+.appfoot button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .appfoot a { display: inline-flex; align-items: center; min-height: 48px; }
 footer > p a { display: inline-flex; align-items: center; min-height: 48px; }
 body.is-dropping::after { content: "Drop to add"; position: fixed; inset: var(--s3); z-index: var(--z-toast); display: grid; place-items: center; font: 700 var(--step-3) var(--font-head); background: color-mix(in srgb, var(--bg) 82%, transparent); outline: 3px dashed var(--accent); outline-offset: -3px; pointer-events: none; }

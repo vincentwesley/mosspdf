@@ -1,6 +1,6 @@
 import type { WatermarkOptions } from "../ops/stamp";
 import type { OpResult } from "../ops/types";
-import { badChars } from "../core/winansi";
+import { badChars, ZH_HINT, zhWouldHelp } from "../core/winansi";
 import { h } from "../ui/dom";
 import { colourField, numberField, radioGroup, textField } from "../ui/fields";
 import { pdfLossWarnings } from "./pages";
@@ -49,7 +49,7 @@ export const watermark: ToolDef = {
     const p = plan(ctx);
     u.custom.el.hidden = u.angle.value() !== "custom";
     u.text.setMessage(
-      p.bad.length ? `These characters cannot be used yet: ${p.bad.map((c) => `"${c}"`).join(" ")}. Use Latin, Greek or Cyrillic letters, digits and basic punctuation.` : p.text.trim() ? "" : "Type the text to stamp on each page.",
+      p.bad.length ? `These characters cannot be used yet: ${p.bad.map((c) => `"${c}"`).join(" ")}. Use Latin, Greek or Cyrillic letters, digits and basic punctuation.${zhWouldHelp(p.bad) ? ZH_HINT : ""}` : p.text.trim() ? "" : "Type the text to stamp on each page.",
       p.bad.length > 0,
     );
     u.opacity.setError(p.opacityOk ? null : "Use a number from 1 to 100.");
