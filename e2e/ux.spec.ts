@@ -20,6 +20,32 @@ test.describe("UX batch", () => {
     await expect(page.getByTestId("file-row")).toContainText("merged");
   });
 
+  test("files left from another tool are flagged and can be cleared; a hand-off is not flagged", async ({ page }) => {
+    await loadApp(page, "/#/compress");
+    await add(page, corpus("plain-3p"));
+    await readyRows(page, 1);
+    await page.evaluate(() => { location.hash = "#/split"; });
+    await expect(page.getByTestId("carry-over")).toContainText("1 file carried over from Compress");
+    await page.getByTestId("carry-clear").click();
+    await expect(page.getByTestId("file-row")).toHaveCount(0);
+    await expect(page.getByTestId("carry-over")).toBeHidden();
+    await page.getByTestId("toast-action").click();
+    await readyRows(page, 1);
+    await expect(page.getByTestId("carry-over")).toBeVisible();
+    await add(page, corpus("mixed-sizes"));
+    await expect(page.getByTestId("carry-over")).toBeHidden();
+  });
+
+  test("hand-off from a result card is not flagged as carried over", async ({ page }) => {
+    await loadApp(page, "/#/merge");
+    await add(page, corpus("plain-3p"), corpus("mixed-sizes"));
+    await readyRows(page, 2);
+    await page.getByTestId("primary-action").click();
+    await page.getByTestId("next-compress").click();
+    await expect(page.getByTestId("file-row")).toHaveCount(1);
+    await expect(page.getByTestId("carry-over")).toBeHidden();
+  });
+
   test("Clear all can be undone", async ({ page }) => {
     await loadApp(page, "/#/compress");
     await add(page, corpus("plain-3p"));

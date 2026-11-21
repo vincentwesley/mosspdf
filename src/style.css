@@ -35,6 +35,7 @@ a { color: var(--accent); text-underline-offset: 0.2em; }
 main { min-height: 60vh; padding-bottom: var(--s6); outline: none; }
 .appfoot { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s5); align-items: center; color: var(--fg-muted); font-size: 0.9rem; margin-bottom: var(--s4); }
 .appfoot a { display: inline-flex; align-items: center; min-height: 48px; }
+footer > p a { display: inline-flex; align-items: center; min-height: 48px; }
 body.is-dropping::after { content: "Drop to add"; position: fixed; inset: var(--s3); z-index: var(--z-toast); display: grid; place-items: center; font: 700 var(--step-3) var(--font-head); background: color-mix(in srgb, var(--bg) 82%, transparent); outline: 3px dashed var(--accent); outline-offset: -3px; pointer-events: none; }
 
 /* ---- dialogs ---- */
@@ -110,6 +111,7 @@ a.tile__in:focus-visible { box-shadow: var(--fx-card-shadow); }
 .file__hint { margin: 0.25rem 0 0; font-size: 0.85rem; color: var(--fg-muted); }
 .file[data-status="locked"] .file__hint { color: var(--fg-muted); }
 .file__acts { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 0.25rem; }
+.file__acts .pg__btn { min-width: 48px; }
 .files__grip { touch-action: none; cursor: grab; }
 .pw { display: grid; gap: 0.25rem; margin-top: var(--s2); max-width: 24rem; }
 .pw__row { display: flex; gap: var(--s2); flex-wrap: wrap; }

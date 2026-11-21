@@ -79,6 +79,8 @@ export interface ToolDef {
   warnings?(ctx: Ctx): string[];
   /** Whether the action may run. Default: merge-style minimum for `accepts` (1 file, or exactly 2 for pdf-pair). */
   ready?(ctx: Ctx): boolean;
+  /** Short muted reason shown next to the primary button while it is disabled for want of input. */
+  whyDisabled?(ctx: Ctx): string;
   /** Label of the main button. Default: the title. */
   primaryLabel?(ctx: Ctx): string;
   /** Replaces the "1 MB to 1 MB" line of the result card with this text. */
