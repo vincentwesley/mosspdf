@@ -25,7 +25,7 @@ Worked: detections appear automatically and are masked in the list (`S****567D`)
 
 Friction (ranked):
 1. Redact's result is the cleanest hand-off to Compress, but the user has to know to look for it under "Use in another tool". LEFT: present and discoverable in the result card.
-2. Postal codes are a separate tick box from street addresses; a user removing the address may not realise the postal code is still ticked. LEFT: needs product decision.
+2. Postal codes are a separate tick box from street addresses; a user removing the address may not realise the postal code is still ticked. FIXED: unticking Street addresses also unticks Postal codes (re-tick if wanted).
 3. Sticky action bar overlaps the review panel in full-page screenshots only (artifact of capture, not a user issue).
 
 ## 3. Power user, keyboard only (1280px): Ctrl+K, Safe to share, batch page numbers

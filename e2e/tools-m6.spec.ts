@@ -76,6 +76,11 @@ test.describe("Redact", () => {
     await expect(page.getByTestId("rd-group-phone")).toHaveCount(0);
     await expect(primary(page)).toHaveText("Redact 3 items");
     await page.getByTestId("rd-kind-phone").check();
+    // unticking addresses also unticks postal codes
+    await page.getByTestId("rd-kind-address").uncheck();
+    await expect(page.getByTestId("rd-kind-postal")).not.toBeChecked();
+    await page.getByTestId("rd-kind-address").check();
+    await page.getByTestId("rd-kind-postal").check();
     // search adds a group
     await page.getByTestId("rd-q").fill("tan wei ming");
     await page.getByTestId("rd-find").click();
