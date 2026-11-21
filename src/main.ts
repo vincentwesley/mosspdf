@@ -49,7 +49,8 @@ btn.addEventListener("click", () => {
 
 // ---- optional Chinese font (D24): switching reloads the tab so the font loads before the seal ----
 const zh = document.querySelector<HTMLButtonElement>("#zh-toggle")!;
-zh.textContent = zhOn() ? "Chinese text: on" : "Chinese text: off (adds 2 MB)";
+zh.textContent = zhOn() ? "Chinese text: on" : "Chinese text: off";
+document.querySelector<HTMLElement>("#zh-hint")!.textContent = zhOn() ? "Switching off reloads the page." : "Adds 2 MB, reloads the page.";
 zh.setAttribute("aria-pressed", String(zhOn()));
 zh.addEventListener("click", () => { setZh(!zhOn()); location.reload(); });
 

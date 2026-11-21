@@ -3,6 +3,7 @@
 All notable changes to this project are documented here. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
+- Design pass (D26): an icon for every tool, category chips and a three-step cue on home, a larger add-files button, choice cards for Compress, a clearer result card and Chinese text switch.
 - Optional Simplified Chinese text (D24): the "Chinese text" switch in the footer loads a 2.2 MB font (about 6,700 common hanzi) before the page seals; fill forms, watermark, page numbers, sign text and the compare report can then use it.
 - Tool code moved to its own chunk, loaded before the seal (D25); main bundle 63 to 25 KB gzip.
 - Sign on phones: "Make your signature" folds away once placed, and the page comes before the placed list.

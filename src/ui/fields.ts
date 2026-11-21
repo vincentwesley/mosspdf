@@ -91,14 +91,17 @@ export interface RadioGroup {
   value(): string;
   set(v: string): void;
 }
-/** Native radios (arrow keys work), styled with `hs-check hs-check--radio`. `testid(value)` names each radio's data-testid. */
-export function radioGroup(o: { name: string; legend: string; options: [value: string, label: string][]; value: string; testid?: (v: string) => string; onChange?: (v: string) => void }): RadioGroup {
-  const el = h("fieldset", { class: "radios" }, h("legend", { text: o.legend }));
-  const radios = o.options.map(([v, label]) => {
+/** Native radios (arrow keys work), styled with `hs-check hs-check--radio`. `testid(value)` names each radio's data-testid. An option with `about` (and optional `badge`) turns the group into choice cards. */
+export function radioGroup(o: { name: string; legend: string; options: ([value: string, label: string] | [value: string, label: string, about: string, badge?: string])[]; value: string; testid?: (v: string) => string; onChange?: (v: string) => void }): RadioGroup {
+  const cards = o.options.some((x) => x.length > 2);
+  const el = h("fieldset", { class: cards ? "radios radios--cards" : "radios" }, h("legend", { text: o.legend }));
+  const radios = o.options.map(([v, label, about, badge]) => {
     const r = h("input", { type: "radio", id: `${o.name}-${v}`, class: "hs-check hs-check--radio", attrs: { name: o.name, value: v, "data-testid": o.testid?.(v) } });
     r.checked = v === o.value;
     r.addEventListener("change", () => { if (r.checked) o.onChange?.(v); });
-    el.append(h("div", { class: "radios__opt" }, r, h("label", { attrs: { for: r.id }, text: label })));
+    el.append(h("div", { class: "radios__opt" }, r, cards
+      ? h("label", { attrs: { for: r.id } }, h("span", { class: "radios__title", text: label }), badge && h("span", { class: "radios__badge", text: badge }), about && h("span", { class: "radios__about", text: about }))
+      : h("label", { attrs: { for: r.id }, text: label })));
     return r;
   });
   return { el, value: () => radios.find((r) => r.checked)?.value ?? o.value, set: (v) => radios.forEach((r) => { r.checked = r.value === v; }) };

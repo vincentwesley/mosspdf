@@ -122,7 +122,7 @@ export function sigMaker(o: { id: string; name: string; colour: () => string; on
   });
 
   // ---- tabs ----
-  const names: [Tab, string][] = [["draw", "Draw"], ["type", "Type"], ["upload", "Upload"]];
+  const names: [Tab, string][] = [["draw", "Draw"], ["type", "Type"], ["upload", "Image"]];
   const panels: Record<Tab, HTMLElement> = {
     draw: h("div", { class: "sm__panel", id: `${o.id}-p-draw`, attrs: { role: "tabpanel", "aria-labelledby": `${o.id}-t-draw` } }, pad, h("div", { class: "sm__row" }, clear)),
     type: h("div", { class: "sm__panel", id: `${o.id}-p-type`, hidden: true, attrs: { role: "tabpanel", "aria-labelledby": `${o.id}-t-type` } },

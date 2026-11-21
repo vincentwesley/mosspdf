@@ -10,8 +10,15 @@ const LEVELS: Record<CompressLevel, [label: string, about: string]> = {
   strong: ["Strong", "Shrinks pictures a lot. Smallest file, but photos look softer."],
 };
 
+/** Choice cards: title, one short line, optional badge. The values stay light / balanced / strong. */
+const CARDS: Record<CompressLevel, [string, string, string?]> = {
+  light: ["Best quality", "Pictures untouched."],
+  balanced: ["Balanced", "Good for email.", "Recommended"],
+  strong: ["Smaller file", "Softer photos."],
+};
+
 const ui = (ctx: Ctx) => ctx.local(() => ({
-  level: radioGroup({ name: "level", legend: "How much to shrink it", value: "balanced", testid: (v) => `level-${v}`, onChange: () => ctx.refresh(), options: (Object.keys(LEVELS) as CompressLevel[]).map((k) => [k, LEVELS[k][0]]) }),
+  level: radioGroup({ name: "level", legend: "How much to shrink it", value: "balanced", testid: (v) => `level-${v}`, onChange: () => ctx.refresh(), options: (Object.keys(LEVELS) as CompressLevel[]).map((k) => [k, CARDS[k][0], CARDS[k][1], CARDS[k][2]]) }),
   about: h("p", { class: "field__hint", attrs: { "data-testid": "level-about" } }),
 }));
 

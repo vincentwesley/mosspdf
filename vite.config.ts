@@ -66,6 +66,7 @@ function licencesTxt(): Plugin {
     ["OCR wasm: libpng", "licences/libpng.txt"], ["OCR wasm: libtiff", "licences/libtiff.txt"], ["OCR wasm: zlib", "licences/zlib.txt"],
     ["OCR wasm: libjpeg (Independent JPEG Group)", "licences/libjpeg-ijg.txt"], ["OCR wasm: libwebp", "licences/libwebp.txt"],
     ["OCR wasm: giflib", "licences/giflib.txt"], ["OCR wasm: Leptonica", "licences/leptonica.txt"],
+    ["Pixelarticons (tool icons, MIT)", "licences/pixelarticons-mit.txt"],
     ["Fonts: SIL Open Font License 1.1 (Space Grotesk, Inter, Silkscreen, JetBrains Mono, Noto Sans, Caveat, Noto Sans SC)", "src/fonts/OFL.txt"],
   ];
   return {

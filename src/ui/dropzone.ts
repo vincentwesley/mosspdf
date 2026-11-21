@@ -24,7 +24,7 @@ export function initGlobalIntake(): void {
   });
 }
 
-export function dropzone(o: { compact?: boolean; title?: string; accept?: string }): HTMLElement {
+export function dropzone(o: { compact?: boolean; title?: string; accept?: string; label?: string; hint?: string }): HTMLElement {
   const input = h("input", { type: "file", class: "sr-only", attrs: { multiple: true, accept: o.accept ?? ".pdf,application/pdf,image/*", "data-testid": "file-input", "aria-label": "Choose files", tabindex: -1 } });
   input.addEventListener("change", () => {
     const files = [...(input.files ?? [])];
@@ -34,7 +34,7 @@ export function dropzone(o: { compact?: boolean; title?: string; accept?: string
   return h("div", { class: `dz hs-card${o.compact ? " dz--compact" : ""}`, attrs: { "data-testid": "dropzone" } },
     h("div", { class: "dz__text" },
       h("p", { class: "dz__title", text: o.title ?? "Drop PDFs or images here" }),
-      h("p", { class: "dz__hint", text: "or paste them. They stay on this device." })),
+      h("p", { class: "dz__hint", text: o.hint ?? "or drop them here." })),
     input,
-    btn("Choose files", () => input.click(), { class: "hs-btn", attrs: { "data-testid": "choose-files" } }));
+    btn(o.label ?? "Choose files", () => input.click(), { class: "hs-btn", attrs: { "data-testid": "choose-files" } }));
 }
