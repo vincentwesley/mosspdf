@@ -20,7 +20,7 @@ Resume here. Plan: `docs/PLAN.md`. Checks: `docs/ACCEPTANCE.md`. Why things are 
 ## 3. Next most valuable ideas (ranked)
 1. **Repair memory**: about 3x the file size (qpdf output in MEMFS, no streaming in this build).
 2. **Traditional Chinese / Japanese / Korean text**: same switch pattern as D24, one font each (2-4 MB). Tamil needs shaping pdf-lib lacks: keep refusing.
-3. **More tools**: PDF to PDF/A, flatten forms and annotations, remove blank pages, reorder by drag across files (iLovePDF parity, all client-side).
+3. **More tools**: PDF/A (no permissive in-browser path yet, D29), reorder by drag across files.
 
 ## How to work here
 - Node 24: in PowerShell `fnm env --use-on-cd | Out-String | Invoke-Expression; fnm use 24`.

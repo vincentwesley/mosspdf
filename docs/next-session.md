@@ -23,8 +23,8 @@ Continue work on **MossPDF** (repo `vincentwesley/mosspdf`, public). Live: https
 - Text: `ops/ufont.ts` `pickFont` (Helvetica → Noto Sans → Chinese font when on), client gate `core/winansi.ts` `badChars`.
 
 ## Current state
-- v1.5.0 (2026-11-23): 30 tools + 3 workflows, palette, batch, OCR (eng, chi_sim, msa, tam), Chinese text switch, Edit PDF, Rotate, Crop, PDF to text, design pass with icons and category chips. Legal audit done (D22 no GPL, `licences.txt`, Terms). CI green on 5 browser projects.
-- Budget: main bundle 27.7 KB gzip of 28. Tool rows and icons live in main: move icon data into the tools chunk (or raise the budget with a reason) before adding more tools.
+- v1.6.0 (2026-11-23): 34 tools + 3 workflows (v1.6 added Flatten, Remove blank pages, Pages per sheet/booklet, Add blank pages, D29), drop files on a home tile, install offer, palette, batch, OCR (eng, chi_sim, msa, tam), Chinese text switch, Edit PDF. Legal audit done (D22). CI green on 5 browser projects.
+- Budget: main bundle 26.4 KB gzip of 28 (icon data moved to `ui/icondata.ts` in the tools chunk).
 
 ## Known gaps
 - Firefox offline test skipped (setOffline broken with service workers); keyboard-only tests skip on touch projects.
