@@ -30,8 +30,9 @@ import { crop } from "./crop";
 import { nup } from "./nup";
 import { addPages } from "./add-pages";
 import { pdfToText } from "./pdf-to-text";
+import { pdfToWord } from "./pdf-to-word";
 import { flatten } from "./flatten";
 import { removeBlank } from "./remove-blank";
 import type { ToolDef } from "./types";
 
-export const DEFS: ToolDef[] = [wfEmail, wfShare, wfApply, merge, split, organize, extract, imagesToPdf, pdfToImages, compress, pageNumbers, watermark, metadata, protect, unprotect, safetyScan, repair, fill, sign, ocr, redact, photo, compare, a11yCheck, edit, rotate, crop, nup, addPages, pdfToText, flatten, removeBlank];
+export const DEFS: ToolDef[] = [wfEmail, wfShare, wfApply, merge, split, organize, extract, imagesToPdf, pdfToImages, compress, pageNumbers, watermark, metadata, protect, unprotect, safetyScan, repair, fill, sign, ocr, redact, photo, compare, a11yCheck, edit, rotate, crop, nup, addPages, pdfToText, pdfToWord, flatten, removeBlank];

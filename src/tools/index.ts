@@ -38,6 +38,7 @@ export const TOOLS: ToolMeta[] = [
   { id: "nup", title: "Pages per sheet", blurb: "Put 2 or 4 pages on each sheet, or make a booklet.", group: "Organize", next: ["compress", "protect"] },
   { id: "add-pages", title: "Add blank pages", blurb: "Insert empty pages where you need them.", group: "Organize", next: ["organize", "page-numbers", "compress", "protect"] },
   { id: "pdf-to-text", title: "PDF to text", blurb: "Copy out all the text.", group: "Convert", next: [] },
+  { id: "pdf-to-word", title: "PDF to Word", blurb: "Turn the text into an editable .docx.", group: "Convert", next: [] },
 ];
 
 export const toolById = (id: string): ToolMeta | undefined => TOOLS.find((t) => t.id === id);
