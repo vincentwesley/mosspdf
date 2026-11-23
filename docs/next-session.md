@@ -25,7 +25,7 @@ Continue work on **MossPDF** (repo `vincentwesley/mosspdf`). main holds M0-M8 (a
 - M8 (D19, branch m8-power, local): palette + shortcuts (`ui/palette.ts`), workflows (`core/workflows.ts`, `tools/wf-*.ts`, `ui/steplist.ts`), `ToolDef.batch` (workspace loops `run` per file), accessibility check (`ops/a11y.ts`, `core/a11yreport.ts`). Budget main-gzip 62. Based on m6-redact.
 
 ## Known gaps
-- CI-only: mobile-safari (Linux WPE) reports an inline `style-src-elem` CSP violation (blank source, line 5) on compare intake after an earlier viewport resize in the same test. M7 tried to reproduce it: 3 runs on local mobile-safari and WebKit pass; all pdf.js documents open through `openDoc` (disableFontFace) and src/ has no style strings. Test stays `fixme` on CI mobile-safari (`e2e/shell.spec.ts`); next step is a CI run with the violation details logged (the fixture already records blockedURI/source/line).
+- Mobile-safari compare CSP report: gone by v1.5.0 (CI diagnostic logged no violations); the test runs everywhere again.
 - Firefox offline test skipped (setOffline broken with service workers, docs/spikes/csp.md); keyboard-only tests skip on touch projects.
 - Liberation Sans dropped from the pdf.js data pack (D22).
 - Main bundle budget raised to 64 KB gzip (62.2 now).

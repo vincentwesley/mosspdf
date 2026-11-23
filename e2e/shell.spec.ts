@@ -129,31 +129,9 @@ test("A-E2E-5 no horizontal overflow: image tool", async ({ page }) => {
   }
 });
 
-test("A-E2E-5 no horizontal overflow: compare with files", async ({ page }, info) => {
-  // ponytail: Linux CI mobile-safari (WPE) only reports an inline style-src-elem violation (blank source, line 5) after the two
-  // PDFs are added; passes locally on WebKit and mobile-safari and on CI webkit. M7 (Compare live): not reproducible locally on WebKit or mobile-safari (3 runs); all pdf.js documents open through openDoc (disableFontFace), no style strings in src/.
-  test.fixme(info.project.name === "mobile-safari" && !!process.env.CI, "CI-only WPE inline-style CSP report on compare intake, see docs/next-session.md");
+test("A-E2E-5 no horizontal overflow: compare with files", async ({ page }) => {
   await loadApp(page, "/#/compare");
   await input(page).setInputFiles([corpus("plain-3p"), corpus("mixed-sizes")]);
   await expect(page.getByTestId("file-label")).toHaveCount(2);
   await expectNoOverflow(page);
-});
-
-// Evidence for the fixme above: CI-only, never fails. Same intake, but violations are collected and attached in full so the next CI run names the source.
-test.describe("compare intake CSP diagnostic (CI mobile-safari)", () => {
-  test.use({ allowedErrors: [/csp-violation/] });
-  test("collect violations", async ({ page }, info) => {
-    test.skip(info.project.name !== "mobile-safari" || !process.env.CI, "diagnostic for the CI-only report");
-    await page.addInitScript(() => {
-      const v: unknown[] = ((window as unknown as { __v: unknown[] }).__v = []);
-      document.addEventListener("securitypolicyviolation", (e) => v.push({ directive: e.violatedDirective, blockedURI: e.blockedURI, sourceFile: e.sourceFile, line: e.lineNumber, column: e.columnNumber, sample: e.sample, disposition: e.disposition }), true);
-    });
-    await loadApp(page, "/#/compare");
-    await input(page).setInputFiles([corpus("plain-3p"), corpus("mixed-sizes")]);
-    await expect(page.getByTestId("file-label")).toHaveCount(2);
-    const v = await page.evaluate(() => (window as unknown as { __v: unknown[] }).__v);
-    await info.attach("csp-violations.json", { body: JSON.stringify(v, null, 2), contentType: "application/json" });
-    console.log("CSP-DIAG " + JSON.stringify(v));
-    info.annotations.push({ type: "csp-violations", description: JSON.stringify(v) });
-  });
 });
