@@ -18,10 +18,9 @@ Resume here. Plan: `docs/PLAN.md`. Checks: `docs/ACCEPTANCE.md`. Why things are 
 2. Optional EAR courtesy notice; delete the two redirect Workers when old links no longer matter.
 
 ## 3. Next most valuable ideas (ranked)
-1. **Mobile-safari compare CSP**: the CI-only diagnostic test (`e2e/shell.spec.ts`, "compare intake CSP diagnostic") attaches `csp-violations.json`; download the Playwright report artifact of a CI run to read it, then fix and drop the `fixme`.
-2. **Repair memory**: about 3x the file size (qpdf output in MEMFS, no streaming in this build).
-3. **Traditional Chinese / Japanese / Korean text**: same switch pattern as D24, one font each (2-4 MB). Tamil needs shaping pdf-lib lacks: keep refusing.
-4. **Design follow-ups (D26)**: options panels of other tools as choice cards where they are radios (split mode, PDF to images format); a result preview thumbnail.
+1. **Repair memory**: about 3x the file size (qpdf output in MEMFS, no streaming in this build).
+2. **Traditional Chinese / Japanese / Korean text**: same switch pattern as D24, one font each (2-4 MB). Tamil needs shaping pdf-lib lacks: keep refusing.
+3. **More tools**: PDF to PDF/A, flatten forms and annotations, remove blank pages, reorder by drag across files (iLovePDF parity, all client-side).
 
 ## How to work here
 - Node 24: in PowerShell `fnm env --use-on-cd | Out-String | Invoke-Expression; fnm use 24`.

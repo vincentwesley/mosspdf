@@ -73,3 +73,24 @@ export function drawBoxes(overlay: HTMLElement, onRect: (r: Rect) => void) {
     overlay.addEventListener("pointermove", move); overlay.addEventListener("pointerup", up); overlay.addEventListener("pointercancel", cancel);
   });
 }
+
+/** Adds a corner handle to `el` that drags the width and height of `r` (pointer and touch); the keyboard resizes through `wireBox`. */
+export function resizeHandle(el: HTMLElement, r: Rect, overlay: HTMLElement, onChange: () => void) {
+  const handle = h("span", { class: "sg-item__handle", attrs: { "aria-hidden": "true" } });
+  el.append(handle);
+  handle.addEventListener("pointerdown", (e) => {
+    if (e.button !== 0 && e.pointerType === "mouse") return;
+    e.preventDefault(); e.stopPropagation();
+    el.focus();
+    handle.setPointerCapture(e.pointerId);
+    const b = overlay.getBoundingClientRect();
+    const start = { px: e.clientX, py: e.clientY, w: r.w, h: r.h };
+    const move = (m: PointerEvent) => {
+      r.w = clamp(start.w + (m.clientX - start.px) / b.width, 0.01, 1 - r.x);
+      r.h = clamp(start.h + (m.clientY - start.py) / b.height, 0.01, 1 - r.y);
+      place(el, r); onChange();
+    };
+    const up = () => { handle.removeEventListener("pointermove", move); handle.removeEventListener("pointerup", up); handle.removeEventListener("pointercancel", up); };
+    handle.addEventListener("pointermove", move); handle.addEventListener("pointerup", up); handle.addEventListener("pointercancel", up);
+  });
+}

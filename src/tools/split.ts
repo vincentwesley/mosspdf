@@ -11,7 +11,7 @@ type Mode = "ranges" | "every" | "size";
 const ui = (ctx: Ctx) => ctx.local(() => ({
   mode: radioGroup({
     name: "mode", legend: "How to split", value: "ranges", testid: (v) => `mode-${v}`, onChange: () => ctx.refresh(),
-    options: [["ranges", "By page ranges"], ["every", "Every N pages"], ["size", "By file size"]],
+    options: [["ranges", "By page ranges", "You choose the pages for each file."], ["every", "Every N pages", "Equal parts, for example every 2 pages."], ["size", "By file size", "Keeps each file under a size limit."]],
   }),
   ranges: textField({ id: "ranges", label: "Page ranges. Each range becomes its own file.", placeholder: "1-3, 5, 8-", testid: "range-input", msgTestId: "range-msg", reserve: true, onInput: () => ctx.refresh() }),
   every: numberField({ id: "every", label: "Pages per file", value: 2, min: 1, testid: "every-input", onInput: () => ctx.refresh() }),

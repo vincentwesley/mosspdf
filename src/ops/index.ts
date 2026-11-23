@@ -21,3 +21,9 @@ export { compareReport } from "./report";
 export { redact, type RedactInput, type RedactPage } from "./redact";
 // M8: accessibility check
 export { accessibilityCheck, type A11yCheck, type A11yReport, type A11yStatus } from "./a11y";
+
+// Edit PDF
+export { editPages, type EditInput, type EditItem } from "./edit";
+// Tools 3: rotate, crop
+export { rotatePages, type RotateOptions } from "./rotate";
+export { cropPages, type CropOptions } from "./crop";

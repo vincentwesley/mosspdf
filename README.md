@@ -8,9 +8,9 @@ Free, private PDF tools that run entirely in your browser. Files never leave you
 
 ## Tools
 
-- **Organize:** merge, split, organize pages (reorder, rotate, delete), extract pages
-- **Convert:** images to PDF, PDF to images, compress
-- **Edit:** page numbers, watermark, metadata, accessibility check
+- **Organize:** merge, split, organize pages (reorder, rotate, delete), extract pages, rotate PDF (quick turn, batch)
+- **Convert:** images to PDF, PDF to images, PDF to text, compress
+- **Edit:** edit PDF (add text, white-out, highlight, rectangle, line), page numbers, watermark, crop (hides the edges; use Redact to remove content), metadata, accessibility check
 - **Protect:** add or remove a password (only with the correct password), safety scan with a cleaned copy, repair
 - **Fill and sign:** fill form fields, sign (draw, type or upload; a visual signature, not a certified one)
 - **OCR:** make scans searchable (English, Chinese (Simplified), Malay, Tamil)
