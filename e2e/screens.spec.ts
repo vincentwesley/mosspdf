@@ -44,6 +44,8 @@ const SCENES: { name: string; widths: number[]; open: (p: Page) => Promise<void>
   { name: "palette", widths: [375, 1280], open: async (p) => { await loadApp(p); await p.getByTestId("palette-open").click(); await p.getByTestId("palette-input").fill("s"); await p.waitForTimeout(500); } },
   { name: "wf-share", widths: [375, 1280], open: async (p) => { await loadApp(p, "/#/wf-share"); await add(p, "risk-everything"); await expect(p.locator('[data-testid="file-row"][data-status="ready"]')).toHaveCount(1); await p.getByTestId("primary-action").click(); await p.getByTestId("results").waitFor({ timeout: 60_000 }); await p.waitForTimeout(400); } },
   { name: "a11y-check", widths: [375, 1280], open: async (p) => { await loadApp(p, "/#/a11y-check"); await add(p, "plain-3p"); await p.getByTestId("a11y-summary").waitFor({ timeout: 30_000 }); await p.waitForTimeout(400); } },
+  ...["flatten", "remove-blank", "nup", "add-pages", "pdf-to-word", "bookmarks"].map((id) => ({ name: id, widths: [375, 1280], open: async (p: Page) => { await loadApp(p, `/#/${id}`); await add(p, id === "bookmarks" ? "outline" : "plain-3p"); await expect(p.getByTestId(id === "bookmarks" ? "bm-row" : "file-meta").first()).toBeVisible({ timeout: 20_000 }); await p.waitForTimeout(800); } })),
+  { name: "edit-empty", widths: [375, 1280], open: async (p) => { await loadApp(p, "/#/edit"); await add(p, "plain-3p"); await drawn(p); } },
   { name: "locked", widths: [375, 1280], open: async (p) => { await loadApp(p, "/#/organize"); await add(p, "encrypted-aes256"); await expect(p.locator('[data-status="locked"]')).toHaveCount(1); } },
 ];
 
