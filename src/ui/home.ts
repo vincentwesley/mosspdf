@@ -37,8 +37,25 @@ export function homeView(navigate: (hash: string) => void): { el: HTMLElement; d
   };
   setFilesHandler(intake);
 
-  const tile = (t: ToolMeta) => h("li", { class: "tile" }, h("a", { class: "tile__in hs-card", attrs: { href: `#/${t.id}`, "data-testid": `tile-${t.id}` } },
-    toolBox(t.id), h("span", { class: "tile__txt" }, h("span", { class: "tile__title", text: t.title }), h("span", { class: "tile__blurb", text: t.blurb }))));
+  // Dropping files on a tile loads them (same store path as the chooser) and opens that tool.
+  const tile = (t: ToolMeta) => {
+    const a = h("a", { class: "tile__in hs-card", attrs: { href: `#/${t.id}`, "data-testid": `tile-${t.id}`, "data-drop": `Drop to open in ${t.title}` } },
+      toolBox(t.id), h("span", { class: "tile__txt" }, h("span", { class: "tile__title", text: t.title }), h("span", { class: "tile__blurb", text: t.blurb })));
+    const has = (e: DragEvent) => [...(e.dataTransfer?.types ?? [])].includes("Files");
+    const over = (e: DragEvent) => { if (has(e)) { e.preventDefault(); e.stopPropagation(); a.classList.add("is-drop"); } };
+    a.addEventListener("dragenter", over);
+    a.addEventListener("dragover", over);
+    a.addEventListener("dragleave", (e) => { if (!a.contains(e.relatedTarget as Node | null)) a.classList.remove("is-drop"); });
+    a.addEventListener("drop", (e) => {
+      if (!has(e)) return;
+      e.preventDefault(); e.stopPropagation();
+      a.classList.remove("is-drop");
+      document.body.classList.remove("is-dropping");
+      const files = [...(e.dataTransfer?.files ?? [])];
+      if (files.length) void store.add(files, files.some(isPdfFile) ? "pdf" : "any").then(() => navigate(`#/${t.id}`));
+    });
+    return h("li", { class: "tile" }, a);
+  };
 
   const groups = CATALOG.map((g, i) => {
     const items = g.tools.map((t) => ({ t, li: tile(t) }));

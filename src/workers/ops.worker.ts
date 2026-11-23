@@ -7,8 +7,8 @@ import type { OcrPage } from "../ops";
 import { compareReport, editPages, fillForm, readForm, stampPage } from "../ops";
 import type { ReportData } from "../core/compare";
 import type { EditInput, FormValues, StampInput } from "../ops";
-import { redact, accessibilityCheck, rotatePages, cropPages } from "../ops";
-import type { RotateOptions, CropOptions } from "../ops";
+import { redact, accessibilityCheck, rotatePages, cropPages, flatten, nupPages, addBlankPages } from "../ops";
+import type { RotateOptions, CropOptions, FlattenOptions, NupOptions, AddPagesOptions } from "../ops";
 import type { RedactInput } from "../ops";
 import type { CleanOptions, ProtectOptions, UnprotectOptions } from "../ops/types-m3";
 import { createEngines } from "../engines";
@@ -59,6 +59,9 @@ serve({
   accessibilityCheck: ({ file }: { file: InFile }) => accessibilityCheck(file, eng()),
   rotatePages: async ({ file, options, o }: { file: InFile; options: RotateOptions; o: O }, ctx) => out(await rotatePages(file, options, opts(o, ctx), eng())),
   cropPages: async ({ file, options, o }: { file: InFile; options: CropOptions; o: O }, ctx) => out(await cropPages(file, options, opts(o, ctx), eng())),
+  flatten: async ({ file, options, o }: { file: InFile; options: FlattenOptions; o: O }, ctx) => out(await flatten(file, options, opts(o, ctx), eng())),
+  nupPages: async ({ file, options, o }: { file: InFile; options: NupOptions; o: O }, ctx) => out(await nupPages(file, options, opts(o, ctx), eng())),
+  addBlankPages: async ({ file, options, o }: { file: InFile; options: AddPagesOptions; o: O }, ctx) => out(await addBlankPages(file, options, opts(o, ctx), eng())),
   ...m7,
   ...edit,
   ...m6,

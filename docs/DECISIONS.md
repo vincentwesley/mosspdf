@@ -179,3 +179,13 @@ Symptom: a `worker-src` CSP violation on page load in Firefox, seen twice in a f
 - **Crop PDF** (`ops/crop.ts`): margins in mm measured on the page as displayed; the op converts them to user space with `view`/`toUser` from `stamp.ts` (so `/Rotate` and an existing CropBox are honoured) and sets CropBox and TrimBox. MediaBox is untouched, so the cut-off content stays in the file; the UI says so and links Redact. A margin that leaves less than 18 pt is refused. Preview is one canvas of the first chosen page with a shaded overlay, not the shared page viewer (which draws every page).
 - **PDF to text** (`core/pagetext.ts`, `tools/pdf-to-text.ts`): pdf.js `getTextContent` on the main thread (as Compare), items joined with `hasEOL` as line ends, `--- Page N ---` separators. Pages without text keep their separator; the tool then suggests OCR. Preview is capped at 100,000 characters; Copy and the download carry everything.
 - No new dependencies; one icon glyph each from Pixelarticons (reload, crop, file-text).
+
+## D29. Flatten, blank pages, pages per sheet, add pages, tile drop (2026-11-23)
+- Research scan (iLovePDF, Smallpdf, PDF24, Stirling-PDF, BentoPDF): BentoPDF is AGPL (ideas only), Stirling is server-side. PDF/A deferred: no permissive in-browser path (Ghostscript/MuPDF are AGPL/GPL).
+- **Flatten** (`ops/flatten.ts`): pdf-lib `form.flatten()`; annotations draw their /AP /N (or /AS state) as a form XObject mapped Matrix/BBox → Rect (spec 12.5.5), then are removed. Link, Popup and hidden annotations stay; odd appearance streams are skipped, not guessed.
+- **Remove blank pages** (`ops/blank.ts`): pages rendered at 160 px, ink ratio of non-near-white pixels against a per-sensitivity limit; refuses to remove every page; output via the existing `assemble` op.
+- **Pages per sheet** (`ops/nup.ts`): pdf-lib `embedPages`, scale-to-fit in each cell with a 10 pt inset; booklet pads to a multiple of 4 and imposes for short-edge duplex. Pages without a content stream get an empty one first (embedding crashed otherwise).
+- **Add blank pages** (`ops/addpages.ts`): before, after, after every page or after page N; size copies the neighbouring page.
+- Icons: path data in `ui/icondata.ts`, imported by `tools/all.ts`; `toolBox` in main draws an empty box and fills it on `setIcons()`, so no layout shift.
+- Home tiles accept dropped files (same `store.add` path as the chooser). Install offer listens for `beforeinstallprompt`; dismissal stored in `mosspdf.install-dismissed`.
+
