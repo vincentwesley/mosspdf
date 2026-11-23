@@ -40,6 +40,7 @@ export const TOOLS: ToolMeta[] = [
   { id: "bookmarks", title: "Bookmarks", blurb: "Add, rename or remove the bookmarks list.", group: "Edit", next: ["compress", "protect", "page-numbers", "organize", "watermark"] },
   { id: "pdf-to-text", title: "PDF to text", blurb: "Copy out all the text.", group: "Convert", next: [] },
   { id: "pdf-to-word", title: "PDF to Word", blurb: "Turn the text into an editable .docx.", group: "Convert", next: [] },
+  { id: "pdf-to-excel", title: "PDF to Excel", blurb: "Pull tables out into a spreadsheet.", group: "Convert", next: [] },
 ];
 
 export const toolById = (id: string): ToolMeta | undefined => TOOLS.find((t) => t.id === id);
