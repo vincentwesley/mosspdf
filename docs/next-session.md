@@ -23,10 +23,12 @@ Continue work on **MossPDF** (repo `vincentwesley/mosspdf`, public). Live: https
 - Text: `ops/ufont.ts` `pickFont` (Helvetica → Noto Sans → Chinese font when on), client gate `core/winansi.ts` `badChars`.
 
 ## Current state
+- **Open: PR #20 = v1.8.0** (branch `v180`: PDF to Excel, Extract images, split by bookmarks, header/footer text, design pass; D32 + CHANGELOG already on the branch, version 1.8.0). Local check + e2e (211) green; CI was running at hand-off. Next: `gh pr checks 20` → merge → deploy → smoke → release v1.8.0 → update this file.
 - v1.7.0 (2026-11-23): 36 tools + 3 workflows. v1.6 added Flatten, Remove blank pages, Pages per sheet, Add blank pages, tile drop, install offer (D29); v1.7 added PDF to Word, Bookmarks (+ Merge bookmark per file), Traditional Chinese/Japanese/Korean text (D30), Edit PDF pictures, undo/redo, bold (D31). CI green on 5 browser projects.
 - Budget: main bundle 26.8 KB gzip of 28 (icon data lives in `ui/icondata.ts`, tools chunk). Home-phone height cap 4800.
 
 ## Known gaps
+- Local e2e can hang silently (seen twice: webkit worker stalls). Always run with `timeout 1300 ... --global-timeout=1200000` and check on it; heavy unit suites (compress, pwd) time out when e2e runs at the same time.
 - Firefox offline test skipped (setOffline broken with service workers); keyboard-only tests skip on touch projects.
 - Repair uses about 3x the file size in memory (no streaming output in this qpdf build).
 - Logo drag-hint test (`e2e/logo.spec.ts`) is occasionally flaky on webkit (passes on retry).
