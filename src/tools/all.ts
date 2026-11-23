@@ -1,4 +1,5 @@
 // The code of every tool, one chunk. Loaded by main.ts before the seal so nothing is fetched afterwards (D25).
+import "../ui/icondata";
 import { merge } from "./merge";
 import { split } from "./split";
 import { organize } from "./organize";
