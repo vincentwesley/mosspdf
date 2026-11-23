@@ -9,10 +9,11 @@ export function place(el: HTMLElement, r: Rect) {
   el.style.left = `${r.x * 100}%`; el.style.top = `${r.y * 100}%`; el.style.width = `${r.w * 100}%`; el.style.height = `${r.h * 100}%`;
 }
 
-/** Makes `el` (already in `overlay`) draggable and keyboard-operable; `r` is edited in place. */
-export function wireBox(el: HTMLElement, r: Rect, overlay: HTMLElement, o: { onChange: () => void; onDelete: () => void }) {
+/** Makes `el` (already in `overlay`) draggable and keyboard-operable; `r` is edited in place. `ratio` (w / h in page fractions) locks the shape. */
+export function wireBox(el: HTMLElement, r: Rect, overlay: HTMLElement, o: { onChange: () => void; onDelete: () => void; ratio?: number }) {
   const apply = () => {
     r.w = clamp(r.w, 0.01, 1); r.h = clamp(r.h, 0.01, 1);
+    if (o.ratio) { r.w = clamp(r.w, 0.01, Math.min(1, o.ratio)); r.h = r.w / o.ratio; }
     r.x = clamp(r.x, 0, 1 - r.w); r.y = clamp(r.y, 0, 1 - r.h);
     place(el, r);
     o.onChange();
@@ -75,7 +76,7 @@ export function drawBoxes(overlay: HTMLElement, onRect: (r: Rect) => void) {
 }
 
 /** Adds a corner handle to `el` that drags the width and height of `r` (pointer and touch); the keyboard resizes through `wireBox`. */
-export function resizeHandle(el: HTMLElement, r: Rect, overlay: HTMLElement, onChange: () => void) {
+export function resizeHandle(el: HTMLElement, r: Rect, overlay: HTMLElement, onChange: () => void, ratio?: number) {
   const handle = h("span", { class: "sg-item__handle", attrs: { "aria-hidden": "true" } });
   el.append(handle);
   handle.addEventListener("pointerdown", (e) => {
@@ -88,6 +89,7 @@ export function resizeHandle(el: HTMLElement, r: Rect, overlay: HTMLElement, onC
     const move = (m: PointerEvent) => {
       r.w = clamp(start.w + (m.clientX - start.px) / b.width, 0.01, 1 - r.x);
       r.h = clamp(start.h + (m.clientY - start.py) / b.height, 0.01, 1 - r.y);
+      if (ratio) { r.w = clamp(r.w, 0.01, Math.min(1 - r.x, (1 - r.y) * ratio)); r.h = r.w / ratio; }
       place(el, r); onChange();
     };
     const up = () => { handle.removeEventListener("pointermove", move); handle.removeEventListener("pointerup", up); handle.removeEventListener("pointercancel", up); };

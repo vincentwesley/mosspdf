@@ -36,3 +36,32 @@ test("A-E2E-1 add text, white-out and a highlight, save, the text reads back; De
   expect(raw).toContain("1 1 1 rg");
   expect(raw).toMatch(/\/BM\s*\/Multiply/);
 });
+
+test("A-E2E-2 add a picture, Undo removes it, Redo brings it back, it saves as an image", async ({ page }) => {
+  await loadApp(page, "/#/edit");
+  await page.getByTestId("file-input").setInputFiles(resolve("tests/corpus/generated/plain-3p.pdf"));
+  await expect(page.locator('[data-testid="file-row"][data-status="ready"]')).toHaveCount(1);
+  await page.getByTestId("ed-kind-image").check();
+  await page.getByTestId("ed-pic").setInputFiles({ name: "x.txt", mimeType: "text/plain", buffer: Buffer.from("no") });
+  await expect(page.getByTestId("ed-pic-msg")).toContainText("not a JPG, PNG or WebP");
+  await page.getByTestId("ed-pic").setInputFiles(resolve("tests/corpus/generated/photo-alpha.png"));
+  await expect(page.getByTestId("ed-pic-msg")).toContainText("Picture ready");
+  await expect(page.getByTestId("ed-undo")).toBeDisabled();
+  await overlay(page).click({ position: { x: 150, y: 250 } });
+  await expect(page.getByTestId("sg-item")).toHaveCount(1);
+  await expect(page.getByTestId("ed-row")).toContainText("Picture, page 1");
+  await page.getByTestId("ed-undo").click();
+  await expect(page.getByTestId("sg-item")).toHaveCount(0);
+  await expect(page.getByTestId("ed-row")).toHaveCount(0);
+  await page.getByTestId("ed-redo").click();
+  await expect(page.getByTestId("sg-item")).toHaveCount(1);
+  await page.getByTestId("sg-item").press("Delete");
+  await expect(page.getByTestId("sg-item")).toHaveCount(0);
+  await page.getByTestId("ed-place").focus();
+  await page.keyboard.press("Control+z");
+  await expect(page.getByTestId("sg-item")).toHaveCount(1);
+  await page.getByTestId("primary-action").click();
+  const dl = await downloadAndCheck(page, () => page.getByTestId("result-download").click());
+  expect(qpdfCheck(dl.path).ok).toBe(true);
+  expect(dl.bytes.toString("latin1")).toMatch(/\/Subtype\s*\/Image/);
+});
