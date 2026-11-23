@@ -3,6 +3,7 @@
 All notable changes to this project are documented here. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
+- Choice cards for Split mode and PDF to images (picture type, sharpness); the result card shows a small local preview of page 1 or the first picture.
 
 ## [1.4.0] - 2026-11-21
 - Design pass (D26): an icon for every tool, category chips and a three-step cue on home, a larger add-files button, choice cards for Compress, a clearer result card and Chinese text switch.
