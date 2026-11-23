@@ -17,7 +17,7 @@ const ui = (ctx: Ctx) => ctx.local(() => {
   const s = { full: "", area, copy, scan, more, key: "", root: h("div", { class: "ptt", hidden: true, attrs: { "data-testid": "ptt" } }, scan, area, more, h("div", { class: "ptt__row" }, copy)) };
   copy.addEventListener("click", () => {
     const done = () => { copy.textContent = "Copied"; announce("Text copied."); setTimeout(() => (copy.textContent = "Copy text"), 1500); };
-    navigator.clipboard.writeText(s.full).then(done, () => { area.value = s.full; area.select(); document.execCommand("copy"); done(); });
+    navigator.clipboard.writeText(s.full).then(done, () => { const t = h("textarea", { class: "sr-only", attrs: { readonly: true, "aria-hidden": "true" } }); t.value = s.full; document.body.append(t); t.select(); document.execCommand("copy"); t.remove(); done(); });
   });
   return s;
 });

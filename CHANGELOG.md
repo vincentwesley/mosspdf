@@ -3,6 +3,8 @@
 All notable changes to this project are documented here. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
+
+## [1.5.0] - 2026-11-23
 - Edit PDF (D27): add text (Unicode, Chinese when on), white-out, highlight, rectangle and line to pages; white-out only covers, with a link to Redact.
 - Three small tools (D28): Rotate PDF (all or chosen pages, batch), Crop PDF (margins in mm with a live preview; hides edges, content stays in the file) and PDF to text (.txt download, preview and copy).
 - Choice cards for Split mode and PDF to images (picture type, sharpness); the result card shows a small local preview of page 1 or the first picture.

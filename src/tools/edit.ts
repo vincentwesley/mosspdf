@@ -160,7 +160,9 @@ const ui = (ctx: Ctx) => ctx.local(() => {
   }
 
   function remove(it: Item): void {
-    s.items.splice(s.items.indexOf(it), 1);
+    const i = s.items.indexOf(it);
+    if (i < 0) return;
+    s.items.splice(i, 1);
     s.els.get(it.id)?.remove();
     s.els.delete(it.id);
     renderList();
