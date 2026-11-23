@@ -4,6 +4,12 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 
 ## [Unreleased]
 
+## [1.7.0] - 2026-11-23
+- PDF to Word (D31): text, paragraphs and headings into an editable .docx, written in the browser (layout, tables and pictures are not kept).
+- Bookmarks tool (D31): read, add, rename, nest, reorder and remove bookmarks, or one per page. Merge now adds a bookmark for each file and keeps each file's own bookmarks under it.
+- Traditional Chinese, Japanese and Korean text (D30): the footer switch is now "Extra text" with one font at a time.
+- Edit PDF: add pictures (JPG, PNG, WebP), undo and redo (buttons and Ctrl+Z / Ctrl+Shift+Z), bold text and white text.
+
 ## [1.6.0] - 2026-11-23
 - Four new tools (D29): Flatten PDF (forms, or forms and annotations baked into the page), Remove blank pages (pick a sensitivity, see the pages before they go), Pages per sheet (2 or 4 per sheet, or a fold-in-half booklet) and Add blank pages.
 - Drop files straight onto a tool on the home page to open them in it.

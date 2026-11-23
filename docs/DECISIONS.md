@@ -189,3 +189,13 @@ Symptom: a `worker-src` CSP violation on page load in Firefox, seen twice in a f
 - Icons: path data in `ui/icondata.ts`, imported by `tools/all.ts`; `toolBox` in main draws an empty box and fills it on `setIcons()`, so no layout shift.
 - Home tiles accept dropped files (same `store.add` path as the chooser). Install offer listens for `beforeinstallprompt`; dismissal stored in `mosspdf.install-dismissed`.
 
+## D30. Traditional Chinese, Japanese, Korean text (2026-11-23)
+- The D24 switch became one choice, "Extra text": Off / Simplified Chinese / Traditional Chinese / Japanese / Korean (`mosspdf.text-lang`; old `mosspdf.text-zh`=1 migrates to Simplified). One font at a time, chosen by reload so it loads before the seal and goes to the ops `init` message. Not precached (D16).
+- Noto Sans TC/JP/KR (OFL-1.1) from google/fonts, instanced at wght 400 and cut with `scripts/subset-cjk.py sc|tc|jp|kr`: TC Big5 level 1 (~5,400 hanzi, 1.9 MB), JP JIS X 0208 (2.2 MB), KR all 11,172 Hangul syllables + jamo (2.4 MB). These builds declare the RFN "Source", so they are renamed "MossPDF Sans TC/JP/KR" like SC.
+- `pickFont` order unchanged (Helvetica, Noto Sans, then the loaded CJK font); `badChars` keeps one font per text using the chosen language's ranges.
+
+## D31. PDF to Word, bookmarks, Edit PDF upgrades (2026-11-23)
+- **PDF to Word** (`core/docx.ts`): pdf.js text items → lines → paragraphs (gap and indent), headings by size against the page's median; a minimal DOCX (content types, rels, document, styles) zipped with fflate, all text XML-escaped. Bold/italic only when the font name says so (pdf.js usually hides it). No new dependency.
+- **Bookmarks** (`ops/outline.ts`): reads /Outlines (incl. named dests), writes a fresh tree with UTF-16 titles and `/PageMode /UseOutlines`. Merge writes one bookmark per file and nests each file's bookmarks under it with remapped pages; files whose outline can't be read (encrypted) keep the `outline-dropped` warning. Old outline objects are left orphaned (harmless).
+- **Edit PDF**: pictures reuse the sign upload path (type check, 15 MB cap, 2400 px downscale, canvas preview); undo/redo is a 50-step snapshot stack, moves within 0.6 s merge into one step; bold uses Helvetica-Bold and is disabled for text that needs Noto or CJK fonts.
+
