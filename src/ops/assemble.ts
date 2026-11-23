@@ -1,5 +1,6 @@
 ﻿// Page assembly (merge, split, extract, reorder, rotate, delete) via qpdf `--empty --pages`, then a pdf-lib metadata pass. See D10.
 import { PDFDocument } from "@cantoo/pdf-lib";
+import { prepare } from "./common";
 import { checkAbort, classify, openPdf, type Opened } from "./open";
 import { readOutlineItems, writeOutlineItems, type BookmarkItem } from "./outline";
 import { parseRanges } from "./ranges";
@@ -152,6 +153,28 @@ export async function merge(files: InFile[], o: OpOptions, e: Engines, mo: { boo
   return res;
 }
 
+/** A file name from a bookmark title: no path or reserved characters, at most 80 long, never empty. */
+// eslint-disable-next-line no-control-regex -- control characters are exactly what a file name must not have
+export const titleName = (t: string) => t.replace(/[\\/:*?"<>|\x00-\x1f\x7f]+/g, " ").replace(/\s+/g, " ").trim().slice(0, 80).replace(/[. ]+$/, "") || "Untitled";
+
+/** Top-level bookmarks with a page become parts: from their page to the page before the next one (0-based). Names are unique, case-insensitive. */
+export function bookmarkParts(items: BookmarkItem[], count: number): { name: string; pages: number[] }[] {
+  const tops = items.filter((it) => it.level === 0 && it.page !== null && it.page >= 1 && it.page <= count).sort((a, b) => a.page! - b.page!);
+  const used = new Set<string>();
+  const parts: { name: string; pages: number[] }[] = [];
+  tops.forEach((it, i) => {
+    const start = it.page! - 1;
+    const end = (tops[i + 1]?.page ?? count + 1) - 1; // exclusive; two bookmarks on one page leave the first empty, so it is skipped
+    if (end <= start) return;
+    const base = titleName(it.title);
+    let name = base;
+    for (let n = 2; used.has(name.toLowerCase()); n++) name = `${base} ${n}`;
+    used.add(name.toLowerCase());
+    parts.push({ name, pages: Array.from({ length: end - start }, (_, k) => start + k) });
+  });
+  return parts;
+}
+
 export async function split(file: InFile, mode: SplitMode, o: OpOptions, e: Engines): Promise<OpResult[]> {
   validate([file], [{ source: 0, page: 0, rotate: 0 }]);
   const opened = [await openPdf(file, e, o.signal)];
@@ -166,6 +189,16 @@ export async function split(file: InFile, mode: SplitMode, o: OpOptions, e: Engi
   else if (mode.kind === "every") {
     if (!Number.isInteger(mode.n) || mode.n < 1) throw new PdfError("unsupported", "Enter how many pages each file should have (1 or more).");
     for (let i = 0; i < count; i += mode.n) groups.push(Array.from({ length: Math.min(mode.n, count - i) }, (_, k) => i + k));
+  }
+  if (mode.kind === "bookmarks") {
+    const p = await prepare(file, o, e);
+    const parts = bookmarkParts(readOutlineItems(await PDFDocument.load(p.bytes, { updateMetadata: false })).items, count);
+    if (!parts.length) throw new PdfError("unsupported", `"${file.name}" has no top-level bookmarks that point to a page, so there is nothing to split by.`, file.name);
+    for (const [i, g] of parts.entries()) {
+      out.push(await build([file], opened, spec(g.pages), `${g.name}.pdf`, o, e));
+      o.onProgress?.(i + 1, parts.length);
+    }
+    return out;
   }
   if (mode.kind !== "size") {
     for (const [i, g] of groups.entries()) {
