@@ -36,7 +36,7 @@ const clamp = (n: number, lo: number, hi: number) => Math.min(Math.max(n, lo), M
 
 /** Where the baseline sits in a 1.2-line-high box of the text font, as a fraction of its size (browsers differ, so it is measured). */
 let blRatio: number | undefined;
-function baselineRatio() {
+export function baselineRatio() {
   if (blRatio === undefined) {
     const m = document.createElement("canvas").getContext("2d")!;
     m.font = "100px Helvetica, Arial, sans-serif";

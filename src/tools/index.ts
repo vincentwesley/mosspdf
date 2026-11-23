@@ -30,6 +30,7 @@ export const TOOLS: ToolMeta[] = [
   { id: "photo", title: "Photo clean", blurb: "Strip location and details.", group: "Privacy" },
   { id: "compare", title: "Compare", blurb: "Spot what changed.", group: "Compare", next: [] },
   { id: "a11y-check", title: "Accessibility check", blurb: "Basic check of screen-reader signals in a PDF.", group: "Edit" },
+  { id: "edit", title: "Edit PDF", blurb: "Add text, highlights and shapes.", group: "Edit", next: ["sign", "compress", "protect"] },
 ];
 
 export const toolById = (id: string): ToolMeta | undefined => TOOLS.find((t) => t.id === id);

@@ -535,3 +535,10 @@ kbd { font: 600 0.85rem var(--font-mono); padding: 0.1rem 0.4rem; background: va
 }
 @media (max-width: 40rem) { .chips { flex-wrap: nowrap; overflow-x: auto; padding-bottom: var(--s2); scrollbar-width: thin; } .chip { flex: none; } }
 @media (max-width: 25rem) { .tile__in { min-height: 5.5rem; } }
+/* ---- Edit PDF (shares the sign layout) ---- */
+.ed-whiteout { background: #fff; outline: 1px dashed #777; box-sizing: border-box; }
+.ed-highlight { background: rgb(255 235 51 / 0.45); mix-blend-mode: multiply; box-sizing: border-box; }
+.ed-rect { box-sizing: border-box; border: 2px solid #000; }
+.ed-line__svg { display: block; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.ed-line__svg line { stroke-linecap: round; }
+.ed .sg-list:empty::before { content: "Nothing added yet."; }

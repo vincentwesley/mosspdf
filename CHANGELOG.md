@@ -3,6 +3,7 @@
 All notable changes to this project are documented here. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
+- Edit PDF (D27): add text (Unicode, Chinese when on), white-out, highlight, rectangle and line to pages; white-out only covers, with a link to Redact.
 
 ## [1.4.0] - 2026-11-21
 - Design pass (D26): an icon for every tool, category chips and a three-step cue on home, a larger add-files button, choice cards for Compress, a clearer result card and Chinese text switch.
