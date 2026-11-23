@@ -53,4 +53,4 @@ export interface Inspection {
   title?: string;
   repaired: boolean;
 }
-export type SplitMode = { kind: "ranges"; ranges: string } | { kind: "every"; n: number } | { kind: "size"; maxBytes: number };
+export type SplitMode = { kind: "ranges"; ranges: string } | { kind: "every"; n: number } | { kind: "size"; maxBytes: number } | { kind: "bookmarks" };

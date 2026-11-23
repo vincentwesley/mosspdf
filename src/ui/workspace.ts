@@ -267,7 +267,7 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
     const change = delta > 0 ? `Saved ${delta}%.` : "";
     const single = results.length === 1 && /\.pdf$/i.test(results[0].name);
     const next = single ? nextTools(tool) : [];
-    const zipName = `${stem(ctx.file?.name ?? "mosspdf")}-${tool.id}.zip`;
+    const zipName = `${stem(ctx.file?.name ?? "mosspdf")}-${tool.zipSuffix ?? tool.id}.zip`;
     resultBox.append(
       h("h2", { id: "res-h", text: results.length > 1 ? `Done. ${results.length} files are ready.` : "Done. Your file is ready.", attrs: { tabindex: -1 } }),
       ...(tool.summary ? [h("p", { class: "res__sum", text: tool.summary(ctx), attrs: { "data-testid": "result-summary" } })] : inBytes ? [h("p", { class: "res__sum", text: `${fmtSize(inBytes)} → ${fmtSize(outBytes)}. ${change}`.trim(), attrs: { "data-testid": "result-summary" } })] : []),
