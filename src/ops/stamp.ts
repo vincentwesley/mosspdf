@@ -11,10 +11,14 @@ export type NumberPosition = "bottom-left" | "bottom-center" | "bottom-right" | 
 export interface PageNumberOptions {
   pages?: number[]; // 0-based; default every page
   position?: NumberPosition; // default bottom-center
-  format?: string; // {n} and {total}; default "{n}"
+  format?: string; // {n}, {total}, {date}, {file}; default "{n}"
   startAt?: number; // number shown on the first selected page; default 1. {total} is the last number shown.
   fontSize?: number; // pt, default 10
   margin?: number; // pt from the visible edge, default 36
+  mirror?: boolean; // swap left and right on even pages (printed books)
+  allowPlain?: boolean; // header/footer text may have no token at all
+  date?: string; // {date}; default today, locale-short
+  fileName?: string; // {file}; default the input name without .pdf
 }
 export interface WatermarkOptions {
   text: string;
@@ -103,7 +107,7 @@ function stampPage(doc: PDFDocument, page: PDFPage, font: PDFFont, s: Stamp) {
   }
 }
 
-async function run(file: InFile, pages: number[] | undefined, text: string, what: string, o: OpOptions, e: Engines, make: (doc: PDFDocument, n: number) => (i: number) => Stamp): Promise<OpResult> {
+async function run(file: InFile, pages: number[] | undefined, text: string, what: string, o: OpOptions, e: Engines, make: (doc: PDFDocument, n: number) => (k: number, i: number) => Stamp): Promise<OpResult> {
   const p = await prepare(file, o, e);
   const sel = selectPages(pages, p.info, file);
   const doc = await PDFDocument.load(p.bytes, { updateMetadata: false });
@@ -113,7 +117,7 @@ async function run(file: InFile, pages: number[] | undefined, text: string, what
   const all = doc.getPages();
   for (const [k, i] of sel.entries()) {
     if (k % 25 === 0) checkAbort(o.signal);
-    stampPage(doc, all[i], font, stamp(k));
+    stampPage(doc, all[i], font, stamp(k, i));
     o.onProgress?.(k + 1, sel.length);
   }
   if (o.producerCredit) applyCredit(doc);
@@ -127,19 +131,26 @@ export async function addPageNumbers(file: InFile, opts: PageNumberOptions, o: O
   const margin = num(opts.margin, 36, 0, 300, "The margin");
   const start = num(opts.startAt, 1, -9999, 999999, "The first number");
   if (!Number.isInteger(start)) throw new PdfError("unsupported", "The first number must be a whole number.");
-  if (!/\{n\}|\{total\}/.test(format)) throw new PdfError("unsupported", "The format needs {n} in it, for example \"Page {n} of {total}\".");
+  const date = opts.date ?? new Date().toLocaleDateString(undefined, { dateStyle: "short" });
+  const name = opts.fileName ?? file.name.replace(/\.pdf$/i, "");
+  if (!opts.allowPlain && !/\{n\}|\{total\}/.test(format)) throw new PdfError("unsupported", "The format needs {n} in it, for example \"Page {n} of {total}\".");
+  if (!format.trim()) throw new PdfError("unsupported", "Enter the text first.");
+  const fill = (n: string, total: string) => format.replace(/\{n\}/g, n).replace(/\{total\}/g, total).replace(/\{date\}/g, () => date).replace(/\{file\}/g, () => name);
   const [vert, horiz] = position.split("-") as ["top" | "bottom", "left" | "center" | "right"];
-  return await run(file, opts.pages, format.replace(/\{n\}|\{total\}/g, "0"), "The format", o, e, (_doc, count) => {
-    return (k) => ({
-      text: format.replace(/\{n\}/g, String(start + k)).replace(/\{total\}/g, String(start + count - 1)),
-      size,
-      rgb: ["0", "0", "0"],
-      at: (w, v) => ({
-        u: horiz === "left" ? margin : horiz === "right" ? v.w - margin - w : (v.w - w) / 2,
-        v: vert === "bottom" ? margin : v.h - margin - size * 0.72,
-        angle: 0,
-      }),
-    });
+  return await run(file, opts.pages, fill("0", "0"), "The text", o, e, (_doc, count) => {
+    return (k, i) => {
+      const h = opts.mirror && i % 2 === 1 ? (horiz === "left" ? "right" : horiz === "right" ? "left" : horiz) : horiz;
+      return {
+        text: fill(String(start + k), String(start + count - 1)),
+        size,
+        rgb: ["0", "0", "0"],
+        at: (w, v) => ({
+          u: h === "left" ? margin : h === "right" ? v.w - margin - w : (v.w - w) / 2,
+          v: vert === "bottom" ? margin : v.h - margin - size * 0.72,
+          angle: 0,
+        }),
+      };
+    };
   });
 }
 
