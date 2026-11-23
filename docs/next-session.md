@@ -30,6 +30,6 @@ Continue work on **MossPDF** (repo `vincentwesley/mosspdf`). main holds M0-M8 (a
 - Liberation Sans dropped from the pdf.js data pack (D22).
 - Main bundle budget raised to 64 KB gzip (62.2 now).
 
-## Resume point (2026-11-21, late)
-- v1.4.0 released and live at https://mosspdf.pages.dev (D24 Chinese text, D25 tools chunk, D26 design pass). Main bundle 27 KB gzip (budget 28).
+## Resume point (2026-11-23)
+- v1.5.0 released and live at https://mosspdf.pages.dev: 30 tools incl. Edit PDF (D27), Rotate/Crop/PDF to text (D28). Main bundle 27.7 KB gzip of 28 (tool icons and rows live in main; raise the budget or move icons to the tools chunk before adding many more tools).
 - Next: docs/HANDOVER.md section 3.
