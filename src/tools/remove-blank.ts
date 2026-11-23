@@ -66,7 +66,9 @@ function show(ctx: Ctx) {
   const shown = b.slice(0, SHOWN);
   const cells = shown.map((i) => ({ i, canvas: h("canvas", { class: "rot__page", attrs: { "aria-hidden": "true" } }) }));
   u.strip.replaceChildren(...cells.map((c) => h("figure", { class: "rot__cell" }, c.canvas, h("figcaption", { text: String(c.i + 1) }))));
+  const mine = u.cells; // a later show() swaps the array, so stale renders are skipped
   void store.doc(f).then((doc) => cells.forEach((c) => {
+    if (u.cells !== mine) return;
     const r = renderThumb(doc, c.i + 1, 0, c.canvas, 96);
     u.cells.push(r);
     r.done.catch(() => undefined);
