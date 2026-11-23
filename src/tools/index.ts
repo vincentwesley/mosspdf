@@ -16,7 +16,7 @@ export const TOOLS: ToolMeta[] = [
   { id: "images-to-pdf", title: "Images to PDF", blurb: "Turn JPG, PNG or WebP pictures into one PDF.", group: "Convert" },
   { id: "pdf-to-images", title: "PDF to images", blurb: "Save each page as a picture.", group: "Convert" },
   { id: "compress", title: "Compress", blurb: "Make a PDF smaller.", group: "Convert" },
-  { id: "page-numbers", title: "Page numbers", blurb: "Number the pages.", group: "Edit" },
+  { id: "page-numbers", title: "Page numbers and headers", blurb: "Number pages, add a header or footer.", group: "Edit" },
   { id: "watermark", title: "Watermark", blurb: "Stamp text on every page.", group: "Edit" },
   { id: "metadata", title: "Metadata", blurb: "Edit title, author and details.", group: "Edit" },
   { id: "protect", title: "Add password", blurb: "Lock a PDF with a password.", group: "Protect" },

@@ -10,10 +10,10 @@ export interface PageChoice {
   read(pageCount: number | undefined): { all: boolean; pages: number[] } | null;
 }
 
-export function pageChoice(ctx: Ctx, id: string): PageChoice {
+export function pageChoice(ctx: Ctx, id: string, skipFirst = false): PageChoice {
   const mode = radioGroup({
     name: `${id}-pages`, legend: "Pages", value: "all", testid: (v) => `pages-${v}`, onChange: () => ctx.refresh(),
-    options: [["all", "All pages"], ["range", "Only some pages"]],
+    options: [["all", "All pages"], ...(skipFirst ? [["skip", "Skip the first page"] as [string, string]] : []), ["range", skipFirst ? "Custom range" : "Only some pages"]],
   });
   const range = textField({ id: `${id}-range`, label: "Which pages", placeholder: "1-3, 5, 8-", testid: "pages-input", msgTestId: "pages-msg", reserve: true, onInput: () => ctx.refresh() });
   const el = h("div", { class: "pagesel" }, mode.el, range.el);
@@ -23,6 +23,7 @@ export function pageChoice(ctx: Ctx, id: string): PageChoice {
       const some = mode.value() === "range";
       range.el.hidden = !some;
       if (!n) return null;
+      if (mode.value() === "skip") { range.setError(null); return n > 1 ? { all: false, pages: Array.from({ length: n - 1 }, (_, i) => i + 1) } : null; }
       if (!some) { range.setError(null); return { all: true, pages: Array.from({ length: n }, (_, i) => i) }; }
       const text = range.input.value.trim();
       try {

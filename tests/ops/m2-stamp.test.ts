@@ -21,6 +21,20 @@ describe("A-COR-6 page numbers", () => {
     const r = await addPageNumbers(corpus("plain-3p"), { startAt: 7 }, opts(), engines);
     expect((await readPdf(r.bytes)).map((p) => noMarker(p.text))).toEqual(["7", "8", "9"]);
   });
+  it("tokens expand per page, skip first page, plain text allowed", async () => {
+    const r = await addPageNumbers(corpus("plain-3p"), { pages: [1, 2], format: "{file} {n}/{total} {date}", allowPlain: true, date: "D1", fileName: "F" }, opts(), engines);
+    const t = (await readPdf(r.bytes)).map((p) => noMarker(p.text));
+    expect(t).toEqual(["", "F 1/2 D1", "F 2/2 D1"]);
+    const h = await addPageNumbers(corpus("plain-3p"), { format: "DRAFT", allowPlain: true, pages: [0] }, opts(), engines);
+    expect(noMarker((await readPdf(h.bytes))[0].text)).toBe("DRAFT");
+  });
+  it("mirror swaps left and right on even pages", async () => {
+    const r = await addPageNumbers(corpus("plain-3p"), { position: "bottom-left", format: "MIR{n}", mirror: true, margin: 30 }, opts(), engines);
+    const [a, b, c] = await Promise.all([1, 2, 3].map((n) => findText(r.bytes, n - 1, `MIR${n}`)));
+    expect(a!.x).toBeLessThan(a!.w / 2);
+    expect(b!.x).toBeGreaterThan(b!.w / 2);
+    expect(c!.x).toBeLessThan(c!.w / 2);
+  });
   const pos = { "bottom-left": [0, 0], "bottom-center": [0.5, 0], "bottom-right": [1, 0], "top-left": [0, 1], "top-center": [0.5, 1], "top-right": [1, 1] } as const;
   for (const rotFile of ["rotated", "rotated-crop"]) {
     for (const [name, [fx, fy]] of Object.entries(pos)) {
