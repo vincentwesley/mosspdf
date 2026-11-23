@@ -27,3 +27,6 @@ export { editPages, type EditInput, type EditItem } from "./edit";
 // Tools 3: rotate, crop
 export { rotatePages, type RotateOptions } from "./rotate";
 export { cropPages, type CropOptions } from "./crop";
+// Tools 4: flatten, remove blank pages
+export { flatten, type FlattenOptions } from "./flatten";
+export { inkRatio, isBlank, BLANK_LIMIT, type Sensitivity } from "./blank";
