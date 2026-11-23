@@ -563,3 +563,12 @@ kbd { font: 600 0.85rem var(--font-mono); padding: 0.1rem 0.4rem; background: va
 .tile__in.is-drop::after { content: attr(data-drop); position: absolute; inset: 0; display: grid; place-items: center; padding: var(--s3); text-align: center; font-weight: 700; color: var(--accent-fg); background: var(--accent); }
 .install { display: inline-flex; align-items: center; gap: var(--s2); }
 .install .dlg__x { margin: 0; font-size: 1.4rem; min-width: 44px; min-height: 44px; }
+
+/* Bookmarks tool */
+.bm__list { list-style: none; margin: var(--s3) 0; padding: 0; display: grid; gap: var(--s2); }
+.bm__row { display: flex; flex-wrap: wrap; gap: var(--s2); align-items: center; padding: var(--s2); background: var(--bg-elev); margin-inline-start: calc(var(--lvl, 0) * 1.5rem); }
+.bm__title { flex: 1 1 12rem; min-width: 0; min-height: 48px; }
+.bm__page { width: 5.5rem; min-height: 48px; }
+.bm__btn { min-width: 48px; min-height: 48px; padding: 0; }
+.bm__btn[disabled] { opacity: 0.4; }
+.bm__tools { display: flex; flex-wrap: wrap; gap: var(--s2); }

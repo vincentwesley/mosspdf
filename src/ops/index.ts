@@ -33,3 +33,5 @@ export { inkRatio, isBlank, BLANK_LIMIT, type Sensitivity } from "./blank";
 // Tools 5: pages per sheet, add blank pages
 export { nupPages, bookletOrder, type NupOptions } from "./nup";
 export { addBlankPages, type AddPagesOptions } from "./addpages";
+// Bookmarks
+export { readOutline, setOutline, type BookmarkItem, type OutlineInfo } from "./outline";

@@ -145,7 +145,7 @@ export const prefs = {
 // Typed ops calls (run in the ops worker; the result buffers are transferred back).
 const base = (extra: CallOptions) => ({ ...extra });
 export const ops = {
-  merge: (files: LoadedFile[], o: CallOptions) => opsRpc.call<OpResult>("merge", { files: files.map(toIn), o: { producerCredit: prefs.producerCredit } }, base(o)),
+  merge: (files: LoadedFile[], o: CallOptions, bookmarks = false) => opsRpc.call<OpResult>("merge", { files: files.map(toIn), bookmarks, o: { producerCredit: prefs.producerCredit } }, base(o)),
   assemble: (files: LoadedFile[], pages: PageSpec[], name: string, o: CallOptions) =>
     opsRpc.call<OpResult>("assemble", { files: files.map(toIn), pages, name, o: { producerCredit: prefs.producerCredit } }, base(o)),
   split: (file: LoadedFile, mode: SplitMode, o: CallOptions) => opsRpc.call<OpResult[]>("split", { file: toIn(file), mode, o: { producerCredit: prefs.producerCredit } }, base(o)),
