@@ -76,6 +76,7 @@ describe("split by bookmarks", () => {
     expect(parts.map((p) => p.name)).toEqual(["A B C", "a b c 2", "x".repeat(80)]);
     expect(parts.map((p) => p.pages)).toEqual([[0, 1], [2, 3], [4, 5]]);
     expect(titleName("  \u0001 ")).toBe("Untitled");
+    expect(bookmarkParts([{ title: "Ch 1", page: 3, level: 0 }], 4)).toEqual([{ name: "Start", pages: [0, 1] }, { name: "Ch 1", pages: [2, 3] }]);
   });
   it("op makes one file per top-level bookmark and refuses a file without any", async () => {
     const d = await PDFDocument.create();

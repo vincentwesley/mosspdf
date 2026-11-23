@@ -162,6 +162,8 @@ export function bookmarkParts(items: BookmarkItem[], count: number): { name: str
   const tops = items.filter((it) => it.level === 0 && it.page !== null && it.page >= 1 && it.page <= count).sort((a, b) => a.page! - b.page!);
   const used = new Set<string>();
   const parts: { name: string; pages: number[] }[] = [];
+  const first = (tops[0]?.page ?? 1) - 1; // pages before the first bookmark (cover, contents) get their own part
+  if (first > 0) { used.add("start"); parts.push({ name: "Start", pages: Array.from({ length: first }, (_, k) => k) }); }
   tops.forEach((it, i) => {
     const start = it.page! - 1;
     const end = (tops[i + 1]?.page ?? count + 1) - 1; // exclusive; two bookmarks on one page leave the first empty, so it is skipped

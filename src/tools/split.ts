@@ -68,7 +68,7 @@ export const split: ToolDef = {
     u.every.el.hidden = mode !== "every";
     u.size.el.hidden = mode !== "size";
     u.mode.el.querySelector<HTMLInputElement>("#mode-bookmarks")!.disabled = !has;
-    u.hint.hidden = has && mode !== "bookmarks";
+    u.hint.hidden = has;
     u.hint.textContent = has ? "" : "This file has no bookmarks, so it can't be split by them.";
     const s = plan(ctx);
     u.preview.replaceChildren(...(mode === "size"

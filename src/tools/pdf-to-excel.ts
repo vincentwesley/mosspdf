@@ -35,10 +35,10 @@ export const pdfToExcel: ToolDef = {
     for (let i = 1; i <= doc.numPages; i++) {
       if (ctx.o.signal?.aborted) throw new PdfError("cancelled", "Cancelled.");
       ctx.note(`Reading page ${i} of ${doc.numPages}`);
-      ctx.o.onProgress?.(i - 1, doc.numPages);
       const page = await doc.getPage(i);
       grids.push(detectGrid((await page.getTextContent()).items.filter((it) => "str" in it) as unknown as XItem[]));
       page.cleanup();
+      ctx.o.onProgress?.(i, doc.numPages);
     }
     const empty = grids.filter((g) => !g.length).length;
     u.scan.replaceChildren();
