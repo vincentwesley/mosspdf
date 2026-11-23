@@ -26,7 +26,9 @@ import { a11yCheck } from "./a11y-check";
 import { edit } from "./edit";
 import { rotate } from "./rotate";
 import { crop } from "./crop";
+import { nup } from "./nup";
+import { addPages } from "./add-pages";
 import { pdfToText } from "./pdf-to-text";
 import type { ToolDef } from "./types";
 
-export const DEFS: ToolDef[] = [wfEmail, wfShare, wfApply, merge, split, organize, extract, imagesToPdf, pdfToImages, compress, pageNumbers, watermark, metadata, protect, unprotect, safetyScan, repair, fill, sign, ocr, redact, photo, compare, a11yCheck, edit, rotate, crop, pdfToText];
+export const DEFS: ToolDef[] = [wfEmail, wfShare, wfApply, merge, split, organize, extract, imagesToPdf, pdfToImages, compress, pageNumbers, watermark, metadata, protect, unprotect, safetyScan, repair, fill, sign, ocr, redact, photo, compare, a11yCheck, edit, rotate, crop, nup, addPages, pdfToText];

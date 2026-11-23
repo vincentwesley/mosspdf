@@ -33,6 +33,8 @@ export const TOOLS: ToolMeta[] = [
   { id: "edit", title: "Edit PDF", blurb: "Add text, highlights and shapes.", group: "Edit", next: ["sign", "compress", "protect"] },
   { id: "rotate", title: "Rotate PDF", blurb: "Turn pages the right way up.", group: "Organize", next: ["organize", "compress", "page-numbers", "watermark", "protect"] },
   { id: "crop", title: "Crop PDF", blurb: "Trim the edges of pages.", group: "Edit", next: ["compress", "redact", "page-numbers", "watermark", "protect"] },
+  { id: "nup", title: "Pages per sheet", blurb: "Put 2 or 4 pages on each sheet, or make a booklet.", group: "Organize", next: ["compress", "protect"] },
+  { id: "add-pages", title: "Add blank pages", blurb: "Insert empty pages where you need them.", group: "Organize", next: ["organize", "page-numbers", "compress", "protect"] },
   { id: "pdf-to-text", title: "PDF to text", blurb: "Copy out all the text.", group: "Convert", next: [] },
 ];
 

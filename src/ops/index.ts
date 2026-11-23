@@ -27,3 +27,6 @@ export { editPages, type EditInput, type EditItem } from "./edit";
 // Tools 3: rotate, crop
 export { rotatePages, type RotateOptions } from "./rotate";
 export { cropPages, type CropOptions } from "./crop";
+// Tools 5: pages per sheet, add blank pages
+export { nupPages, bookletOrder, type NupOptions } from "./nup";
+export { addBlankPages, type AddPagesOptions } from "./addpages";
