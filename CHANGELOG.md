@@ -4,6 +4,12 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 
 ## [Unreleased]
 
+## [1.6.0] - 2026-11-23
+- Four new tools (D29): Flatten PDF (forms, or forms and annotations baked into the page), Remove blank pages (pick a sensitivity, see the pages before they go), Pages per sheet (2 or 4 per sheet, or a fold-in-half booklet) and Add blank pages.
+- Drop files straight onto a tool on the home page to open them in it.
+- Install offer in the footer (Chromium browsers) so MossPDF runs as an app and offline.
+- Tool icon data moved out of the main bundle into the pre-seal tools chunk (main 27.7 → 26.4 KB gzip).
+
 ## [1.5.0] - 2026-11-23
 - Edit PDF (D27): add text (Unicode, Chinese when on), white-out, highlight, rectangle and line to pages; white-out only covers, with a link to Redact.
 - Three small tools (D28): Rotate PDF (all or chosen pages, batch), Crop PDF (margins in mm with a live preview; hides edges, content stays in the file) and PDF to text (.txt download, preview and copy).
