@@ -556,3 +556,10 @@ kbd { font: 600 0.85rem var(--font-mono); padding: 0.1rem 0.4rem; background: va
 .ptt { display: grid; gap: var(--s3); margin-top: var(--s3); }
 .ptt__area { width: 100%; min-height: 14rem; resize: vertical; font-family: var(--font-mono, monospace); font-size: 0.85rem; white-space: pre-wrap; }
 .ptt__row { display: flex; gap: var(--s3); }
+
+/* drop files on a home tile */
+.tile__in { position: relative; }
+.tile__in.is-drop { outline: 3px solid var(--accent); outline-offset: 2px; }
+.tile__in.is-drop::after { content: attr(data-drop); position: absolute; inset: 0; display: grid; place-items: center; padding: var(--s3); text-align: center; font-weight: 700; color: var(--accent-fg); background: var(--accent); }
+.install { display: inline-flex; align-items: center; gap: var(--s2); }
+.install .dlg__x { margin: 0; font-size: 1.4rem; min-width: 44px; min-height: 44px; }

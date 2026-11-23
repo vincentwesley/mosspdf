@@ -13,6 +13,7 @@ import { toolById } from "./tools";
 import type { ToolDef } from "./tools/types";
 import { live } from "./ui/dom";
 import { initGlobalIntake } from "./ui/dropzone";
+import { initInstall } from "./ui/install";
 import { initPalette, MOD } from "./ui/palette";
 import { routeOf } from "./core/ocrlangs";
 import { setZh, zhOn } from "./core/zhfont";
@@ -78,6 +79,7 @@ searchBtn.addEventListener("click", () => palette.open(searchBtn));
 const app = document.querySelector<HTMLElement>("#app")!;
 let current: { destroy: () => void } | null = null;
 initGlobalIntake();
+initInstall(document.querySelector<HTMLElement>(".appfoot")!);
 
 // D25: tool code is one chunk, imported before the seal (an engine entry) so nothing loads afterwards.
 let defs: Map<string, ToolDef> | undefined;

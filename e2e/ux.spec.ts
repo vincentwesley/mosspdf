@@ -66,4 +66,30 @@ test.describe("UX batch", () => {
     await page.getByTestId("find-tool").fill("zzzz");
     await expect(page.getByTestId("find-none")).toBeVisible();
   });
+  test("dropping files on a tile opens that tool with them loaded", async ({ page }) => {
+    await loadApp(page, "/");
+    const drop = (type: string) => page.evaluate(async ([tid, type]) => {
+      const dt = new DataTransfer();
+      dt.items.add(new File([new TextEncoder().encode("%PDF-1.4\n")],"a.pdf", { type: "application/pdf" }));
+      const el = document.querySelector(`[data-testid=${tid}]`)!;
+      el.dispatchEvent(new DragEvent(type, { dataTransfer: dt, bubbles: true, cancelable: true }));
+      return el.classList.contains("is-drop");
+    }, ["tile-compress", type]);
+    expect(await drop("dragenter")).toBe(true);
+    await drop("drop");
+    await expect(page).toHaveURL(/#\/compress$/);
+  });
+
+  test("install offer appears on beforeinstallprompt, prompts, and dismissal sticks", async ({ page }) => {
+    await loadApp(page, "/");
+    await page.evaluate(() => {
+      const e = new Event("beforeinstallprompt", { cancelable: true });
+      (e as unknown as { prompt: () => Promise<void> }).prompt = async () => { (window as unknown as { __p: number }).__p = 1; };
+      dispatchEvent(e);
+    });
+    await expect(page.getByTestId("install")).toBeVisible();
+    await page.getByTestId("install-btn").click();
+    expect(await page.evaluate(() => (window as unknown as { __p: number }).__p)).toBe(1);
+    await expect(page.getByTestId("install")).toBeHidden();
+  });
 });
