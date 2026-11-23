@@ -1,26 +1,35 @@
-# One-off: cut src/fonts/notosanssc-gb2312-400-normal.ttf from the Google Fonts Noto Sans SC variable TTF (OFL-1.1).
-# Usage: python -I scripts/subset-cjk.py NotoSansSC[wght].ttf   (needs fonttools; not part of the build)
-# Kept: Latin basics, GB2312 level 1+2 hanzi, CJK + full-width punctuation/forms. The font declares Reserved Font Name 'Source',
-# which we do not use: the family is renamed "MossPDF Sans SC" (name records mentioning Source are rewritten).
+# One-off: cut the optional CJK fonts in src/fonts/ from the Google Fonts Noto Sans SC/TC/JP/KR variable TTFs (OFL-1.1, github.com/google/fonts/ofl).
+# Usage: python -I scripts/subset-cjk.py sc|tc|jp|kr NotoSansXX[wght].ttf   (needs fonttools; not part of the build)
+# Kept: Latin basics, general + CJK punctuation, full-width forms, and per language: SC GB2312 hanzi; TC Big5 level 1 (the ~5,400 common hanzi) plus Big5 symbols;
+# JP JIS X 0208 (kana, level 1-2 kanji); KR all 11,172 Hangul syllables + compatibility jamo.
+# The fonts declare Reserved Font Name 'Source', which we do not use: each family is renamed "MossPDF Sans <XX>" (name records mentioning Source are rewritten).
 import sys
 from fontTools.ttLib import TTFont
 from fontTools.varLib.instancer import instantiateVariableFont
 from fontTools import subset
 
-src, out = sys.argv[1], "src/fonts/notosanssc-gb2312-400-normal.ttf"
+def pairs(codec, his, los):
+    for hi in his:
+        for lo in los:
+            try: yield ord(bytes([hi, lo]).decode(codec))
+            except (UnicodeDecodeError, ValueError): pass
+
+lang, src = sys.argv[1], sys.argv[2]
 cps = set(range(0x20, 0x7F)) | set(range(0xA0, 0x100)) | set(range(0x2000, 0x2070)) | set(range(0x3000, 0x3040)) | set(range(0xFF00, 0xFFF0))
-for hi in range(0xA1, 0xF8):
-    for lo in range(0xA1, 0xFF):
-        try: cps.add(ord(bytes([hi, lo]).decode("gb2312")))
-        except UnicodeDecodeError: pass
+if lang == "sc": cps |= set(pairs("gb2312", range(0xA1, 0xF8), range(0xA1, 0xFF))); file = "notosanssc-gb2312"
+elif lang == "tc": cps |= set(pairs("big5", range(0xA1, 0xC7), list(range(0x40, 0x7F)) + list(range(0xA1, 0xFF)))); file = "notosanstc-big5"
+elif lang == "jp": cps |= set(pairs("euc_jp", range(0xA1, 0xFF), range(0xA1, 0xFF))); file = "notosansjp-jisx0208"
+elif lang == "kr": cps |= set(range(0xAC00, 0xD7A4)) | set(range(0x3131, 0x318F)); file = "notosanskr-hangul"
+else: sys.exit("lang must be sc, tc, jp or kr")
+out, fam = f"src/fonts/{file}-400-normal.ttf", "MossPDF Sans " + lang.upper()
 f = instantiateVariableFont(TTFont(src), {"wght": 400})
 opt = subset.Options(); opt.layout_features = []; opt.notdef_outline = True; opt.name_IDs = [0, 1, 2, 3, 4, 6, 13, 14]; opt.hinting = False; opt.desubroutinize = True
 s = subset.Subsetter(opt); s.populate(unicodes=cps); s.subset(f)
 for n in f["name"].names:
     t = n.toUnicode()
-    if n.nameID in (1, 4): t = "MossPDF Sans SC" + (" Regular" if n.nameID == 4 else "")
-    if n.nameID == 6: t = "MossPDFSansSC-Regular"
-    if n.nameID == 3: t = "MossPDF Sans SC Regular subset"
+    if n.nameID in (1, 4): t = fam + (" Regular" if n.nameID == 4 else "")
+    if n.nameID == 6: t = fam.replace(" ", "") + "-Regular"
+    if n.nameID == 3: t = fam + " Regular subset"
     n.string = t
 f["name"].names = [n for n in f["name"].names if n.nameID < 256]
 for t in ("vhea", "vmtx", "STAT", "BASE", "GDEF", "GPOS", "GSUB", "gasp"):
