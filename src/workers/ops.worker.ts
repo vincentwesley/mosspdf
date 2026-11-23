@@ -7,8 +7,8 @@ import type { OcrPage } from "../ops";
 import { compareReport, editPages, fillForm, readForm, stampPage } from "../ops";
 import type { ReportData } from "../core/compare";
 import type { EditInput, FormValues, StampInput } from "../ops";
-import { redact, accessibilityCheck, rotatePages, cropPages } from "../ops";
-import type { RotateOptions, CropOptions } from "../ops";
+import { redact, accessibilityCheck, rotatePages, cropPages, flatten } from "../ops";
+import type { RotateOptions, CropOptions, FlattenOptions } from "../ops";
 import type { RedactInput } from "../ops";
 import type { CleanOptions, ProtectOptions, UnprotectOptions } from "../ops/types-m3";
 import { createEngines } from "../engines";
@@ -59,6 +59,7 @@ serve({
   accessibilityCheck: ({ file }: { file: InFile }) => accessibilityCheck(file, eng()),
   rotatePages: async ({ file, options, o }: { file: InFile; options: RotateOptions; o: O }, ctx) => out(await rotatePages(file, options, opts(o, ctx), eng())),
   cropPages: async ({ file, options, o }: { file: InFile; options: CropOptions; o: O }, ctx) => out(await cropPages(file, options, opts(o, ctx), eng())),
+  flatten: async ({ file, options, o }: { file: InFile; options: FlattenOptions; o: O }, ctx) => out(await flatten(file, options, opts(o, ctx), eng())),
   ...m7,
   ...edit,
   ...m6,
