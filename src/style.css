@@ -521,11 +521,9 @@ kbd { font: 600 0.85rem var(--font-mono); padding: 0.1rem 0.4rem; background: va
 .pal__opt[aria-selected="true"] .ibox { color: var(--accent-fg); background: transparent; box-shadow: inset 0 0 0 2px var(--accent-fg); }
 .pal__label { flex: 1; }
 
-/* footer: Chinese text switch */
+/* footer: extra text language choice */
 .zhsw { display: inline-flex; align-items: center; gap: var(--s3); flex-wrap: wrap; }
-.appfoot .zhsw__btn { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: var(--s2); min-height: 48px; color: var(--fg); font-weight: 600; text-decoration: none; }
-.zhsw__btn::before { content: ""; width: 2.5rem; height: 1.4rem; background: linear-gradient(var(--fg-muted), var(--fg-muted)) 0.2rem 50% / 0.9rem 0.9rem no-repeat, var(--bg-elev); box-shadow: var(--pix); }
-.zhsw__btn[aria-pressed="true"]::before { background: linear-gradient(var(--accent-fg), var(--accent-fg)) calc(100% - 0.2rem) 50% / 0.9rem 0.9rem no-repeat, var(--accent); }
+.appfoot .zhsw__btn { min-height: 48px; background: var(--bg-elev); color: var(--fg); border: 0; box-shadow: var(--pix); font: inherit; font-weight: 600; padding: 0 var(--s3); cursor: pointer; }
 .appfoot .zhsw__btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
 .zhsw__hint { font-size: 0.85rem; }
 .tile__title { overflow-wrap: anywhere; }

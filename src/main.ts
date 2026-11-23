@@ -8,6 +8,7 @@ import { bootAndSeal, registerEngine, seal } from "./core/seal";
 import { netlog } from "./core/netlog";
 import { badgeText, privacyDialog, privacyPage, VERSION } from "./ui/privacy";
 import { homeView } from "./ui/home";
+import { h } from "./ui/dom";
 import { workspace } from "./ui/workspace";
 import { toolById } from "./tools";
 import type { ToolDef } from "./tools/types";
@@ -16,7 +17,7 @@ import { initGlobalIntake } from "./ui/dropzone";
 import { initInstall } from "./ui/install";
 import { initPalette, MOD } from "./ui/palette";
 import { routeOf } from "./core/ocrlangs";
-import { setZh, zhOn } from "./core/zhfont";
+import { cjkLang, LANG_NAME, LANGS, setCjkLang, type Lang } from "./core/zhfont";
 
 const KEY = "theme";
 const store = {
@@ -48,12 +49,12 @@ btn.addEventListener("click", () => {
   sync(t);
 });
 
-// ---- optional Chinese font (D24): switching reloads the tab so the font loads before the seal ----
-const zh = document.querySelector<HTMLButtonElement>("#zh-toggle")!;
-zh.textContent = zhOn() ? "Chinese text: on" : "Chinese text: off";
-document.querySelector<HTMLElement>("#zh-hint")!.textContent = zhOn() ? "Switching off reloads the page." : "Adds 2 MB, reloads the page.";
-zh.setAttribute("aria-pressed", String(zhOn()));
-zh.addEventListener("click", () => { setZh(!zhOn()); location.reload(); });
+// ---- optional CJK font (D24, D30): choosing a language reloads the tab so the font loads before the seal ----
+const zh = document.querySelector<HTMLSelectElement>("#zh-toggle")!;
+for (const [v, t] of [["off", "Off"], ...LANGS.map((l) => [l, LANG_NAME[l]])]) zh.append(h("option", { attrs: { value: v } }, t));
+zh.value = cjkLang() ?? "off";
+document.querySelector<HTMLElement>("#zh-hint")!.textContent = cjkLang() ? "Changing it reloads the page." : "Adds 2 to 3 MB, reloads the page.";
+zh.addEventListener("change", () => { setCjkLang(zh.value === "off" ? undefined : (zh.value as Lang)); location.reload(); });
 
 // ---- seal badge + privacy dialog ----
 document.querySelector<HTMLElement>("#app-version")!.textContent = VERSION;
