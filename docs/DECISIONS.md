@@ -172,3 +172,9 @@ Symptom: a `worker-src` CSP violation on page load in Firefox, seen twice in a f
 - **White-out is not redaction.** It is an opaque white rectangle; the text underneath stays in the file. The UI says so and links Redact.
 - **Lines** run along the box diagonal (a box lower than 1.2% of the page height is level); a Flip button mirrors it. Colour and width apply to newly placed items.
 - **Tests.** `tests/ops/edit.test.ts` (kinds, Unicode extraction, rotated/cropped geometry, errors), `e2e/edit.spec.ts` (chromium, webkit), screens entry `edit`.
+
+## D28. Rotate, Crop and PDF to text (2026-11-23)
+- **Rotate PDF** (`ops/rotate.ts`): adds a turn to `/Rotate` with pdf-lib instead of rebuilding through qpdf, so bookmarks and links survive. All pages or a range, batch-capable. Preview is a strip of the first 8 pages drawn with the turn applied (not the page grid, whose per-page rotate and delete buttons would fight the options).
+- **Crop PDF** (`ops/crop.ts`): margins in mm measured on the page as displayed; the op converts them to user space with `view`/`toUser` from `stamp.ts` (so `/Rotate` and an existing CropBox are honoured) and sets CropBox and TrimBox. MediaBox is untouched, so the cut-off content stays in the file; the UI says so and links Redact. A margin that leaves less than 18 pt is refused. Preview is one canvas of the first chosen page with a shaded overlay, not the shared page viewer (which draws every page).
+- **PDF to text** (`core/pagetext.ts`, `tools/pdf-to-text.ts`): pdf.js `getTextContent` on the main thread (as Compare), items joined with `hasEOL` as line ends, `--- Page N ---` separators. Pages without text keep their separator; the tool then suggests OCR. Preview is capped at 100,000 characters; Copy and the download carry everything.
+- No new dependencies; one icon glyph each from Pixelarticons (reload, crop, file-text).

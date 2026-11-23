@@ -4,6 +4,7 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 
 ## [Unreleased]
 - Edit PDF (D27): add text (Unicode, Chinese when on), white-out, highlight, rectangle and line to pages; white-out only covers, with a link to Redact.
+- Three small tools (D28): Rotate PDF (all or chosen pages, batch), Crop PDF (margins in mm with a live preview; hides edges, content stays in the file) and PDF to text (.txt download, preview and copy).
 
 ## [1.4.0] - 2026-11-21
 - Design pass (D26): an icon for every tool, category chips and a three-step cue on home, a larger add-files button, choice cards for Compress, a clearer result card and Chinese text switch.

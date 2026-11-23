@@ -24,3 +24,6 @@ export { accessibilityCheck, type A11yCheck, type A11yReport, type A11yStatus } 
 
 // Edit PDF
 export { editPages, type EditInput, type EditItem } from "./edit";
+// Tools 3: rotate, crop
+export { rotatePages, type RotateOptions } from "./rotate";
+export { cropPages, type CropOptions } from "./crop";

@@ -542,3 +542,16 @@ kbd { font: 600 0.85rem var(--font-mono); padding: 0.1rem 0.4rem; background: va
 .ed-line__svg { display: block; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
 .ed-line__svg line { stroke-linecap: round; }
 .ed .sg-list:empty::before { content: "Nothing added yet."; }
+
+/* Tools 3: rotate preview strip, crop preview, text preview (D28) */
+.rot__strip { display: flex; flex-wrap: wrap; gap: var(--s3); margin-block: var(--s3); }
+.rot__cell { margin: 0; display: grid; justify-items: center; gap: 0.25rem; width: 96px; height: 128px; align-content: center; background: var(--bg-elev); }
+.rot__cell figcaption { font: 0.75rem var(--font-mono, monospace); color: var(--fg-muted); }
+.rot__page { max-width: 96px; max-height: 112px; background: #fff; box-shadow: var(--pix); }
+.crop__fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr)); gap: var(--s3); }
+.crop__page { position: relative; overflow: hidden; width: min(100%, 15rem); aspect-ratio: var(--ar, 3 / 4); margin-block: var(--s3); background: #fff; border: 1px solid var(--border); }
+.crop__canvas { display: block; width: 100%; height: 100%; }
+.crop__keep { position: absolute; border: 2px dashed var(--accent); box-shadow: 0 0 0 100vmax rgb(0 0 0 / 0.55); pointer-events: none; }
+.ptt { display: grid; gap: var(--s3); margin-top: var(--s3); }
+.ptt__area { width: 100%; min-height: 14rem; resize: vertical; font-family: var(--font-mono, monospace); font-size: 0.85rem; white-space: pre-wrap; }
+.ptt__row { display: flex; gap: var(--s3); }
