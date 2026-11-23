@@ -521,11 +521,9 @@ kbd { font: 600 0.85rem var(--font-mono); padding: 0.1rem 0.4rem; background: va
 .pal__opt[aria-selected="true"] .ibox { color: var(--accent-fg); background: transparent; box-shadow: inset 0 0 0 2px var(--accent-fg); }
 .pal__label { flex: 1; }
 
-/* footer: Chinese text switch */
+/* footer: extra text language choice */
 .zhsw { display: inline-flex; align-items: center; gap: var(--s3); flex-wrap: wrap; }
-.appfoot .zhsw__btn { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: var(--s2); min-height: 48px; color: var(--fg); font-weight: 600; text-decoration: none; }
-.zhsw__btn::before { content: ""; width: 2.5rem; height: 1.4rem; background: linear-gradient(var(--fg-muted), var(--fg-muted)) 0.2rem 50% / 0.9rem 0.9rem no-repeat, var(--bg-elev); box-shadow: var(--pix); }
-.zhsw__btn[aria-pressed="true"]::before { background: linear-gradient(var(--accent-fg), var(--accent-fg)) calc(100% - 0.2rem) 50% / 0.9rem 0.9rem no-repeat, var(--accent); }
+.appfoot .zhsw__btn { min-height: 48px; background: var(--bg-elev); color: var(--fg); border: 0; box-shadow: var(--pix); font: inherit; font-weight: 600; padding: 0 var(--s3); cursor: pointer; }
 .appfoot .zhsw__btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
 .zhsw__hint { font-size: 0.85rem; }
 .tile__title { overflow-wrap: anywhere; }
@@ -540,6 +538,7 @@ kbd { font: 600 0.85rem var(--font-mono); padding: 0.1rem 0.4rem; background: va
 .ed-whiteout { background: #fff; outline: 1px dashed #777; box-sizing: border-box; }
 .ed-highlight { background: rgb(255 235 51 / 0.45); mix-blend-mode: multiply; box-sizing: border-box; }
 .ed-rect { box-sizing: border-box; border: 2px solid #000; }
+.ed-white .sg-item__text { text-shadow: 0 0 2px #000, 0 0 1px #000; }
 .ed-line__svg { display: block; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
 .ed-line__svg line { stroke-linecap: round; }
 .ed .sg-list:empty::before { content: "Nothing added yet."; }
@@ -563,3 +562,12 @@ kbd { font: 600 0.85rem var(--font-mono); padding: 0.1rem 0.4rem; background: va
 .tile__in.is-drop::after { content: attr(data-drop); position: absolute; inset: 0; display: grid; place-items: center; padding: var(--s3); text-align: center; font-weight: 700; color: var(--accent-fg); background: var(--accent); }
 .install { display: inline-flex; align-items: center; gap: var(--s2); }
 .install .dlg__x { margin: 0; font-size: 1.4rem; min-width: 44px; min-height: 44px; }
+
+/* Bookmarks tool */
+.bm__list { list-style: none; margin: var(--s3) 0; padding: 0; display: grid; gap: var(--s2); }
+.bm__row { display: flex; flex-wrap: wrap; gap: var(--s2); align-items: center; padding: var(--s2); background: var(--bg-elev); margin-inline-start: calc(var(--lvl, 0) * 1.5rem); }
+.bm__title { flex: 1 1 12rem; min-width: 0; min-height: 48px; }
+.bm__page { width: 5.5rem; min-height: 48px; }
+.bm__btn { min-width: 48px; min-height: 48px; padding: 0; }
+.bm__btn[disabled] { opacity: 0.4; }
+.bm__tools { display: flex; flex-wrap: wrap; gap: var(--s2); }

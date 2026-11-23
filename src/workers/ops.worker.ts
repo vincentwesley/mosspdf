@@ -8,6 +8,8 @@ import { compareReport, editPages, fillForm, readForm, stampPage } from "../ops"
 import type { ReportData } from "../core/compare";
 import type { EditInput, FormValues, StampInput } from "../ops";
 import { redact, accessibilityCheck, rotatePages, cropPages, flatten, nupPages, addBlankPages } from "../ops";
+import { readOutline, setOutline } from "../ops";
+import type { BookmarkItem } from "../ops";
 import type { RotateOptions, CropOptions, FlattenOptions, NupOptions, AddPagesOptions } from "../ops";
 import type { RedactInput } from "../ops";
 import type { CleanOptions, ProtectOptions, UnprotectOptions } from "../ops/types-m3";
@@ -62,6 +64,8 @@ serve({
   flatten: async ({ file, options, o }: { file: InFile; options: FlattenOptions; o: O }, ctx) => out(await flatten(file, options, opts(o, ctx), eng())),
   nupPages: async ({ file, options, o }: { file: InFile; options: NupOptions; o: O }, ctx) => out(await nupPages(file, options, opts(o, ctx), eng())),
   addBlankPages: async ({ file, options, o }: { file: InFile; options: AddPagesOptions; o: O }, ctx) => out(await addBlankPages(file, options, opts(o, ctx), eng())),
+  readOutline: ({ file }: { file: InFile }, ctx) => readOutline(file, { signal: ctx.signal }, eng()),
+  setOutline: async ({ file, items, o }: { file: InFile; items: BookmarkItem[]; o: O }, ctx) => out(await setOutline(file, { items }, opts(o, ctx), eng())),
   ...m7,
   ...edit,
   ...m6,
@@ -72,7 +76,7 @@ serve({
     return true;
   },
   inspect: ({ file }: { file: InFile }) => inspect(file, eng()),
-  merge: async ({ files, o }: { files: InFile[]; o: O }, ctx) => out(await merge(files, opts(o, ctx), eng())),
+  merge: async ({ files, o, bookmarks }: { files: InFile[]; o: O; bookmarks?: boolean }, ctx) => out(await merge(files, opts(o, ctx), eng(), { bookmarks })),
   assemble: async ({ files, pages, name, o }: { files: InFile[]; pages: PageSpec[]; name: string; o: O }, ctx) => out(await assemble(files, pages, name, opts(o, ctx), eng())),
   split: async ({ file, mode, o }: { file: InFile; mode: SplitMode; o: O }, ctx) => out(await split(file, mode, opts(o, ctx), eng())),
   imagesToPdf: async ({ images, options, o }: { images: ImageInput[]; options: ImagesToPdfOptions; o: O }, ctx) => out(await imagesToPdf(images, options, opts(o, ctx))),

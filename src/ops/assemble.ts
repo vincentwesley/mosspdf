@@ -1,6 +1,7 @@
 ﻿// Page assembly (merge, split, extract, reorder, rotate, delete) via qpdf `--empty --pages`, then a pdf-lib metadata pass. See D10.
 import { PDFDocument } from "@cantoo/pdf-lib";
 import { checkAbort, classify, openPdf, type Opened } from "./open";
+import { readOutlineItems, writeOutlineItems, type BookmarkItem } from "./outline";
 import { parseRanges } from "./ranges";
 import { PdfError, type Bytes, type Engines, type InFile, type OpOptions, type OpResult, type PageSpec, type SplitMode, type Warning } from "./types";
 
@@ -112,7 +113,33 @@ export async function assemble(files: InFile[], pages: PageSpec[], name: string,
   return res;
 }
 
-export async function merge(files: InFile[], o: OpOptions, e: Engines): Promise<OpResult> {
+/** One top-level bookmark per file, with that file's own bookmarks nested under it (pages remapped). Encrypted or unreadable outlines keep the "dropped" warning. */
+async function addFileBookmarks(res: OpResult, files: InFile[], opened: Opened[]) {
+  const items: BookmarkItem[] = [];
+  const lost: string[] = [];
+  let offset = 0;
+  for (const [i, f] of files.entries()) {
+    const { info, bytes } = opened[i];
+    items.push({ title: f.name.replace(/\.pdf$/i, ""), page: offset + 1, level: 0 });
+    if (info.hasOutline) {
+      try {
+        if (info.encrypted) throw new Error("encrypted");
+        const sub = readOutlineItems(await PDFDocument.load(bytes, { updateMetadata: false }));
+        for (const it of sub.items) items.push({ title: it.title, page: it.page && it.page + offset, level: it.level + 1 });
+      } catch {
+        lost.push(f.name);
+      }
+    }
+    offset += info.pageCount;
+  }
+  const doc = await PDFDocument.load(res.bytes, { updateMetadata: false });
+  writeOutlineItems(doc, items);
+  res.bytes = await doc.save({ useObjectStreams: false });
+  res.warnings = res.warnings.filter((w) => w.code !== "outline-dropped");
+  for (const n of lost) res.warnings.push({ code: "outline-dropped", message: `The bookmarks inside "${n}" can't be kept. The new file has one bookmark for the file itself.` });
+}
+
+export async function merge(files: InFile[], o: OpOptions, e: Engines, mo: { bookmarks?: boolean } = {}): Promise<OpResult> {
   if (!files.length) throw new PdfError("unsupported", "Add at least one PDF first.");
   const used = new Set(files.keys());
   const step = { n: 0, total: used.size + 1 };
@@ -120,6 +147,7 @@ export async function merge(files: InFile[], o: OpOptions, e: Engines): Promise<
   const pages = opened.flatMap((op, source) => Array.from({ length: op.info.pageCount }, (_, page): PageSpec => ({ source, page, rotate: 0 })));
   validate(files, pages);
   const res = await build(files, opened, pages, "merged.pdf", o, e);
+  if (mo.bookmarks) await addFileBookmarks(res, files, opened);
   o.onProgress?.(step.total, step.total);
   return res;
 }

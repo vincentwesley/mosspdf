@@ -15,8 +15,8 @@ const sc = new Uint8Array(readFileSync(font("notosanssc-gb2312-400-normal.ttf"))
 describe("D24 optional Simplified Chinese font", () => {
   it("is off by default: refused by name, with the switch offered", async () => {
     setUnicodeFont(noto);
-    await expect(watermark(corpus("plain-3p"), { text: "机密" }, opts(), engines)).rejects.toMatchObject({ message: expect.stringContaining("Chinese text") });
-    expect(zhWouldHelp(badChars("机密", false))).toBe(true);
+    await expect(watermark(corpus("plain-3p"), { text: "机密" }, opts(), engines)).rejects.toMatchObject({ message: expect.stringContaining("Extra text") });
+    expect(zhWouldHelp(badChars("机密", undefined))).toBe(true);
   });
   it("round-trips in a stamp, page numbers and a form field; Tamil stays refused", async () => {
     setUnicodeFont(noto, sc);
@@ -36,7 +36,25 @@ describe("D24 optional Simplified Chinese font", () => {
   });
   it("the shipped font stays small and the client gate follows the switch", () => {
     expect(statSync(font("notosanssc-gb2312-400-normal.ttf")).size).toBeLessThan(2.4 * 1024 * 1024);
-    expect(badChars("机密，ＡＢ", true)).toEqual([]);
-    expect(badChars("தமிழ்", true)).toHaveLength(5);
+    expect(badChars("机密，ＡＢ", "sc")).toEqual([]);
+    expect(badChars("தமிழ்", "sc")).toHaveLength(5);
+  });
+  const langs = { tc: ["notosanstc-big5-400-normal.ttf", "機密文件 繁體中文，你好！"], jp: ["notosansjp-jisx0208-400-normal.ttf", "機密文書 こんにちは、カタカナ！"], kr: ["notosanskr-hangul-400-normal.ttf", "기밀 문서 안녕하세요！"] } as const;
+  for (const [lang, [file, text]] of Object.entries(langs)) {
+    it(`D30 ${lang}: a sample renders, extracts, and the font stays small`, async () => {
+      expect(statSync(font(file)).size).toBeLessThan(3 * 1024 * 1024);
+      setUnicodeFont(noto, new Uint8Array(readFileSync(font(file))));
+      expect(badChars(text, lang as "tc")).toEqual([]);
+      const s = await stampPage(corpus("plain-3p"), { images: [], items: [{ kind: "text", text, size: 14, fx: 0.2, fy: 0.5, pages: "all" }] }, opts(), engines);
+      qpdfCheck(s.bytes);
+      expect((await all(s.bytes)).replace(/\s/g, "")).toContain(text.replace(/\s/g, ""));
+      setUnicodeFont(noto);
+    });
+  }
+  it("D30 the gate is per language", () => {
+    expect(badChars("こんにちは", "sc")).toHaveLength(5);
+    expect(zhWouldHelp(badChars("こんにちは", "sc"), "sc")).toBe(true);
+    expect(badChars("안녕", "jp")).toHaveLength(2);
+    expect(badChars("안녕", "kr")).toEqual([]);
   });
 });

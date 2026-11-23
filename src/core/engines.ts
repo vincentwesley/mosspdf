@@ -3,7 +3,10 @@ import qpdfWasmUrl from "@neslinesli93/qpdf-wasm/dist/qpdf.wasm?url";
 import jpegDecUrl from "@jsquash/jpeg/codec/dec/mozjpeg_dec.wasm?url";
 import jpegEncUrl from "@jsquash/jpeg/codec/enc/mozjpeg_enc.wasm?url";
 import unicodeFontUrl from "../fonts/notosans-unicode-400-normal.ttf?url";
-import zhFontUrl from "../fonts/notosanssc-gb2312-400-normal.ttf?url";
+import scFontUrl from "../fonts/notosanssc-gb2312-400-normal.ttf?url";
+import tcFontUrl from "../fonts/notosanstc-big5-400-normal.ttf?url";
+import jpFontUrl from "../fonts/notosansjp-jisx0208-400-normal.ttf?url";
+import krFontUrl from "../fonts/notosanskr-hangul-400-normal.ttf?url";
 import ocrWasmUrl from "tesseract.js-core/tesseract-core-simd-lstm.wasm?url";
 import engUrl from "@tesseract.js-data/eng/4.0.0_best_int/eng.traineddata.gz?url";
 import chiSimUrl from "@tesseract.js-data/chi_sim/4.0.0_best_int/chi_sim.traineddata.gz?url";
@@ -15,7 +18,8 @@ import ocrWorkerUrl from "../workers/ocr.worker.ts?worker&url";
 import pdfWorkerUrl from "pdfjs-dist/build/pdf.worker.mjs?worker&url";
 import type * as PdfJs from "pdfjs-dist/build/pdf.mjs";
 import { chosenLangs, routeOf } from "./ocrlangs";
-import { zhOn } from "./zhfont";
+import { cjkLang, type Lang } from "./zhfont";
+const CJK_URL: Record<Lang, string> = { sc: scFontUrl, tc: tcFontUrl, jp: jpFontUrl, kr: krFontUrl };
 import { RpcClient } from "./rpc";
 import { fetchBytes, registerEngine } from "./seal";
 import { scriptUrl } from "./tt";
@@ -31,7 +35,7 @@ registerEngine({
   async load() {
     // The same worker also needs the MozJPEG codecs (compress) and the Noto Sans subset for text beyond WinAnsi (D20); both are fetched here, before the seal.
     const [wasm, jpegDecWasm, jpegEncWasm, font] = await Promise.all([fetchBytes(qpdfWasmUrl), fetchBytes(jpegDecUrl), fetchBytes(jpegEncUrl), fetchBytes(unicodeFontUrl)]);
-    const zhFont = zhOn() ? await fetchBytes(zhFontUrl) : undefined; // optional Chinese font (D24), only when turned on
+    const lang = cjkLang(), zhFont = lang ? await fetchBytes(CJK_URL[lang]) : undefined; // the one optional CJK font (D24, D30), only when chosen
     const worker = new Worker(scriptUrl(opsWorkerUrl), { type: "module" });
     opsRpc = new RpcClient(worker);
     await opsRpc.call("init", { qpdfWasm: wasm, jpegDecWasm, jpegEncWasm, font, zhFont }, { transfer: [wasm.buffer as ArrayBuffer, jpegDecWasm.buffer as ArrayBuffer, jpegEncWasm.buffer as ArrayBuffer, font.buffer as ArrayBuffer, ...(zhFont ? [zhFont.buffer as ArrayBuffer] : [])] });

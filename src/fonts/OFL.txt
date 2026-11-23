@@ -6,6 +6,9 @@ JetBrains Mono - Copyright 2020 The JetBrains Mono Project Authors (https://gith
 Silkscreen - Copyright 2001 The Silkscreen Project Authors (https://github.com/googlefonts/silkscreen)
 Noto Sans (subset, notosans-unicode-400-normal.ttf) - Copyright 2022 The Noto Project Authors (https://github.com/notofonts/latin-greek-cyrillic)
 Noto Sans SC (subset, notosanssc-gb2312-400-normal.ttf, renamed MossPDF Sans SC) - Copyright 2014-2021 Adobe (http://www.adobe.com/), with Reserved Font Name 'Source' (https://github.com/google/fonts/tree/main/ofl/notosanssc)
+Noto Sans TC (subset, notosanstc-big5-400-normal.ttf, renamed MossPDF Sans TC) - Copyright 2014-2021 Adobe (http://www.adobe.com/), with Reserved Font Name 'Source' (https://github.com/google/fonts/tree/main/ofl/notosanstc)
+Noto Sans JP (subset, notosansjp-jisx0208-400-normal.ttf, renamed MossPDF Sans JP) - Copyright 2014-2021 Adobe (http://www.adobe.com/), with Reserved Font Name 'Source' (https://github.com/google/fonts/tree/main/ofl/notosansjp)
+Noto Sans KR (subset, notosanskr-hangul-400-normal.ttf, renamed MossPDF Sans KR) - Copyright 2014-2021 Adobe (http://www.adobe.com/), with Reserved Font Name 'Source' (https://github.com/google/fonts/tree/main/ofl/notosanskr)
 Caveat - Copyright 2014 The Caveat Project Authors (https://github.com/googlefonts/caveat)
 
 This license is also available with a FAQ at: https://openfontlicense.org

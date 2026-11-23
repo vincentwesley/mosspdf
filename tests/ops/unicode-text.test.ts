@@ -12,8 +12,8 @@ describe("D20 text beyond WinAnsi", () => {
   it("the client gate agrees: Latin Extended, Vietnamese, Greek, Cyrillic pass; CJK and emoji are named", () => {
     expect(badChars(`${VI} ${PL} ${EXTRA}`)).toEqual([]);
     expect(badChars("李 ok 🙂")).toEqual(["李", "🙂"]);
-    expect(badChars("李 α ok", true)).toEqual(["α"]); // one font per text: Greek next to hanzi is refused up front
-    expect(badChars("α ok", true)).toEqual([]);
+    expect(badChars("李 α ok", "sc")).toEqual(["α"]); // one font per text: Greek next to hanzi is refused up front
+    expect(badChars("α ok", "sc")).toEqual([]);
   });
   it("watermark and page numbers", async () => {
     for (const t of [VI, PL, EXTRA]) {

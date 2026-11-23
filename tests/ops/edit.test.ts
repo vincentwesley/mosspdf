@@ -57,6 +57,24 @@ describe("editPages", () => {
       }
     }
   });
+  it("picture: embedded as an image XObject on the page (PNG and JPEG)", async () => {
+    const gen = (n: string) => new Uint8Array(readFileSync(new URL(`../corpus/generated/${n}`, import.meta.url)));
+    const images = [{ bytes: gen("photo-alpha.png"), jpeg: false }, { bytes: gen("photo-small.jpg"), jpeg: true }];
+    const r = await editPages(corpus("plain-3p"), { items: [{ kind: "image", page: 0, image: 0, x: 0.1, y: 0.1, w: 0.3, h: 0.2 }, { kind: "image", page: 1, image: 1, x: 0.1, y: 0.1, w: 0.3, h: 0.2 }], images }, opts(), engines);
+    qpdfCheck(r.bytes);
+    const s = raw(r.bytes);
+    expect(s).toMatch(/\/Subtype\s*\/Image/);
+    expect(s).toMatch(/\/DCTDecode/);
+    expect(s).toMatch(/\/PHI-?\d* Do|\/PHI\w* Do/);
+    await expect(editPages(corpus("plain-3p"), { items: [{ kind: "image", page: 0, image: 3, x: 0, y: 0, w: 0.1, h: 0.1 }], images }, opts(), engines)).rejects.toMatchObject({ code: "unsupported" });
+  });
+  it("bold text uses Helvetica-Bold for Latin text, regular otherwise", async () => {
+    const r = await run("plain-3p", [{ kind: "text", page: 0, text: "Strong", size: 14, bold: true, color: "#ffffff", x: 0.1, y: 0.2 }]);
+    qpdfCheck(r.bytes);
+    expect(raw(r.bytes)).toContain("/BaseFont /Helvetica-Bold");
+    const r2 = await run("plain-3p", [{ kind: "text", page: 0, text: "Plain", size: 14, x: 0.1, y: 0.2 }]);
+    expect(raw(r2.bytes)).not.toContain("Helvetica-Bold");
+  });
   it("bad input gives plain errors", async () => {
     await expect(run("plain-3p", [])).rejects.toMatchObject({ code: "unsupported" });
     await expect(run("plain-3p", [{ kind: "whiteout", page: 9, x: 0, y: 0, w: 0.1, h: 0.1 }])).rejects.toMatchObject({ message: expect.stringContaining("3 pages") });
