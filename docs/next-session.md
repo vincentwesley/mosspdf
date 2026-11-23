@@ -18,13 +18,13 @@ Continue work on **MossPDF** (repo `vincentwesley/mosspdf`, public). Live: https
 
 ## Architecture in one breath
 - Tools: light row in `src/tools/index.ts` (main bundle: home, palette, routing) + module `src/tools/<id>.ts` registered in `src/tools/all.ts` (pre-seal tools chunk, D25) + icon in `src/ui/toolicons.ts`. Ops are pure functions in `src/ops` run in the ops worker (`src/workers/ops.worker.ts`) and in Node tests.
-- Seal (D14): engines, fonts, wasm and the tools chunk load BEFORE the page locks itself; e2e fails on any request after the seal. Optional heavy data (OCR languages D21, Chinese font D24) loads only when switched on, via reload.
+- Seal (D14): engines, fonts, wasm and the tools chunk load BEFORE the page locks itself; e2e fails on any request after the seal. Optional heavy data (OCR languages D21, CJK fonts D24/D30) loads only when switched on, via reload.
 - Shared UI: `ui/workspace.ts` (intake, options, action bar, result card with preview + "Continue with"), `ui/pageview.ts` + `ui/boxlayer.ts` (sign, edit, redact), `ui/fields.ts` (`radioGroup` with `about` = choice cards; flex not grid on fieldsets, WebKit).
 - Text: `ops/ufont.ts` `pickFont` (Helvetica → Noto Sans → Chinese font when on), client gate `core/winansi.ts` `badChars`.
 
 ## Current state
-- v1.6.0 (2026-11-23): 34 tools + 3 workflows (v1.6 added Flatten, Remove blank pages, Pages per sheet/booklet, Add blank pages, D29), drop files on a home tile, install offer, palette, batch, OCR (eng, chi_sim, msa, tam), Chinese text switch, Edit PDF. Legal audit done (D22). CI green on 5 browser projects.
-- Budget: main bundle 26.4 KB gzip of 28 (icon data moved to `ui/icondata.ts` in the tools chunk).
+- v1.7.0 (2026-11-23): 36 tools + 3 workflows. v1.6 added Flatten, Remove blank pages, Pages per sheet, Add blank pages, tile drop, install offer (D29); v1.7 added PDF to Word, Bookmarks (+ Merge bookmark per file), Traditional Chinese/Japanese/Korean text (D30), Edit PDF pictures, undo/redo, bold (D31). CI green on 5 browser projects.
+- Budget: main bundle 26.8 KB gzip of 28 (icon data lives in `ui/icondata.ts`, tools chunk). Home-phone height cap 4800.
 
 ## Known gaps
 - Firefox offline test skipped (setOffline broken with service workers); keyboard-only tests skip on touch projects.
