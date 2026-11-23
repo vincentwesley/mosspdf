@@ -11,9 +11,9 @@ const MAX_PIXELS = 16_000_000;
 const WARN_PAGES = 50;
 
 const ui = (ctx: Ctx) => ctx.local(() => ({
-  format: radioGroup({ name: "format", legend: "Picture type", value: "png", testid: (v) => `format-${v}`, onChange: () => ctx.refresh(), options: [["png", "PNG (sharp, larger files)"], ["jpeg", "JPG (smaller files)"]] }),
+  format: radioGroup({ name: "format", legend: "Picture type", value: "png", testid: (v) => `format-${v}`, onChange: () => ctx.refresh(), options: [["png", "PNG", "Sharp text and lines. Larger files."], ["jpeg", "JPG", "Smaller files. Best for photos."]] }),
   quality: numberField({ id: "quality", label: "JPG quality (1 to 100)", value: 85, min: 1, max: 100, testid: "quality-input", onInput: () => ctx.refresh() }),
-  dpi: radioGroup({ name: "dpi", legend: "Sharpness", value: "150", testid: (v) => `dpi-${v}`, onChange: () => ctx.refresh(), options: [["72", "72 dpi (screen)"], ["150", "150 dpi (good)"], ["300", "300 dpi (print)"]] }),
+  dpi: radioGroup({ name: "dpi", legend: "Sharpness", value: "150", testid: (v) => `dpi-${v}`, onChange: () => ctx.refresh(), options: [["72", "72 dpi", "For screens."], ["150", "150 dpi", "Good for most uses."], ["300", "300 dpi", "For printing. Slower."]] }),
   pages: pageChoice(ctx, "p2i"),
 }));
 

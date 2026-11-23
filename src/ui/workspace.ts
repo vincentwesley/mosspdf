@@ -11,6 +11,7 @@ import { announce, fmtSize, h } from "./dom";
 import { toast } from "./toast";
 import { dropzone, setFilesHandler } from "./dropzone";
 import { fileList } from "./filelist";
+import { openDoc, renderThumb } from "../core/render";
 import { newItem, pageGrid } from "./pagegrid";
 import { saveResult, saveZip } from "./download";
 import { toolBox } from "./toolicons";
@@ -232,7 +233,31 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
     }
   }
 
+  let dropThumb = () => {};
+  /** Small local preview of the first output: page 1 of a single PDF, or the first picture. Null for zip/txt. No object URLs: the CSP has no img-src blob:. */
+  function thumb(): HTMLElement | null {
+    const r = results[0];
+    const img = /\.(png|jpe?g)$/i.test(r.name);
+    if (!img && !(results.length === 1 && /\.pdf$/i.test(r.name))) return null;
+    const alt = img ? `Preview of ${r.name}` : "Preview of page 1";
+    const canvas = h("canvas", { class: "out__thumb", attrs: { role: "img", "aria-label": alt, "data-testid": "result-thumb" } });
+    let dead = false, cancel = () => {}, doc: Awaited<ReturnType<typeof openDoc>> | undefined;
+    dropThumb = () => { dead = true; cancel(); void doc?.loadingTask.destroy(); };
+    if (img) { // decoded to a canvas, not a blob: URL, so the page CSP needs no img-src blob:
+      createImageBitmap(new Blob([r.bytes as BlobPart])).then((b) => {
+        if (dead) return b.close();
+        canvas.width = 72 * 2; canvas.height = Math.round((b.height / b.width) * canvas.width);
+        canvas.getContext("2d")?.drawImage(b, 0, 0, canvas.width, canvas.height);
+        b.close();
+      }).catch(() => canvas.remove());
+      return canvas;
+    }
+    openDoc(r.bytes).then((d) => { doc = d; if (dead) return void d.loadingTask.destroy(); const t = renderThumb(d, 1, 0, canvas, 72); cancel = t.cancel; return t.done; }).catch(() => canvas.remove());
+    return canvas;
+  }
+
   function renderResults() {
+    dropThumb(); dropThumb = () => {};
     resultBox.replaceChildren();
     if (!results.length) return;
     const warns = results.flatMap((r) => r.warnings);
@@ -248,6 +273,7 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
       ...(tool.summary ? [h("p", { class: "res__sum", text: tool.summary(ctx), attrs: { "data-testid": "result-summary" } })] : inBytes ? [h("p", { class: "res__sum", text: `${fmtSize(inBytes)} → ${fmtSize(outBytes)}. ${change}`.trim(), attrs: { "data-testid": "result-summary" } })] : []),
       h("ul", { class: "outs", attrs: { role: "list" } }, ...results.map((r) =>
         h("li", { class: "out", attrs: { "data-testid": "result-row" } },
+          ...(r === results[0] ? [thumb()] : []),
           h("span", { class: "out__name", text: r.name }),
           h("span", { class: "out__size", text: fmtSize(r.bytes.length) }),
           h("button", { class: "hs-btn out__dl", type: "button", text: "Download", attrs: { "aria-label": `Download ${r.name}`, "data-testid": "result-download" }, on: { click: () => void saveResult(r) } })))),
@@ -280,5 +306,5 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
     h("header", { class: "view__head" }, toolBox(tool.id, true), h1, h("p", { class: "view__lede", text: tool.lede })),
     dz, soon, notice, carryBox, fl.el, tip, warnBox, optBox, gridBox, settings, resultBox, bar);
   update();
-  return { el, destroy: () => { unsub(); grid?.destroy(); abort?.abort(); tool.destroy?.(ctx); } };
+  return { el, destroy: () => { dropThumb(); unsub(); grid?.destroy(); abort?.abort(); tool.destroy?.(ctx); } };
 }

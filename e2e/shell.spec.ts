@@ -153,6 +153,7 @@ test.describe("compare intake CSP diagnostic (CI mobile-safari)", () => {
     await expect(page.getByTestId("file-label")).toHaveCount(2);
     const v = await page.evaluate(() => (window as unknown as { __v: unknown[] }).__v);
     await info.attach("csp-violations.json", { body: JSON.stringify(v, null, 2), contentType: "application/json" });
+    console.log("CSP-DIAG " + JSON.stringify(v));
     info.annotations.push({ type: "csp-violations", description: JSON.stringify(v) });
   });
 });

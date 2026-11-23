@@ -189,6 +189,7 @@ div.pg__thumb { cursor: default; }
 .outs__all { margin-top: var(--s3); }
 .out { display: flex; align-items: center; gap: var(--s3); flex-wrap: wrap; }
 .out__name { flex: 1; min-width: 8rem; overflow-wrap: anywhere; font-weight: 600; }
+.out__thumb { width: 72px; height: auto; max-height: 100px; object-fit: contain; background: #fff; box-shadow: var(--pix); }
 .out__size { color: var(--fg-muted); }
 .results p { margin: 0; }
 
