@@ -35,6 +35,8 @@ export const TOOLS: ToolMeta[] = [
   { id: "crop", title: "Crop PDF", blurb: "Trim the edges of pages.", group: "Edit", next: ["compress", "redact", "page-numbers", "watermark", "protect"] },
   { id: "flatten", title: "Flatten PDF", blurb: "Lock form fields and notes into the page.", group: "Edit", next: ["compress", "protect", "sign", "page-numbers", "watermark"] },
   { id: "remove-blank", title: "Remove blank pages", blurb: "Drop empty pages from a scan or export.", group: "Organize", next: ["organize", "compress", "ocr", "page-numbers", "protect"] },
+  { id: "nup", title: "Pages per sheet", blurb: "Put 2 or 4 pages on each sheet, or make a booklet.", group: "Organize", next: ["compress", "protect"] },
+  { id: "add-pages", title: "Add blank pages", blurb: "Insert empty pages where you need them.", group: "Organize", next: ["organize", "page-numbers", "compress", "protect"] },
   { id: "pdf-to-text", title: "PDF to text", blurb: "Copy out all the text.", group: "Convert", next: [] },
 ];
 

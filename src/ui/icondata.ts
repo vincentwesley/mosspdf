@@ -31,6 +31,8 @@ const D: Record<string, string> = {
   "rotate": "M16 4h2v6h-2zm-2-2h2v2h-2zm0 2h2v8h-2zM4 8H2v5h2zM4 6h16v2H4zm4 14H6v-6h2zm2 2H8v-2h2zm0-2H8v-8h2zm10-4h2v-5h-2zM20 18H4v-2h16z", // reload
   "crop": "M18 16h4v2h-4v4h-2V8h2v8Zm-4 2H8v-2h6v2Zm-6-2H6v-6h2v6ZM8 6h8v2H2V6h4V2h2v4Z", // crop
   "pdf-to-text": "M6 4H4v16h2zm10-2H6v2h10zm4 4h-2v14h2zm-2 14H6v2h12zM16 4h2v2h-2zm-4 0h2v6h-2zm0 4h6v2h-6zm-4 8h8v2H8zm0-4h8v2H8zm0-4h2v2H8z", // file-text
+  "nup": "M20 20H4v-2h4v-8H4v8H2V6h2v2h16V6h2v12h-2v-8H10v8h10v2Zm0-14H4V4h16v2Z", // layout
+  "add-pages": "M4 2h16v2H4zm0 18h16v2H4zM2 4h2v16H2zm18 0h2v16h-2zM7 11h10v2H7zm4 6V7h2v10z", // plus-box
   "flatten": "M2 4h2v16H2zm18 0h2v12h-2zM4 2h16v2H4zm14 14h2v2h-2zm-2 2h2v2h-2zM4 20h12v2H4zm10-8h6v2h-6zm-2 2h2v6h-2z", // note
   "remove-blank": "M18 22H6V20H18V22ZM9 6H15V4H17V6H22V8H20V20H18V8H6V20H4V8H2V6H7V4H9V6ZM15 4H9V2H15V4Z", // trash
 };
