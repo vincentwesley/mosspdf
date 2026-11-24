@@ -7,6 +7,7 @@ import { PdfError, type OpResult } from "../ops/types";
 import type { Ctx, GridOpts, ToolDef } from "../tools/types";
 import { nextTools } from "../tools";
 import { pushRecent } from "../core/recent";
+import { memoryWarning } from "../core/memguard";
 import { announce, fmtSize, h } from "./dom";
 import { toast } from "./toast";
 import { dropzone, setFilesHandler } from "./dropzone";
@@ -117,7 +118,12 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
   const primary = h("button", { class: "hs-btn", type: "button", attrs: { "data-testid": "primary-action" } });
   const cancel = h("button", { class: "hs-btn hs-btn--secondary", type: "button", text: "Cancel", hidden: true, attrs: { "data-testid": "cancel-job" } });
   const clearAll = h("button", { class: "hs-btn hs-btn--ghost", type: "button", text: "Clear all", attrs: { "data-testid": "clear-all" } });
-  const bar = h("div", { class: "actionbar" }, h("div", { class: "actionbar__in" }, prog, status, errBox, why, h("div", { class: "actionbar__btns" }, primary, cancel, clearAll)));
+  // Memory guard: a plain warning before a big job, never a block.
+  const memText = h("span", { attrs: { "data-testid": "mem-warning-text" } });
+  const memOk = h("button", { class: "hs-btn hs-btn--secondary", type: "button", text: "Try anyway", attrs: { "data-testid": "mem-try-anyway" } });
+  const memBox = h("p", { class: "hs-banner hs-banner--warn", hidden: true, attrs: { role: "alert", "data-testid": "mem-warning" } }, memText, " ", memOk);
+  let memKey = ""; // the files the owner already said "try anyway" for
+  const bar = h("div", { class: "actionbar" }, h("div", { class: "actionbar__in" }, memBox, prog, status, errBox, why, h("div", { class: "actionbar__btns" }, primary, cancel, clearAll)));
 
   // output settings
   const credit = h("input", { class: "hs-check", id: "credit", type: "checkbox", attrs: { "data-testid": "producer-credit" } });
@@ -160,6 +166,7 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
   function update(full = true) {
     const busy = store.busy;
     if (full) fl.render();
+    memBox.hidden = true;
     notice.hidden = !store.notice;
     notice.textContent = store.notice;
     syncItems();
@@ -190,6 +197,10 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
 
   async function run() {
     if (!tool.run || !primaryEnabled || store.busy) return;
+    const key = ctx.files.map((f) => f.id).join();
+    const mem = memoryWarning(tool.id, ctx.files.reduce((n, f) => n + f.size, 0));
+    memBox.hidden = !mem || memKey === key;
+    if (!memBox.hidden) { memText.textContent = mem; memOk.focus(); return; }
     results = [];
     resultBox.hidden = true;
     status.textContent = "";
@@ -298,6 +309,7 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
     if (snapshot.length) toast(snapshot.length === 1 ? `Cleared ${snapshot[0].name}.` : `Cleared ${snapshot.length} files.`, { label: "Undo", run: () => store.restore(snapshot) });
   }
   primary.addEventListener("click", () => void run());
+  memOk.addEventListener("click", () => { memKey = ctx.files.map((f) => f.id).join(); void run(); });
   cancel.addEventListener("click", () => abort?.abort());
   clearAll.addEventListener("click", startOver);
   const unsub = store.subscribe(() => update());

@@ -6,5 +6,44 @@
       "scrollToEndThumbMs": 12000,
       "maxMainThreadStallMs": 4000
     }
+  },
+  "A-PERF-1": {
+    "_note": "scripts/perf-browser.mjs (npm run perf:browser): headless Chromium, 100 MB / 500-page image PDF and 1000-page text PDF, measured 2026-11-24 on a 16 GB laptop, budgets about 2x the measured numbers (docs/PERF.md).",
+    "organize1000": {
+      "metaMs": 4000,
+      "firstMs": 12000,
+      "longTaskMs": 1000,
+      "heapMB": 300
+    },
+    "organize100mb": {
+      "metaMs": 6000,
+      "firstMs": 12000,
+      "longTaskMs": 1000,
+      "heapMB": 400
+    },
+    "merge100mb": {
+      "metaMs": 6000,
+      "opMs": 30000,
+      "longTaskMs": 1500,
+      "heapMB": 600
+    },
+    "compress100mb": {
+      "metaMs": 6000,
+      "opMs": 90000,
+      "longTaskMs": 1000,
+      "heapMB": 400
+    },
+    "edit100mb": {
+      "metaMs": 6000,
+      "firstMs": 12000,
+      "longTaskMs": 1000,
+      "heapMB": 400
+    },
+    "removeBlank500": {
+      "metaMs": 6000,
+      "opMs": 40000,
+      "longTaskMs": 1000,
+      "heapMB": 400
+    }
   }
 }
