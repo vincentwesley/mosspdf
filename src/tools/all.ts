@@ -15,6 +15,7 @@ import { unprotect } from "./unprotect";
 import { safetyScan } from "./safety-scan";
 import { repair } from "./repair";
 import { fill } from "./fill";
+import { createFormTool } from "./create-form";
 import { sign } from "./sign";
 import { ocr } from "./ocr";
 import { redact } from "./redact";
@@ -42,7 +43,7 @@ import { registerSaved, registry, wfCustom } from "./wf-custom";
 import type { ToolDef } from "./types";
 export { workspace } from "../ui/workspace"; // tool-page shell: only needed once a tool opens, so it rides with the tools (D25)
 
-export const DEFS: ToolDef[] = [wfEmail, wfShare, wfApply, wfCustom, merge, split, organize, extract, imagesToPdf, pdfToImages, compress, pageNumbers, watermark, metadata, protect, unprotect, safetyScan, repair, fill, sign, ocr, redact, photo, compare, a11yCheck, edit, rotate, crop, nup, addPages, pdfToText, pdfToWord, pdfToExcel, pdfToPpt, pdfToMarkdown, flatten, removeBlank, bookmarks, extractImagesTool];
+export const DEFS: ToolDef[] = [wfEmail, wfShare, wfApply, wfCustom, merge, split, organize, extract, imagesToPdf, pdfToImages, compress, pageNumbers, watermark, metadata, protect, unprotect, safetyScan, repair, fill, createFormTool, sign, ocr, redact, photo, compare, a11yCheck, edit, rotate, crop, nup, addPages, pdfToText, pdfToWord, pdfToExcel, pdfToPpt, pdfToMarkdown, flatten, removeBlank, bookmarks, extractImagesTool];
 
 DEFS.forEach((d) => registry.set(d.id, d));
 /** The router reads this map; saved workflows join it. */

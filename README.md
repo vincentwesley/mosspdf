@@ -27,7 +27,7 @@ Free, private PDF tools that run entirely in your browser. Files never leave you
 
 - The site's CSP allows only its own origin. After the engines load, the page adds a stricter CSP that blocks all network access, and the engine workers have none at all.
 - The **Sealed** badge lists the requests since the page loaded that the browser reports. The privacy page explains how to check this yourself in DevTools.
-- No accounts, analytics, cookies or ads. The browser stores only your theme, logo size, recently used tools, the OCR languages you chose, a small counter for the logo tip and the output setting. Files and signatures are never stored.
+- No accounts, analytics, cookies or ads. The browser stores only your theme, logo size, recently used tools, the OCR languages you chose, a small counter for the logo tip and the output setting. Files are never stored. Signatures and initials are never stored unless you choose "Keep on this device"; you can forget them any time.
 - See [docs/LEGAL-REVIEW.md](docs/LEGAL-REVIEW.md) for what the app claims and its limits, and [docs/COMPARISON.md](docs/COMPARISON.md) for how it compares with other PDF tools.
 
 ## Run it offline from a release

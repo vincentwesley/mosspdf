@@ -4,9 +4,9 @@ import { addPageNumbers, assemble, compress, imagesToPdf, inspect, merge, readMe
 import type { CompressLevel, ImageInput, ImagesToPdfOptions, MetadataEdit, PageNumberOptions, WatermarkOptions } from "../ops";
 import { addTextLayer, cleanCopy, protect, repair, safetyScan, unprotect } from "../ops";
 import type { OcrPage } from "../ops";
-import { compareReport, editPages, fillForm, readForm, stampPage } from "../ops";
+import { compareReport, createForm, editPages, fillForm, readForm, stampPage } from "../ops";
 import type { ReportData } from "../core/compare";
-import type { EditInput, FormValues, StampInput } from "../ops";
+import type { CreateFormInput, EditInput, FormValues, StampInput } from "../ops";
 import { redact, accessibilityCheck, rotatePages, cropPages, flatten, nupPages, addBlankPages } from "../ops";
 import { readOutline, setOutline, extractImages } from "../ops";
 import type { ExtractImagesOptions } from "../ops";
@@ -48,6 +48,10 @@ const edit = {
   editPages: async ({ file, input, o }: { file: InFile; input: EditInput; o: { producerCredit: boolean } }, ctx: Ctx) => out(await editPages(file, input, opts(o, ctx), eng())),
 };
 
+const forms = {
+  createForm: async ({ file, input, o }: { file: InFile; input: CreateFormInput; o: { producerCredit: boolean } }, ctx: Ctx) => out(await createForm(file, input, opts(o, ctx), eng())),
+};
+
 // M7 (compare)
 const m7 = {
   compareReport: async ({ report, o }: { report: ReportData; o: O }, ctx: Ctx) => out(await compareReport(report, opts(o, ctx))),
@@ -70,6 +74,7 @@ serve({
   extractImages: async ({ file, options, o }: { file: InFile; options: ExtractImagesOptions; o: O }, ctx) => out(await extractImages(file, options, opts(o, ctx), eng())),
   ...m7,
   ...edit,
+  ...forms,
   ...m6,
   ...m4,
   ...m3,

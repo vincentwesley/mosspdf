@@ -27,7 +27,7 @@ A plain checklist of the legal and licensing points for MossPDF, as of 2026-11-2
 
 - The operator collects no personal data: there are no accounts, analytics, cookies, server logs of file contents or third-party hosts.
 - Cloudflare serves the static files. Its standard request logs (IP, user agent) apply to page loads, as for any website. The privacy page says so.
-- The browser's local storage holds only the theme, the logo form, recently used tools, the OCR languages chosen and a small counter for the logo tip. Files and signatures are never stored.
+- The browser's local storage holds only the theme, the logo form, recently used tools, the OCR languages chosen and a small counter for the logo tip. Files are never stored. Signatures and initials are never stored unless you choose "Keep on this device"; you can forget them any time.
 
 ## Names and marks
 

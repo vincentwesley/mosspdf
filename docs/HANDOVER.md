@@ -10,7 +10,7 @@ Resume here. Roadmap to 2.0: `docs/ROADMAP.md`. Original plan: `docs/PLAN.md`. C
 ## 1. Done in v1.0.0
 - Tools: merge, split, organize, extract, images to PDF, PDF to images, compress, page numbers, watermark, metadata, add/remove password (correct password only), safety scan + cleaned copy, repair, fill, sign, OCR (English), redact (SG NRIC/FIN, phones, emails, addresses), photo clean, compare, accessibility check.
 - Workflows: Small enough to email, Clean copy to share, Job application pack. Command palette (Ctrl/Cmd+K), shortcuts (?), batch with zip output.
-- Privacy: header CSP + seal after preload, request log, no storage of files or signatures; privacy page names Cloudflare's request logs.
+- Privacy: header CSP + seal after preload, request log, no storage of files; signatures only if the user opts in (Keep on this device, `mosspdf.saved-sigs`, max 4, 200 KB each, validated on load, "Forget all"); privacy page names Cloudflare's request logs.
 - Docs: USABILITY (3 personas, fixes), PERF (large files), LEGAL-REVIEW, COMPARISON, DECISIONS D1-D19.
 
 ## 2. Needs the owner (never blocks; see NEEDS-VIN.md)
