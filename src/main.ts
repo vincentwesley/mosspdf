@@ -9,7 +9,6 @@ import { netlog } from "./core/netlog";
 import { badgeText, privacyDialog, privacyPage, VERSION } from "./ui/privacy";
 import { homeView } from "./ui/home";
 import { h } from "./ui/dom";
-import { workspace } from "./ui/workspace";
 import { toolById } from "./tools";
 import type { ToolDef } from "./tools/types";
 import { live } from "./ui/dom";
@@ -84,7 +83,8 @@ initInstall(document.querySelector<HTMLElement>(".appfoot")!);
 
 // D25: tool code is one chunk, imported before the seal (an engine entry) so nothing loads afterwards.
 let defs: Map<string, ToolDef> | undefined;
-const toolsReady = import("./tools/all").then((m) => { defs = new Map(m.DEFS.map((d) => [d.id, d])); });
+let workspace: typeof import("./tools/all").workspace;
+const toolsReady = import("./tools/all").then((m) => { defs = new Map(m.DEFS.map((d) => [d.id, d])); workspace = m.workspace; });
 registerEngine({ name: "tools", load: () => toolsReady });
 
 function resolve(): { el: HTMLElement; destroy: () => void } {

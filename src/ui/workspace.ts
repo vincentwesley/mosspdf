@@ -16,6 +16,7 @@ import { openDoc, renderThumb } from "../core/render";
 import { newItem, pageGrid } from "./pagegrid";
 import { saveResult, saveZip } from "./download";
 import { toolBox } from "./toolicons";
+import { tray } from "./tray";
 
 const DROP_TITLE = { pdf: "Drop a PDF here", pdfs: "Drop PDFs here", images: "Drop images here", "pdf-pair": "Drop the two PDFs here" } as const;
 const CHOOSE = { pdf: "Choose a PDF", pdfs: "Choose PDF files", images: "Choose images", "pdf-pair": "Choose two PDFs" } as const;
@@ -102,6 +103,7 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
     visible: () => (single ? ofKind().slice(-1) : ofKind()),
     label: tool.accepts === "pdf-pair" ? (_f, i) => (i === 0 ? "Original" : "Changed") : undefined,
   });
+  const tr = tray({ kind, single });
   const carryTxt = h("span", { attrs: { "data-testid": "carry-text" } });
   const carryBox = h("p", { class: "hs-banner hs-banner--info", hidden: true, attrs: { role: "status", "data-testid": "carry-over" } }, carryTxt,
     h("button", { class: "hs-btn hs-btn--ghost", type: "button", text: "Clear", attrs: { "data-testid": "carry-clear" }, on: { click: () => startOver() } }));
@@ -317,7 +319,7 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
 
   const el = h("div", { class: "view tool" },
     h("header", { class: "view__head" }, toolBox(tool.id, true), h1, h("p", { class: "view__lede", text: tool.lede }), ...(tool.how ? [h("p", { class: "view__how", text: tool.how, attrs: { "data-testid": "tool-how" } })] : [])),
-    dz, soon, notice, carryBox, fl.el, tip, warnBox, optBox, gridBox, settings, resultBox, bar);
+    dz, tr.el, soon, notice, carryBox, fl.el, tip, warnBox, optBox, gridBox, settings, resultBox, bar);
   update();
-  return { el, destroy: () => { dropThumb(); unsub(); grid?.destroy(); abort?.abort(); tool.destroy?.(ctx); } };
+  return { el, destroy: () => { tr.destroy(); dropThumb(); unsub(); grid?.destroy(); abort?.abort(); tool.destroy?.(ctx); } };
 }

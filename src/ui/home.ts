@@ -5,6 +5,7 @@ import { matchTool } from "../core/toolsearch";
 import { h } from "./dom";
 import { dropzone, setFilesHandler } from "./dropzone";
 import { toolBox } from "./toolicons";
+import { tray } from "./tray";
 
 /** First-visit hint: dismissed for good in localStorage. */
 const HINT = "mosspdf.hint-home";
@@ -103,6 +104,7 @@ export function homeView(navigate: (hash: string) => void): { el: HTMLElement; d
   const hint = h("p", { class: "hs-banner hs-banner--info hint", hidden: hintSeen(), attrs: { "data-testid": "home-hint" } },
     h("span", { text: "Drop a file or paste it. It never leaves this device." }),
     h("button", { class: "dlg__x", type: "button", text: "Close", attrs: { "aria-label": "Close hint", "data-testid": "home-hint-close" }, on: { click: () => { hint.hidden = true; try { localStorage.setItem(HINT, "1"); } catch { /* private mode */ } } } }));
+  const tr = tray();
   const el = h("div", { class: "view home" },
     h("header", { class: "hero" },
       h("h1", { text: "PDF tools that stay on your device.", attrs: { tabindex: -1, "data-testid": "view-heading" } }),
@@ -110,10 +112,11 @@ export function homeView(navigate: (hash: string) => void): { el: HTMLElement; d
       h("ol", { class: "steps3", attrs: { "data-testid": "three-steps" } }, ...["Pick a tool.", "Add your file.", "Download."].map((t) => h("li", { text: t })))),
     dropzone({ hint: "Or paste them. They stay on this device." }),
     h("p", { class: "trust" }, h("a", { href: "#/privacy", text: "Files stay on this device · No account · Works offline after the first visit", attrs: { "data-testid": "trust-strip" } })),
+    tr.el,
     findRow,
     recentRow,
     groups[0].el,
     h("div", { class: "groups-soon" }, ...groups.slice(1).map((g) => g.el)),
     chooser);
-  return { el, destroy: () => chooser.close() };
+  return { el, destroy: () => { tr.destroy(); chooser.close(); } };
 }

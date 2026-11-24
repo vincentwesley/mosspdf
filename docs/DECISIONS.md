@@ -211,3 +211,7 @@ Symptom: a `worker-src` CSP violation on page load in Firefox, seen twice in a f
 - **Large files:** measured (PERF.md): no freezes; thumbnails were already lazy, cancelable, 2 at a time. Added `core/memguard.ts`: files ≥ 50 MB whose estimate (size × tool factor 3-5) exceeds a quarter of `navigator.deviceMemory` (1.5 GB if unknown) get a warning with "Try anyway", never a block. `npm run perf:browser` enforces A-PERF-1 budgets.
 - **Tests:** playwright.config local `globalTimeout` 40 min, 60 s per test, 2 workers on Windows; `scripts/pw.mjs` kills its child tree on exit and has a 50 min watchdog (`PW_WATCHDOG_MIN`). Cause of the original silent hang not found; it can no longer hang unseen. CI browser-install retries run `apt-get update`.
 
+
+## D34. File tray; shell moved into the tools chunk (2026-11-24)
+- **Chunk.** `src/tools/all.ts` re-exports `workspace`, so the tool-page shell (and fields, pagegrid, download, preview) loads in the pre-seal tools chunk, not main. main gzip 27.6 to 16.3 KB; `main-gzip` budget 28 to 20.
+- **Tray.** `src/ui/tray.ts` lists every file held in memory (home chip "N files ready" and tool pages) with remove (44px+ X, undo toast) and Clear all; "Kept only while this tab is open". Inside a tool, files it won't use are dimmed with a reason (`src/core/trayfit.ts`: wrong kind, or not the newest PDF for one-PDF tools). Fitting files are used automatically, as before; "Continue with" results land in the tray.
