@@ -112,5 +112,5 @@ Accepted (ranked):
 Rejected:
 - QR handoff to sign on a phone (iLovePDF): needs a server relay; breaks "nothing leaves the device".
 - Cloud import (Drive, Dropbox): network, and a privacy risk.
-- Saving signatures between visits: convenient but sensitive; not stored at all (D15).
+- Saving signatures between visits: convenient but sensitive; originally not stored (D15), now strictly opt-in ("Keep on this device", default off, v1.12).
 - Accounts, caps, watermarks, upsells: never.

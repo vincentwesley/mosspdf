@@ -163,6 +163,35 @@ test.describe("Sign", () => {
     expect((dl.bytes.toString("latin1").match(/\/Subtype\s*\/Image/g) ?? []).length).toBeGreaterThanOrEqual(1);
   });
 
+  test("A-E2E-1 keep a signature on this device: reload, saved thumbnail places it, forget all clears storage", async ({ page }) => {
+    await loadApp(page, "/#/sign");
+    await add(page, "plain-3p");
+    await ready(page);
+    await expect(page.getByTestId("sg-saved")).toBeHidden();
+    await typeSignature(page);
+    await page.getByTestId("sg-keep").check();
+    await page.getByTestId("sg-date-under").check();
+    await page.getByTestId("sg-pageno").fill("1");
+    await page.getByTestId("sg-place").click();
+    await expect(page.getByTestId("sg-row")).toHaveCount(2); // signature + its date
+    await expect(page.getByTestId("sg-saved-use")).toHaveCount(1);
+    await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem("mosspdf.saved-sigs") ?? "[]").length)).toBe(1);
+    await page.reload();
+    await loadApp(page, "/#/sign");
+    await add(page, "plain-3p");
+    await ready(page);
+    await expect(page.getByTestId("sg-saved-use")).toHaveCount(1);
+    await expect(page.getByTestId("sg-saved")).toContainText("Never uploaded");
+    await page.getByTestId("sg-saved-use").click();
+    await expect(page.getByTestId("sg-row")).toHaveCount(1);
+    await primary(page).click();
+    const dl = await save(page);
+    expect((dl.bytes.toString("latin1").match(/\/Subtype\s*\/Image/g) ?? []).length).toBeGreaterThanOrEqual(1);
+    await page.getByTestId("sg-forget-all").click();
+    await expect(page.getByTestId("sg-saved")).toBeHidden();
+    expect(await page.evaluate(() => localStorage.getItem("mosspdf.saved-sigs"))).toBeNull();
+  });
+
   test("A-E2E-1 text and date on every page; keyboard moves and deletes an item", async ({ page }) => {
     test.skip(isMobile(), "keyboard-only flow");
     await loadApp(page, "/#/sign");
