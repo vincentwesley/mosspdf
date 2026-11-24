@@ -235,6 +235,8 @@ export const sign: ToolDef = {
   id: "sign", title: "Sign", heading: "Sign a PDF", group: "Fill and sign",
   blurb: "Add your signature.",
   lede: "Draw, type or upload a signature, then click a page to place it. You can also add initials, today's date or a line of text.",
+  how: "Add a PDF, make your signature, click where it goes, then save.",
+  next: ["flatten", "compress", "protect"],
   accepts: "pdf",
   options(ctx) {
     const u = ui(ctx);

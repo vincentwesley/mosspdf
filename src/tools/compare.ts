@@ -40,6 +40,7 @@ export const compare: ToolDef = {
   id: "compare", title: "Compare", group: "Compare",
   blurb: "Spot what changed.",
   lede: "Put two versions of a PDF side by side and see what changed. Both stay on this device.",
+  how: "Add the original and the changed PDF, then see the differences page by page.",
   accepts: "pdf-pair",
   next: [],
   options(ctx) {
@@ -53,7 +54,7 @@ export const compare: ToolDef = {
   },
   summary: (ctx) => ui(ctx).summary,
   destroy(ctx) { ui(ctx).view.destroy(); },
-  primaryLabel: () => "Compare",
+  primaryLabel: () => "Compare PDFs",
   async run(ctx): Promise<OpResult[]> {
     const u = ui(ctx);
     const files = [ctx.files[0], ctx.files[1]] as const;

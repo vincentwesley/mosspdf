@@ -205,3 +205,9 @@ Symptom: a `worker-src` CSP violation on page load in Firefox, seen twice in a f
 - **Split by bookmarks** (`ops/assemble.ts` `bookmarkParts`): top-level bookmarks with a page, each to the page before the next; names sanitised, max 80, unique. Pages before the first bookmark are not exported.
 - **Headers** (`ops/stamp.ts`): tokens {n} {total} {date} {file}; page set all / skip first / range; mirror swaps left and right on even physical pages; margin in mm (default 36 pt). Plain text without a token needs `allowPlain` (UI sets it).
 
+## D33. Quality pass, v1.9 (2026-11-24)
+- **Copy:** primary actions are verb + object; `ToolDef.how` (tools chunk, not main) gives one line per tool under the lede; error messages follow "what happened + what to do", codes unchanged; home hint strip (`mosspdf.hint-home`) replaces the hero lede.
+- **A11y:** `e2e/a11y-tools.spec.ts` (chromium) runs axe (WCAG 2/2.1/2.2 A+AA) on all tools empty and loaded plus a keyboard walk; the only gap was disabled primary buttons without a reason, now `whyDisabled` on 8 tools.
+- **Large files:** measured (PERF.md): no freezes; thumbnails were already lazy, cancelable, 2 at a time. Added `core/memguard.ts`: files ≥ 50 MB whose estimate (size × tool factor 3-5) exceeds a quarter of `navigator.deviceMemory` (1.5 GB if unknown) get a warning with "Try anyway", never a block. `npm run perf:browser` enforces A-PERF-1 budgets.
+- **Tests:** playwright.config local `globalTimeout` 40 min, 60 s per test, 2 workers on Windows; `scripts/pw.mjs` kills its child tree on exit and has a 50 min watchdog (`PW_WATCHDOG_MIN`). Cause of the original silent hang not found; it can no longer hang unseen. CI browser-install retries run `apt-get update`.
+

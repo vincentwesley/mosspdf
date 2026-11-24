@@ -13,6 +13,8 @@ export const unprotect: ToolDef = {
   id: "unprotect", title: "Remove password", heading: "Remove a password", group: "Protect",
   blurb: "Unlock a PDF you have the password for.",
   lede: "Remove the password from a PDF you can already open.",
+  how: "Add the locked PDF, enter its password, then save an unlocked copy.",
+  next: ["compress", "organize", "sign", "page-numbers", "watermark"],
   accepts: "pdf",
   options(ctx) { return ui(ctx).box; },
   sync(ctx) {
@@ -27,6 +29,7 @@ export const unprotect: ToolDef = {
   },
   warnings: (ctx) => (ctx.file?.info && !ctx.file.info.encrypted ? ["This PDF has no password, so there is nothing to remove."] : []),
   ready: (ctx) => !!ctx.file?.info?.encrypted && ui(ctx).pw.input.value !== "",
+  whyDisabled: (ctx) => (!ctx.file ? "Add a PDF first." : ctx.file.info?.encrypted ? "Type the password." : "This PDF has no password."),
   primaryLabel: () => "Remove password",
   async run(ctx) {
     return [await ctx.call<OpResult>("unprotect", { file: ctx.input(ctx.file!), p: { password: ui(ctx).pw.input.value }, o: { producerCredit: ctx.producerCredit } })];

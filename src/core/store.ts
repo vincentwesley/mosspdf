@@ -82,9 +82,9 @@ export const store = {
     f.error = undefined;
     notify();
     try {
-      if (!f.bytes.length) throw new PdfError("empty", "This file is empty.", f.name);
+      if (!f.bytes.length) throw new PdfError("empty", "This file is empty. Choose a different file.", f.name);
       if (!PDF_MAGIC.every((b, i) => f.bytes[i] === b) && !new TextDecoder().decode(f.bytes.subarray(0, 1024)).includes("%PDF")) {
-        throw new PdfError("not-pdf", "This is not a PDF file.", f.name);
+        throw new PdfError("not-pdf", "This is not a PDF file. Choose a PDF instead.", f.name);
       }
       f.info = await opsRpc.call<Inspection>("inspect", { file: toIn(f) });
       f.status = f.info.needsPassword ? "locked" : "ready";
@@ -151,21 +151,17 @@ export const ops = {
   split: (file: LoadedFile, mode: SplitMode, o: CallOptions) => opsRpc.call<OpResult[]>("split", { file: toIn(file), mode, o: { producerCredit: prefs.producerCredit } }, base(o)),
 };
 
-/** Plain message + next step for any failure. */
+/** Plain message for any failure: what happened, then what to do (each PdfError message carries both). */
 export function errorMessage(e: unknown): string {
   if (e instanceof PdfError) {
-    const who = e.fileName ? `"${e.fileName}": ` : "";
+    const who = e.fileName && !e.message.includes(e.fileName) ? `"${e.fileName}": ` : "";
+    // Fallback next step for one-sentence messages (e.g. from the worker or password flow) that don't say what to do.
     const next: Record<string, string> = {
-      "not-pdf": "Choose a PDF file instead.",
-      empty: "Choose a different file.",
-      corrupt: "Try opening it in another app and saving a fresh copy, then add it again.",
-      encrypted: "Enter its password to open it.",
-      "wrong-password": "Check the password and try again.",
-      unsupported: "MossPDF cannot handle this kind of file yet.",
-      "too-large": "Try a smaller file, or split it elsewhere first.",
-      cancelled: "Nothing was changed.",
+      "not-pdf": "Choose a PDF instead.", empty: "Choose a different file.", corrupt: "Open it in another app, save a fresh copy, then add it again.",
+      encrypted: "Enter its password to open it.", "wrong-password": "Check the password and try again.", "too-large": "Try a smaller file, or split it first.", cancelled: "Nothing was changed.",
     };
-    return `${who}${e.message} ${next[e.code] ?? ""}`.trim();
+    const oneSentence = !/[.!?]\s+\S/.test(e.message.trim());
+    return `${who}${e.message}${oneSentence && next[e.code] ? ` ${next[e.code]}` : ""}`;
   }
   return "Something went wrong with this file. Your files are still here. Try again, or remove the file and add it again.";
 }

@@ -22,8 +22,8 @@ export async function prepare(file: InFile, o: Pick<OpOptions, "signal">, e: Eng
 export function selectPages(pages: number[] | undefined, info: Inspection, file: InFile): number[] {
   const n = info.pageCount;
   const sel = pages ? [...new Set(pages)].sort((a, b) => a - b) : Array.from({ length: n }, (_, i) => i);
-  if (!sel.length) throw new PdfError("unsupported", "No pages are selected. Pick at least one page.", file.name);
+  if (!sel.length) throw new PdfError("unsupported", "No pages are selected. Pick at least one page and try again.", file.name);
   const bad = sel.find((p) => !Number.isInteger(p) || p < 0 || p >= n);
-  if (bad !== undefined) throw new PdfError("unsupported", `Page ${bad + 1} doesn't exist in "${file.name}", which has ${n} page${n === 1 ? "" : "s"}.`, file.name);
+  if (bad !== undefined) throw new PdfError("unsupported", `Page ${bad + 1} doesn't exist in "${file.name}", which has ${n} page${n === 1 ? "" : "s"}. Pick a page that is in the file.`, file.name);
   return sel;
 }

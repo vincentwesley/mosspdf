@@ -4,6 +4,14 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 
 ## [Unreleased]
 
+## [1.9.0] - 2026-11-24
+Quality pass (D33, roadmap v1.9).
+- Clearer everywhere: buttons say what they do ("Merge PDFs", "Shrink PDF"), each tool has a one-line "how it works", the drop area says which files it takes, and about 70 error messages now say what happened and what to do.
+- First-visit hint on home (closable). Better "Continue with" suggestions after a result.
+- Accessibility: every tool checked with axe (WCAG 2.2 AA) and a keyboard walk, empty and with a file loaded; disabled buttons now explain why.
+- Large files: a plain warning with "Try anyway" before heavy jobs on big files when the device may run short of memory; browser performance budgets for 100 MB and 1000-page files.
+- Test runs can no longer hang silently; flaky tests steadied.
+
 ## [1.8.0] - 2026-11-23
 - PDF to Excel (D32): tables from text positions into .xlsx (a sheet per page) or CSV; numbers become numbers; CSV text cells are guarded against formula injection.
 - Extract images (D32): save the pictures inside a PDF (JPEGs byte for byte, others as PNG), optionally skipping tiny ones.

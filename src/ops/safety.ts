@@ -217,7 +217,7 @@ export async function cleanCopy(file: InFile, c: CleanOptions, o: OpOptions, e: 
   o.onProgress?.(2, 4);
   const r = await e.qpdf(["--object-streams=disable", "/in.pdf", "/out.pdf"], { "/in.pdf": rawBytes }, ["/out.pdf"]);
   const bytes = r.files["/out.pdf"];
-  if (!bytes || r.code === 2) throw new PdfError("corrupt", `A clean copy of "${file.name}" couldn't be made. The original is unchanged.`, file.name);
+  if (!bytes || r.code === 2) throw new PdfError("corrupt", `A clean copy of "${file.name}" couldn't be made. Your original is unchanged. Try Repair first, then scan again.`, file.name);
   const after = await safetyScan({ name: file.name, bytes }, e);
   o.onProgress?.(4, 4);
 

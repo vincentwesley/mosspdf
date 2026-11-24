@@ -21,11 +21,12 @@ export const pdfToExcel: ToolDef = {
   id: "pdf-to-excel", title: "PDF to Excel", heading: "Pull tables out of a PDF", group: "Convert",
   blurb: "Pull tables out into a spreadsheet.",
   lede: "Find the rows and columns on each page and save them as an Excel file or CSV.",
+  how: "Add a PDF, check the tables found, then save an Excel file or CSV.",
   accepts: "pdf",
   next: [],
   options: (ctx) => ui(ctx).root,
   whyDisabled: () => "Add a PDF first.",
-  primaryLabel: () => "Make spreadsheet",
+  primaryLabel: () => "Make Excel file",
   async run(ctx): Promise<OpResult[]> {
     const u = ui(ctx);
     const f = ctx.file!;

@@ -6,6 +6,7 @@ const WIDTHS = [320, 375, 768, 1280];
 for (const theme of ["dark", "light"] as Theme[]) {
   test(`A-E2E-10 home is compact on small screens (${theme})`, async ({ page }) => {
     test.skip(test.info().project.name !== "chromium", "layout is engine-independent; Chromium is enough");
+    test.setTimeout(150_000); // four full loads (each waits for the seal) plus axe: well past the default when the machine is busy
     for (const w of WIDTHS) {
       await page.setViewportSize({ width: w, height: 800 });
       await loadApp(page);

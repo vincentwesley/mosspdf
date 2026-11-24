@@ -52,6 +52,7 @@ export const split: ToolDef = {
   id: "split", title: "Split", heading: "Split a PDF", group: "Organize",
   blurb: "Cut a PDF into parts.",
   lede: "Cut one PDF into several smaller files.",
+  how: "Add a PDF, choose how to cut it, then save the parts.",
   accepts: "pdf",
   options(ctx) {
     const u = ui(ctx);
@@ -78,6 +79,7 @@ export const split: ToolDef = {
   },
   warnings: pdfLossWarnings,
   ready: (ctx) => !!plan(ctx),
-  primaryLabel(ctx) { const n = plan(ctx)?.parts?.length; return n ? `Split into ${plural(n, "file")}` : "Split"; },
+  whyDisabled: (ctx) => (ctx.file ? "Check the split settings above." : "Add a PDF first."),
+  primaryLabel(ctx) { const n = plan(ctx)?.parts?.length; return n ? `Split into ${plural(n, "file")}` : "Split PDF"; },
   run: (ctx) => ops.split(ctx.file!, plan(ctx)!.mode, ctx.o),
 };

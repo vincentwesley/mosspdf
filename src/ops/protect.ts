@@ -34,7 +34,7 @@ export async function authorise(f: InFile, e: Engines): Promise<Authorised> {
   if (!enc.ownerpasswordmatched && restricted) {
     throw new PdfError(
       "wrong-password",
-      `"${f.name}" has restrictions (for example on printing, copying or editing). Taking them off needs its owner password, which can be different from the password that opens it. Enter the owner password.`,
+      `"${f.name}" has limits on printing, copying or editing. To remove them you need its owner password, which can differ from the password that opens it. Enter the owner password and try again.`,
       f.name,
     );
   }
@@ -44,9 +44,9 @@ export async function authorise(f: InFile, e: Engines): Promise<Authorised> {
 }
 
 export async function protect(file: InFile, p: ProtectOptions, o: OpOptions, e: Engines): Promise<OpResult> {
-  if (!p.userPassword) throw new PdfError("unsupported", "Enter a password to protect the file with. An empty password would not protect anything.", file.name);
+  if (!p.userPassword) throw new PdfError("unsupported", "Enter a password to lock the file with. An empty password would not protect anything.", file.name);
   const owner = p.ownerPassword || p.userPassword;
-  if (p.userPassword.length > MAX_PW || owner.length > MAX_PW) throw new PdfError("unsupported", `Passwords can be at most ${MAX_PW} characters long.`, file.name);
+  if (p.userPassword.length > MAX_PW || owner.length > MAX_PW) throw new PdfError("unsupported", `Passwords can be at most ${MAX_PW} characters long. Use a shorter one.`, file.name);
   checkAbort(o.signal);
   // An already protected input is only re-encrypted by someone allowed to change it (owner rule).
   const plain = await authorise(file, e);
@@ -85,7 +85,7 @@ export async function protect(file: InFile, p: ProtectOptions, o: OpOptions, e: 
 }
 
 export async function unprotect(file: InFile, p: UnprotectOptions, o: OpOptions, e: Engines): Promise<OpResult> {
-  if (!p.password) throw new PdfError("wrong-password", `Enter the password for "${file.name}".`, file.name);
+  if (!p.password) throw new PdfError("wrong-password", `"${file.name}" is locked with a password. Enter the password to continue.`, file.name);
   checkAbort(o.signal);
   // Empty or non-PDF input is classified by openPdf below; a wrong password throws wrong-password from authorise.
   const plain = await authorise({ ...file, password: p.password }, e);

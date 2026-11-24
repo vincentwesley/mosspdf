@@ -159,6 +159,8 @@ export const fill: ToolDef = {
   id: "fill", title: "Fill forms", heading: "Fill in a form", group: "Fill and sign",
   blurb: "Fill in a PDF form.",
   lede: "Type into the fields of a PDF form, on the page or in the list below, then save a filled copy.",
+  how: "Add a PDF form, type into its fields, then save the filled copy.",
+  next: ["sign", "flatten", "compress", "protect"],
   accepts: "pdf",
   options(ctx) { return ui(ctx).root; },
   sync(ctx) {

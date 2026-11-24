@@ -110,7 +110,7 @@ function scrubNames(doc: PDFDocument, needles: string[]): void {
 }
 
 export async function redact(file: InFile, input: RedactInput, o: OpOptions, e: Engines): Promise<OpResult> {
-  if (!input.pages.length) throw new PdfError("unsupported", "Nothing is selected to redact.", file.name);
+  if (!input.pages.length) throw new PdfError("unsupported", "Nothing is selected to redact. Tick at least one item and try again.", file.name);
   const p = await prepare(file, o, e);
   const doc = await PDFDocument.load(p.bytes, { updateMetadata: false, throwOnInvalidObject: false });
   const pages = doc.getPages();
@@ -146,10 +146,10 @@ export async function redact(file: InFile, input: RedactInput, o: OpOptions, e: 
   // The full rewrite: no incremental history, and only the objects that are still reachable (the old pages, fonts and images are gone).
   const r = await e.qpdf(["--object-streams=disable", "/in.pdf", "/out.pdf"], { "/in.pdf": raw }, ["/out.pdf"]);
   const bytes = r.files["/out.pdf"];
-  if (!bytes || r.code === 2) throw new PdfError("corrupt", `"${file.name}" couldn't be redacted. The original is unchanged.`, file.name);
+  if (!bytes || r.code === 2) throw new PdfError("corrupt", `"${file.name}" couldn't be redacted. Your original is unchanged. Try again, or run Repair first.`, file.name);
   o.onProgress?.(input.pages.length + 1, input.pages.length + 2);
   const left = await leaks(bytes, input.needles, new Set(input.keptNeedles), e);
-  if (left.length) throw new PdfError("corrupt", "The redacted copy was checked and still contained some of the text, so it was not saved. Try again, and tell us if it keeps happening.", file.name);
+  if (left.length) throw new PdfError("corrupt", "The redacted copy was checked and still contained some of the text, so it was not saved. Try again, or redact fewer items.", file.name);
   o.onProgress?.(input.pages.length + 2, input.pages.length + 2);
 
   const n = input.pages.length;

@@ -39,6 +39,8 @@ export const watermark: ToolDef = {
   id: "watermark", title: "Watermark", heading: "Add a watermark", group: "Edit",
   blurb: "Stamp text on every page.",
   lede: "Stamp a line of text across your pages, such as DRAFT or CONFIDENTIAL.",
+  how: "Add a PDF, type the stamp text, then save the stamped copy.",
+  next: ["compress", "protect", "sign"],
   accepts: "pdf", batch: true,
   options(ctx) {
     const u = ui(ctx);
@@ -58,6 +60,7 @@ export const watermark: ToolDef = {
   },
   warnings: pdfLossWarnings,
   ready(ctx) { const p = plan(ctx); return !!ctx.file && !!p.text.trim() && !p.bad.length && !!p.sel && p.opacityOk && p.sizeOk && p.angleOk; },
+  whyDisabled: (ctx) => (ctx.file ? "Check the watermark settings above." : "Add a PDF first."),
   primaryLabel: () => "Add watermark",
   async run(ctx) {
     const u = ui(ctx);

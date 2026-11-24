@@ -27,6 +27,8 @@ export const extract: ToolDef = {
   id: "extract", title: "Extract pages", group: "Organize",
   blurb: "Keep only the pages you pick.",
   lede: "Pick the pages you want to keep. Your original is never changed.",
+  how: "Add a PDF, tick the pages you want, then save only those.",
+  next: ["organize", "compress", "protect", "merge"],
   accepts: "pdf", grid: { selectable: true },
   options: (ctx) => field(ctx).el,
   sync(ctx) {
@@ -38,6 +40,7 @@ export const extract: ToolDef = {
   onItems(ctx) { field(ctx).input.value = compress(ctx.items.map((p, i) => (p.selected ? i + 1 : 0)).filter(Boolean)); },
   warnings: pdfLossWarnings,
   ready: (ctx) => ctx.items.some((p) => p.selected),
+  whyDisabled: (ctx) => (ctx.file ? "Pick at least one page." : "Add a PDF first."),
   primaryLabel(ctx) { const n = ctx.items.filter((p) => p.selected).length; return n ? `Extract ${plural(n, "page")}` : "Extract pages"; },
   run: (ctx) => assemble(ctx, ctx.items.filter((p) => p.selected), `${base(ctx.file!.name)}-extract.pdf`),
 };

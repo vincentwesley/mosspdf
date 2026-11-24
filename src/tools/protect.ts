@@ -41,6 +41,8 @@ export const protect: ToolDef = {
   id: "protect", title: "Add password", heading: "Add a password", group: "Protect",
   blurb: "Lock a PDF with a password.",
   lede: "Lock a PDF so it needs a password to open.",
+  how: "Add a PDF, choose a password, then save the locked copy.",
+  next: [],
   accepts: "pdf", batch: true,
   options(ctx) { return ui(ctx).box; },
   sync(ctx) {
@@ -58,6 +60,7 @@ export const protect: ToolDef = {
     const p = problems(ctx);
     return !!ctx.file && u.f.pw.input.value !== "" && u.f.confirm.input.value === u.f.pw.input.value && !p.needOwner && !p.sameOwner;
   },
+  whyDisabled: (ctx) => (ctx.file ? "Type the password twice, the same both times." : "Add a PDF first."),
   primaryLabel: () => "Add password",
   async run(ctx) {
     const { f, perms } = ui(ctx);

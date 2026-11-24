@@ -44,3 +44,28 @@ An earlier run with a 458 MB variant of (b): compress 144 s, repair 6.6 s at 2.6
 - Cap or warn on inputs above about 250 MB (there is a `too-large` error code) since repair/scan RSS passes 2 GB beyond that.
 - Safety scan only needs structure, not stream data: scanning without copying the full buffer into qpdf (or using `--json` on the inspected object tree) would cut RSS.
 - Verify the browser equivalents in Playwright separately (these figures are Node only).
+
+## Browser pass (v1.9, 2026-11-24)
+`npm run build && PH_PORT=4873 npm run perf:browser [scenario]` (`scripts/perf-browser.mjs`): headless Chromium against `dist`, fixtures built in the OS temp dir (not the repo). Inputs: (c) 500 pages cycling over 33 distinct 1000x1000 RGB noise images, 95 MB; (d) `text-1000p.pdf` from the corpus. Long tasks = `PerformanceObserver("longtask")`; heap = `performance.memory.usedJSHeapSize` on the main thread only (the ops worker and pdf.js worker are not in it). 16 GB Windows laptop, one run each, so expect roughly +-40% noise between runs. Budgets (about 2x) are in `tests/perf.budgets.json` under `A-PERF-1`; any miss exits 1.
+
+| Scenario | File meta | First page drawn | Op | Longest task | Heap peak |
+|---|---|---|---|---|---|
+| organize, 1000-page text (d) | 0.1 s | 3.7 to 6.8 s | | 126 to 172 ms | 9 MB |
+| organize, 500-page 95 MB (c) | 0.4 to 2.4 s | 2.5 to 4.8 s | | 115 to 177 ms | 102 MB |
+| merge (c + d, 1500 pages) | 0.4 s | | 4.5 to 8.6 s | 325 to 472 ms | 201 MB |
+| compress balanced (c) | 0.2 to 0.9 s | | 36 to 47 s | 109 to 134 ms | 116 MB |
+| edit, open (c) | 0.3 to 1.1 s | 0.6 to 1.2 s | | 107 to 189 ms | 103 MB |
+| remove-blank scan, 500 pages (c) | 0.1 to 0.4 s | | 10 to 20 s | 0 to 112 ms | 111 MB |
+
+Ranges are two runs (the first before any change, the second after the memory guard; no render-path code changed). Nothing freezes: the longest main-thread task is under 0.5 s everywhere. Single cold run of organize: cards built by 0.3 s (text) or 1.1 s (95 MB, the worker `inspect` copy), first thumbnail 2.4 to 2.7 s.
+
+What was already right (no change needed): thumbnails and the Fill/Edit page viewer draw only on screen (IntersectionObserver, 500 to 600 px buffer), release canvases when they leave, cancel queued renders, and run at most 2 at a time. Results come back from the worker as transferred buffers. Every long loop (worker ops via `checkAbort`, pdf.js tool loops via `ctx.o.signal`, remove-blank via its own `stop`) already honours Cancel.
+
+Costs left, by size:
+- Compress is 36 to 47 s on 95 MB of incompressible noise (worker, progress shown, Cancel works); see the Node table above.
+- Each thumbnail costs about 150 to 400 ms of pdf.js time. For non-embedded Helvetica/Arial pages part of it is the missing Liberation Sans data (not shipped on purpose, D22).
+- Opening a document copies the file twice on the main thread (`inspect` message to the ops worker, `bytes.slice()` for pdf.js, which takes ownership): peak main heap is about 1x the file for organize, 2x for merge of two files. The store must keep its own bytes, so this cannot be a transfer.
+- `content-visibility: auto` was not added to page cards: it implies paint containment, which would clip the card's outer `box-shadow` frame.
+
+### Memory guard
+`src/core/memguard.ts`: before an op runs, `estimateNeed` = input bytes x factor (compress 5, repair 4, safety scan 4, ocr 4, everything else 3, from the RSS multiples above). If the file is 50 MB or more and the estimate is over the tab budget (a quarter of `navigator.deviceMemory`, or 1.5 GB when the browser does not say), the action bar shows a plain warning with a "Try anyway" button instead of running. It never blocks. Tests: `tests/core/memguard.test.ts`, `e2e/memguard.spec.ts`.

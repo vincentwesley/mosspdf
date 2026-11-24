@@ -26,16 +26,16 @@ export interface ImagesToPdfOptions {
 const PAGES = { a4: [595.28, 841.89], letter: [612, 792] } as const;
 
 export async function imagesToPdf(images: ImageInput[], opts: ImagesToPdfOptions, o: OpOptions): Promise<OpResult> {
-  if (!images.length) throw new PdfError("unsupported", "Add at least one image first.");
+  if (!images.length) throw new PdfError("unsupported", "There is no picture to work on. Add a picture and try again.");
   const size = opts.size ?? "fit";
   const dpi = opts.dpi ?? 72;
   const margin = opts.margin ?? 36;
-  if (!(dpi > 0 && dpi <= 2400)) throw new PdfError("unsupported", "The DPI must be between 1 and 2400.");
-  if (!(margin >= 0 && margin < 200)) throw new PdfError("unsupported", "The margin must be between 0 and 200 points.");
+  if (!(dpi > 0 && dpi <= 2400)) throw new PdfError("unsupported", "The DPI must be between 1 and 2400. Change it and try again.");
+  if (!(margin >= 0 && margin < 200)) throw new PdfError("unsupported", "The margin must be between 0 and 200 points. Change it and try again.");
   const doc = await PDFDocument.create({ updateMetadata: false });
   for (const [i, im] of images.entries()) {
     checkAbort(o.signal);
-    if (!(im.width > 0 && im.height > 0)) throw new PdfError("unsupported", `"${im.name}" has no size. Open it again.`, im.name);
+    if (!(im.width > 0 && im.height > 0)) throw new PdfError("unsupported", `"${im.name}" couldn't be measured. Remove it and add it again.`, im.name);
     let img;
     try {
       img = im.format === "jpeg" ? await doc.embedJpg(im.bytes) : await doc.embedPng(im.bytes);
@@ -52,7 +52,7 @@ export async function imagesToPdf(images: ImageInput[], opts: ImagesToPdfOptions
       let [a, b]: number[] = [...PAGES[size]];
       if (opts.orientation === "landscape" || (opts.orientation !== "portrait" && im.width > im.height)) [a, b] = [b, a];
       [pw, ph] = [a, b];
-      if (margin * 2 >= Math.min(pw, ph)) throw new PdfError("unsupported", "The margin is too big for this page size.");
+      if (margin * 2 >= Math.min(pw, ph)) throw new PdfError("unsupported", "The margin is too big for this page size. Use a smaller margin or a bigger page.");
       const s = Math.min((pw - 2 * margin) / im.width, (ph - 2 * margin) / im.height);
       [w, h] = [im.width * s, im.height * s];
       [x, y] = [(pw - w) / 2, (ph - h) / 2];

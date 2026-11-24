@@ -57,6 +57,8 @@ export const metadata: ToolDef = {
   id: "metadata", title: "Metadata", heading: "Edit a PDF's details", group: "Edit",
   blurb: "Edit title, author and details.",
   lede: "See and change the title, author and other details stored inside a PDF, or remove them all.",
+  how: "Add a PDF, change the title, author or other details, then save.",
+  next: ["compress", "protect"],
   accepts: "pdf", batch: true,
   options(ctx) {
     const u = ui(ctx);
@@ -77,6 +79,7 @@ export const metadata: ToolDef = {
       : ctx.producerCredit ? "MossPDF will note itself in the Producer field (\"MossPDF by Vin's Atelier\"). You can switch that off under More settings." : "MossPDF will not add its name to the file.";
   },
   ready(ctx) { const u = ui(ctx); return !!ctx.file && u.state === "ready" && (u.wipe.input.checked || changed(ctx).length > 0); },
+  whyDisabled: (ctx) => (ctx.file ? "Change a detail first." : "Add a PDF first."),
   primaryLabel(ctx) { return ui(ctx).wipe.input.checked ? "Remove all details" : "Save details"; },
   async run(ctx) {
     const u = ui(ctx);

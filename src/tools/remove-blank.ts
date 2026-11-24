@@ -61,7 +61,7 @@ function show(ctx: Ctx) {
   if (!f || !u.ratios) { u.strip.replaceChildren(); u.thumbs = ""; return; }
   const b = blanks(ctx);
   const n = f.info!.pageCount;
-  u.status.textContent = !b.length ? "No blank pages found. Try a looser setting." : b.length === n ? "Every page looks blank, so nothing would be left. Try a stricter setting."
+  u.status.textContent = !b.length ? "No blank pages found. Try a looser setting." : b.length === n ? "Every page looks blank, so nothing would be left. Keep the file as it is, or try a stricter setting."
     : `${plural(b.length, "blank page")} will be removed: ${compress(b.map((i) => i + 1))}.`;
   const shown = b.slice(0, SHOWN);
   const cells = shown.map((i) => ({ i, canvas: h("canvas", { class: "rot__page", attrs: { "aria-hidden": "true" } }) }));
@@ -79,6 +79,7 @@ export const removeBlank: ToolDef = {
   id: "remove-blank", title: "Remove blank pages", group: "Organize",
   blurb: "Drop empty pages from a scan or export.",
   lede: "Find pages with nothing on them and drop them. You see which pages go before you confirm. Your original is never changed.",
+  how: "Add a PDF, check which pages look empty, then remove them.",
   accepts: "pdf",
   next: ["organize", "compress", "ocr", "page-numbers", "protect"],
   options: (ctx) => h("div", { class: "rot" }, ui(ctx).level.el, ui(ctx).status, ui(ctx).strip),
@@ -103,7 +104,7 @@ export const removeBlank: ToolDef = {
   async run(ctx) {
     const f = ctx.file!;
     const drop = new Set(blanks(ctx));
-    if (drop.size >= f.info!.pageCount) throw new PdfError("unsupported", "Every page looks blank, so nothing would be left.", f.name);
+    if (drop.size >= f.info!.pageCount) throw new PdfError("unsupported", "Every page looks blank, so nothing would be left. Keep the file as it is, or change the blank-page setting.", f.name);
     const pages: PageSpec[] = Array.from({ length: f.info!.pageCount }, (_, i) => i).filter((i) => !drop.has(i)).map((page) => ({ source: 0, page, rotate: 0 }));
     return [await ops.assemble([f], pages, `${base(f.name)}-no-blanks.pdf`, ctx.o)];
   },

@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import fc from "fast-check";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { compress, imagesToPdf, type CompressLevel } from "../../src/ops";
 import { resize, unpredict } from "../../src/ops/compress";
 import { corpus, engines, opts } from "../helpers/env";
@@ -8,6 +8,7 @@ import { qpdfCheck, qpdfJson, readInfo, readPdf } from "../helpers/qpdf";
 
 const gen = (n: string) => new Uint8Array(readFileSync(new URL(`../corpus/generated/${n}`, import.meta.url)));
 
+vi.setConfig({ testTimeout: 180_000 }); // 1000-page and image-heavy runs: slow when e2e runs alongside
 describe("A-COR-5 compress", () => {
   const sizes: Record<string, number[]> = {};
   for (const level of ["light", "balanced", "strong"] as CompressLevel[]) {

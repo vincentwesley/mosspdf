@@ -22,6 +22,8 @@ export const wfShare: ToolDef = {
   id: "wf-share", title: "Clean copy to share", group: "Workflows",
   blurb: "Clean a PDF before you send it.",
   lede: "Takes out scripts, actions and hidden attachments, then removes the title, author, dates and program names stored inside.",
+  how: "Add your PDF. Scripts and hidden details are removed and you get a clean copy.",
+  next: ["compress", "protect"],
   accepts: "pdf",
   options(ctx) {
     const u = ui(ctx);
@@ -30,7 +32,7 @@ export const wfShare: ToolDef = {
   },
   warnings: pdfLossWarnings,
   summary: (ctx) => ui(ctx).sum,
-  primaryLabel: () => "Make a cleaned copy",
+  primaryLabel: () => "Make clean copy",
   async run(ctx) {
     const u = ui(ctx);
     const f = ctx.file!;

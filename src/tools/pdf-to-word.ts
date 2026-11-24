@@ -20,6 +20,7 @@ export const pdfToWord: ToolDef = {
   id: "pdf-to-word", title: "PDF to Word", heading: "Turn a PDF into a Word file", group: "Convert",
   blurb: "Turn the text into an editable .docx.",
   lede: "Get the text of a PDF as an editable .docx with paragraphs and headings. Each page starts on a new page.",
+  how: "Add a PDF, then save its text as an editable Word file.",
   accepts: "pdf",
   next: [],
   options: (ctx) => ui(ctx).root,

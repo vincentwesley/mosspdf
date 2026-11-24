@@ -7,6 +7,7 @@ import { PdfError, type OpResult } from "../ops/types";
 import type { Ctx, GridOpts, ToolDef } from "../tools/types";
 import { nextTools } from "../tools";
 import { pushRecent } from "../core/recent";
+import { memoryWarning } from "../core/memguard";
 import { announce, fmtSize, h } from "./dom";
 import { toast } from "./toast";
 import { dropzone, setFilesHandler } from "./dropzone";
@@ -22,6 +23,7 @@ const ACCEPT = {
   pdf: ".pdf,application/pdf",
   images: "image/jpeg,image/png,image/webp,image/heic,image/heif,.jpg,.jpeg,.png,.webp,.heic,.heif",
 } as const;
+const TAKES = { pdf: "Takes a PDF.", pdfs: "Takes two or more PDFs.", images: "Takes JPG, PNG or WebP pictures.", "pdf-pair": "Takes two PDFs: the original and the changed one." } as const;
 const stem = (name: string) => name.replace(/\.[^.]+$/, "");
 
 /** Tool title last opened, and whether the next open follows a "Use in another tool" hand-off (then carried files are expected). */
@@ -92,7 +94,7 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
       ofKind().slice(0, -2).forEach((f) => store.remove(f.id));
     });
   });
-  const dz = dropzone({ title: tool.dropTitle ?? DROP_TITLE[tool.accepts], accept: ACCEPT[kind === "image" ? "images" : "pdf"], label: CHOOSE[tool.accepts], hint: "They stay on this device." });
+  const dz = dropzone({ title: tool.dropTitle ?? DROP_TITLE[tool.accepts], accept: ACCEPT[kind === "image" ? "images" : "pdf"], label: CHOOSE[tool.accepts], hint: `${TAKES[tool.accepts]} They stay on this device.` });
   const soon = h("p", { class: "hs-banner hs-banner--info", text: "Coming soon. This tool is not built yet, so nothing here will run.", hidden: !!tool.run, attrs: { "data-testid": "coming-soon" } });
   const notice = h("p", { class: "hs-banner hs-banner--info", attrs: { role: "status", "data-testid": "notice" }, hidden: true });
   const fl = fileList({
@@ -117,7 +119,12 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
   const primary = h("button", { class: "hs-btn", type: "button", attrs: { "data-testid": "primary-action" } });
   const cancel = h("button", { class: "hs-btn hs-btn--secondary", type: "button", text: "Cancel", hidden: true, attrs: { "data-testid": "cancel-job" } });
   const clearAll = h("button", { class: "hs-btn hs-btn--ghost", type: "button", text: "Clear all", attrs: { "data-testid": "clear-all" } });
-  const bar = h("div", { class: "actionbar" }, h("div", { class: "actionbar__in" }, prog, status, errBox, why, h("div", { class: "actionbar__btns" }, primary, cancel, clearAll)));
+  // Memory guard: a plain warning before a big job, never a block.
+  const memText = h("span", { attrs: { "data-testid": "mem-warning-text" } });
+  const memOk = h("button", { class: "hs-btn hs-btn--secondary", type: "button", text: "Try anyway", attrs: { "data-testid": "mem-try-anyway" } });
+  const memBox = h("p", { class: "hs-banner hs-banner--warn", hidden: true, attrs: { role: "alert", "data-testid": "mem-warning" } }, memText, " ", memOk);
+  let memKey = ""; // the files the owner already said "try anyway" for
+  const bar = h("div", { class: "actionbar" }, h("div", { class: "actionbar__in" }, memBox, prog, status, errBox, why, h("div", { class: "actionbar__btns" }, primary, cancel, clearAll)));
 
   // output settings
   const credit = h("input", { class: "hs-check", id: "credit", type: "checkbox", attrs: { "data-testid": "producer-credit" } });
@@ -160,6 +167,7 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
   function update(full = true) {
     const busy = store.busy;
     if (full) fl.render();
+    memBox.hidden = true;
     notice.hidden = !store.notice;
     notice.textContent = store.notice;
     syncItems();
@@ -190,6 +198,10 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
 
   async function run() {
     if (!tool.run || !primaryEnabled || store.busy) return;
+    const key = ctx.files.map((f) => f.id).join();
+    const mem = memoryWarning(tool.id, tool.batch ? Math.max(0, ...ctx.files.map((f) => f.size)) : ctx.files.reduce((n, f) => n + f.size, 0)); // batch runs one file at a time
+    memBox.hidden = !mem || memKey === key;
+    if (!memBox.hidden) { memText.textContent = mem; memOk.focus(); return; }
     results = [];
     resultBox.hidden = true;
     status.textContent = "";
@@ -298,12 +310,13 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
     if (snapshot.length) toast(snapshot.length === 1 ? `Cleared ${snapshot[0].name}.` : `Cleared ${snapshot.length} files.`, { label: "Undo", run: () => store.restore(snapshot) });
   }
   primary.addEventListener("click", () => void run());
+  memOk.addEventListener("click", () => { memKey = ctx.files.map((f) => f.id).join(); void run(); });
   cancel.addEventListener("click", () => abort?.abort());
   clearAll.addEventListener("click", startOver);
   const unsub = store.subscribe(() => update());
 
   const el = h("div", { class: "view tool" },
-    h("header", { class: "view__head" }, toolBox(tool.id, true), h1, h("p", { class: "view__lede", text: tool.lede })),
+    h("header", { class: "view__head" }, toolBox(tool.id, true), h1, h("p", { class: "view__lede", text: tool.lede }), ...(tool.how ? [h("p", { class: "view__how", text: tool.how, attrs: { "data-testid": "tool-how" } })] : [])),
     dz, soon, notice, carryBox, fl.el, tip, warnBox, optBox, gridBox, settings, resultBox, bar);
   update();
   return { el, destroy: () => { dropThumb(); unsub(); grid?.destroy(); abort?.abort(); tool.destroy?.(ctx); } };

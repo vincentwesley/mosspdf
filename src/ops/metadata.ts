@@ -80,7 +80,7 @@ export async function writeMetadata(file: InFile, edit: MetadataEdit, o: OpOptio
     bytes = await doc.save({ useObjectStreams: false });
     // The old Info and XMP objects are still in pdf-lib's output as orphans; a qpdf rewrite drops them.
     const r = await e.qpdf(["/in.pdf", "/out.pdf"], { "/in.pdf": bytes }, ["/out.pdf"]);
-    if (!r.files["/out.pdf"] || r.code === 2) throw new PdfError("corrupt", `"${file.name}" couldn't be cleaned.`, file.name);
+    if (!r.files["/out.pdf"] || r.code === 2) throw new PdfError("corrupt", `"${file.name}" couldn't be cleaned. Your original is unchanged. Try Repair first, then try again.`, file.name);
     bytes = r.files["/out.pdf"];
   } else {
     const fields: [keyof MetadataEdit, XmpKey, (v: string) => void, string][] = [

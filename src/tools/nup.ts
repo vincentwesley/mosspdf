@@ -21,6 +21,7 @@ export const nup: ToolDef = {
   id: "nup", title: "Pages per sheet", group: "Organize",
   blurb: "Put 2 or 4 pages on each sheet, or make a booklet.",
   lede: "Shrink pages so several fit on one sheet, or put them in booklet order for folding. Your original is never changed.",
+  how: "Add a PDF, choose how many pages per sheet, then save the new layout.",
   accepts: "pdf", batch: true,
   next: ["compress", "protect"],
   options(ctx) {
@@ -30,7 +31,7 @@ export const nup: ToolDef = {
   warnings: pdfLossWarnings,
   ready: (ctx) => !!ctx.file,
   whyDisabled: () => "Add a PDF first.",
-  primaryLabel: () => "Make sheets",
+  primaryLabel: () => "Lay out pages",
   async run(ctx) {
     const u = ui(ctx);
     const f = ctx.file!;

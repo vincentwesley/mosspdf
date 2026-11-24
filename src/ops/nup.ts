@@ -31,7 +31,7 @@ export function bookletOrder(n: number): ([number | null, number | null])[] {
 }
 
 export async function nupPages(file: InFile, opts: NupOptions, o: OpOptions, e: Engines): Promise<OpResult> {
-  if (!["2", "4", "booklet"].includes(opts.layout)) throw new PdfError("unsupported", "Choose 2 per sheet, 4 per sheet or booklet.");
+  if (!["2", "4", "booklet"].includes(opts.layout)) throw new PdfError("unsupported", "Choose 2 per sheet, 4 per sheet or booklet, then try again.");
   const p = await prepare(file, o, e);
   const src = await PDFDocument.load(p.bytes, { updateMetadata: false });
   const pages = src.getPages();
