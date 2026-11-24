@@ -221,3 +221,6 @@ Symptom: a `worker-src` CSP violation on page load in Firefox, seen twice in a f
 - **Batch**: enabled where the op is per-file and option-only (17 tools). Skipped: tools needing per-file interaction, multi-input tools, heavy/report-only tools. Per-file failures are listed on the result card instead of stopping the run.
 - **My workflows** (`tools/wf-custom.ts`, `wf-store.ts`): 2-5 steps from a chainable set using each tool's own options UI; stored in `mosspdf.workflows` (max 20, name ≤ 60, strict schema, known tool ids only, values typed and length-capped; import ≤ 64 KB, `JSON.parse` only). Password tools are never chainable, so no password is stored.
 
+
+## D34. PDF to Word: bold/italic and pictures (2026-11-24)
+- Bold/italic come from the real pdf.js font (`commonObjs`: `.bold`, `.italic`, `.black`, name) after `getOperatorList`; the font id name is the fallback. Pictures: image ops in the operator list (CTM tracked through save/restore/transform), decoded by pdf.js, encoded as PNG via canvas, placed as inline pictures before the first paragraph that sits lower; skipped under 32 px; masks, repeats of one object at one place and sub-8pt pictures are dropped. "Text only" turns pictures off.
