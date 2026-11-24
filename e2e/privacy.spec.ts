@@ -1,7 +1,7 @@
 import { test, expect, waitForSeal } from "./fixtures";
 
 // Keys the app may write: theme, palette, logo form (+ its first-visits hint counter). Opt-in prefs get added here when they exist.
-const ALLOWED_KEYS = ["theme", "palette", "logo-form", "logo-hint"];
+const ALLOWED_KEYS = ["theme", "palette", "logo-form", "logo-hint", "mosspdf.workflows"];
 
 test("A-NET-5: no cookies, localStorage keys only from the allowlist", async ({ page, context }) => {
   await page.goto("/");

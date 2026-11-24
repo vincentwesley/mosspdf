@@ -8,6 +8,7 @@ export type ToolMeta = Pick<ToolDef, "id" | "title" | "blurb" | "group" | "next"
 export const TOOLS: ToolMeta[] = [
   { id: "wf-email", title: "Small enough to email", blurb: "Shrink a PDF to fit an email.", group: "Workflows", next: ["protect", "sign"] },
   { id: "wf-share", title: "Clean copy to share", blurb: "Clean a PDF before you send it.", group: "Workflows", next: ["compress", "protect"] },
+  { id: "wf-custom", title: "My workflows", blurb: "Chain your own steps and reuse them.", group: "Workflows" },
   { id: "wf-apply", title: "Job application pack", blurb: "Join your documents into one numbered PDF.", group: "Workflows", next: ["compress", "protect", "sign"] },
   { id: "merge", title: "Merge", blurb: "Combine PDFs into one.", group: "Organize", next: ["sign", "compress", "protect", "page-numbers", "watermark"] },
   { id: "split", title: "Split", blurb: "Cut a PDF into parts.", group: "Organize" },

@@ -34,7 +34,7 @@ export const pdfToImages: ToolDef = {
   blurb: "Save each page as a picture.",
   lede: "Save the pages of a PDF as PNG or JPG pictures. Several pages come as one .zip.",
   how: "Add a PDF, pick the pages and the picture type, then save the pictures.",
-  accepts: "pdf",
+  accepts: "pdf", batch: true,
   options(ctx) {
     const u = ui(ctx);
     return h("div", { class: "p2i" }, u.format.el, u.quality.el, u.dpi.el, u.pages.el);

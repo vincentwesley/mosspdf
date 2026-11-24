@@ -21,7 +21,7 @@ export const pdfToWord: ToolDef = {
   blurb: "Turn the text into an editable .docx.",
   lede: "Get the text of a PDF as an editable .docx with paragraphs and headings. Each page starts on a new page.",
   how: "Add a PDF, then save its text as an editable Word file.",
-  accepts: "pdf",
+  accepts: "pdf", batch: true,
   next: [],
   options: (ctx) => ui(ctx).root,
   whyDisabled: () => "Add a PDF first.",

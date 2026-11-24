@@ -84,7 +84,11 @@ initInstall(document.querySelector<HTMLElement>(".appfoot")!);
 
 // D25: tool code is one chunk, imported before the seal (an engine entry) so nothing loads afterwards.
 let defs: Map<string, ToolDef> | undefined;
-const toolsReady = import("./tools/all").then((m) => { defs = new Map(m.DEFS.map((d) => [d.id, d])); });
+const toolsReady = import("./tools/all").then((m) => {
+  defs = m.defs;
+  const r = routeOf(location.hash); // saved workflows were not known when home or their own route first drew
+  if (m.SAVED.length && (!r || m.SAVED.includes(r))) render();
+});
 registerEngine({ name: "tools", load: () => toolsReady });
 
 function resolve(): { el: HTMLElement; destroy: () => void } {

@@ -31,8 +31,8 @@ export function initPalette(act: PaletteActions): { open(opener?: HTMLElement): 
   let active = 0;
 
   const go = (id: string) => () => { skipRefocus = true; location.hash = `#/${id}`; };
-  const all: Cmd[] = [
-    ...CATALOG.flatMap((g) => g.tools.map((t): Cmd => ({ id: `tool-${t.id}`, label: t.title, hint: g.name, blurb: `${t.blurb} ${g.name}`, run: go(t.id) }))),
+  const toolCmds = () => CATALOG.flatMap((g) => g.tools.map((t): Cmd => ({ id: `tool-${t.id}`, label: t.title, hint: g.name, blurb: `${t.blurb} ${g.name}`, run: go(t.id) })));
+  const cmds: Cmd[] = [
     { id: "cmd-theme", label: "Switch theme", hint: "Command", blurb: "dark light appearance", run: () => act.switchTheme() },
     { id: "cmd-privacy", label: "Privacy log", hint: "Command", blurb: "requests seal network", run: () => { skipRefocus = true; act.openPrivacy(opener ?? document.body); } },
     { id: "cmd-clear", label: "Clear all files", hint: "Command", blurb: "remove delete files", run: () => {
@@ -41,6 +41,7 @@ export function initPalette(act: PaletteActions): { open(opener?: HTMLElement): 
       if (snap.length) toast(snap.length === 1 ? `Cleared ${snap[0].name}.` : `Cleared ${snap.length} files.`, { label: "Undo", run: () => store.restore(snap) });
     } },
   ];
+  const all = () => [...toolCmds(), ...cmds];
 
   const list = h("ul", { class: "pal__list", id: "pal-list", attrs: { role: "listbox", "aria-label": "Tools and commands", "data-testid": "palette-list" } });
   const none = h("p", { class: "pal__none", text: "Nothing matches. Try a different word, like merge or compress.", hidden: true, attrs: { role: "status", "data-testid": "palette-none" } });
@@ -55,8 +56,8 @@ export function initPalette(act: PaletteActions): { open(opener?: HTMLElement): 
   const render = () => {
     const q = input.value;
     shown = q.trim()
-      ? all.map((c) => ({ c, s: scoreTool({ title: c.label, blurb: c.blurb, group: c.hint as never }, q) })).filter((x) => x.s).sort((a, b) => b.s - a.s).map((x) => x.c)
-      : all;
+      ? all().map((c) => ({ c, s: scoreTool({ title: c.label, blurb: c.blurb, group: c.hint as never }, q) })).filter((x) => x.s).sort((a, b) => b.s - a.s).map((x) => x.c)
+      : all();
     active = 0;
     list.replaceChildren(...shown.map((c, i) => h("li", { class: "pal__opt", id: `pal-o-${i}`, attrs: { role: "option", "data-testid": "palette-option", "data-id": c.id }, on: { click: () => pick(c) } },
       c.id.startsWith("tool-") ? toolBox(c.id.slice(5)) : h("span", { class: "ibox ibox--blank" }), h("span", { class: "pal__label", text: c.label }), h("span", { class: "pal__hint", text: c.hint }))));
