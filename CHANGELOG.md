@@ -4,6 +4,13 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 
 ## [Unreleased]
 
+## [1.8.0] - 2026-11-23
+- PDF to Excel (D32): tables from text positions into .xlsx (a sheet per page) or CSV; numbers become numbers; CSV text cells are guarded against formula injection.
+- Extract images (D32): save the pictures inside a PDF (JPEGs byte for byte, others as PNG), optionally skipping tiny ones.
+- Split by bookmarks: one file per top-level bookmark, named after it.
+- Page numbers and headers: custom text with {n}, {total}, {date}, {file}; skip the first page or pick a range; mirror on even pages; margin.
+- Design pass: bookmark rows fit phones, clearer disabled buttons.
+
 ## [1.7.0] - 2026-11-23
 - PDF to Word (D31): text, paragraphs and headings into an editable .docx, written in the browser (layout, tables and pictures are not kept).
 - Bookmarks tool (D31): read, add, rename, nest, reorder and remove bookmarks, or one per page. Merge now adds a bookmark for each file and keeps each file's own bookmarks under it.

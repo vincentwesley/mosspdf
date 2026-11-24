@@ -16,7 +16,7 @@ export const TOOLS: ToolMeta[] = [
   { id: "images-to-pdf", title: "Images to PDF", blurb: "Turn JPG, PNG or WebP pictures into one PDF.", group: "Convert" },
   { id: "pdf-to-images", title: "PDF to images", blurb: "Save each page as a picture.", group: "Convert" },
   { id: "compress", title: "Compress", blurb: "Make a PDF smaller.", group: "Convert" },
-  { id: "page-numbers", title: "Page numbers", blurb: "Number the pages.", group: "Edit" },
+  { id: "page-numbers", title: "Page numbers and headers", blurb: "Number pages, add a header or footer.", group: "Edit" },
   { id: "watermark", title: "Watermark", blurb: "Stamp text on every page.", group: "Edit" },
   { id: "metadata", title: "Metadata", blurb: "Edit title, author and details.", group: "Edit" },
   { id: "protect", title: "Add password", blurb: "Lock a PDF with a password.", group: "Protect" },
@@ -38,8 +38,10 @@ export const TOOLS: ToolMeta[] = [
   { id: "nup", title: "Pages per sheet", blurb: "Put 2 or 4 pages on each sheet, or make a booklet.", group: "Organize", next: ["compress", "protect"] },
   { id: "add-pages", title: "Add blank pages", blurb: "Insert empty pages where you need them.", group: "Organize", next: ["organize", "page-numbers", "compress", "protect"] },
   { id: "bookmarks", title: "Bookmarks", blurb: "Add, rename or remove the bookmarks list.", group: "Edit", next: ["compress", "protect", "page-numbers", "organize", "watermark"] },
+  { id: "extract-images", title: "Extract images", blurb: "Save the pictures inside a PDF.", group: "Convert", next: [] },
   { id: "pdf-to-text", title: "PDF to text", blurb: "Copy out all the text.", group: "Convert", next: [] },
   { id: "pdf-to-word", title: "PDF to Word", blurb: "Turn the text into an editable .docx.", group: "Convert", next: [] },
+  { id: "pdf-to-excel", title: "PDF to Excel", blurb: "Pull tables out into a spreadsheet.", group: "Convert", next: [] },
 ];
 
 export const toolById = (id: string): ToolMeta | undefined => TOOLS.find((t) => t.id === id);

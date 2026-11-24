@@ -6,16 +6,17 @@ import { numberField, radioGroup, textField } from "../ui/fields";
 import { compress, pdfLossWarnings } from "./pages";
 import type { Ctx, ToolDef } from "./types";
 
-type Mode = "ranges" | "every" | "size";
+type Mode = "ranges" | "every" | "size" | "bookmarks";
 
 const ui = (ctx: Ctx) => ctx.local(() => ({
   mode: radioGroup({
     name: "mode", legend: "How to split", value: "ranges", testid: (v) => `mode-${v}`, onChange: () => ctx.refresh(),
-    options: [["ranges", "By page ranges", "You choose the pages for each file."], ["every", "Every N pages", "Equal parts, for example every 2 pages."], ["size", "By file size", "Keeps each file under a size limit."]],
+    options: [["ranges", "By page ranges", "You choose the pages for each file."], ["every", "Every N pages", "Equal parts, for example every 2 pages."], ["size", "By file size", "Keeps each file under a size limit."], ["bookmarks", "By bookmarks", "One file for each top-level bookmark."]],
   }),
   ranges: textField({ id: "ranges", label: "Page ranges. Each range becomes its own file.", placeholder: "1-3, 5, 8-", testid: "range-input", msgTestId: "range-msg", reserve: true, onInput: () => ctx.refresh() }),
   every: numberField({ id: "every", label: "Pages per file", value: 2, min: 1, testid: "every-input", onInput: () => ctx.refresh() }),
   size: numberField({ id: "size", label: "Largest file size (MB)", value: 5, min: 0.1, step: 0.1, decimal: true, testid: "size-input", onInput: () => ctx.refresh() }),
+  hint: h("p", { class: "field__hint", attrs: { "data-testid": "bookmarks-hint" } }),
   preview: h("ol", { class: "parts", attrs: { "data-testid": "split-preview", "aria-label": "Files you will get" } }),
   box: h("div", { class: "split" }),
 }));
@@ -42,6 +43,7 @@ function plan(ctx: Ctx): { mode: SplitMode; parts: number[][] | null } | null {
     if (!(k >= 1)) return null;
     return { mode: { kind: "every", n: k }, parts: Array.from({ length: Math.ceil(n / k) }, (_, i) => Array.from({ length: Math.min(k, n - i * k) }, (_, j) => i * k + j + 1)) };
   }
+  if (mode === "bookmarks") return ctx.file?.info?.hasOutline ? { mode: { kind: "bookmarks" }, parts: null } : null;
   const mb = Number(u.size.input.value);
   return mb > 0 ? { mode: { kind: "size", maxBytes: Math.round(mb * 1024 * 1024) }, parts: null } : null;
 }
@@ -53,19 +55,25 @@ export const split: ToolDef = {
   accepts: "pdf",
   options(ctx) {
     const u = ui(ctx);
-    u.box.append(u.mode.el, u.ranges.el, u.every.el, u.size.el, u.preview);
+    u.box.append(u.mode.el, u.hint, u.ranges.el, u.every.el, u.size.el, u.preview);
     return u.box;
   },
   sync(ctx) {
     const u = ui(ctx);
+    const has = !!ctx.file?.info?.hasOutline;
+    if (!has && u.mode.value() === "bookmarks") u.mode.set("ranges");
     const mode = u.mode.value() as Mode;
     u.box.hidden = !ctx.file;
     u.ranges.el.hidden = mode !== "ranges";
     u.every.el.hidden = mode !== "every";
     u.size.el.hidden = mode !== "size";
+    u.mode.el.querySelector<HTMLInputElement>("#mode-bookmarks")!.disabled = !has;
+    u.hint.hidden = has;
+    u.hint.textContent = has ? "" : "This file has no bookmarks, so it can't be split by them.";
     const s = plan(ctx);
     u.preview.replaceChildren(...(mode === "size"
       ? [h("li", { text: "MossPDF picks the page breaks so each file stays under this size." })]
+      : mode === "bookmarks" ? [h("li", { text: "You get one file for each top-level bookmark, named after it." })]
       : (s?.parts ?? []).map((g) => h("li", { text: `${compress(g)} (${plural(g.length, "page")})`, attrs: { "data-testid": "split-part" } }))));
   },
   warnings: pdfLossWarnings,

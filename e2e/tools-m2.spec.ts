@@ -160,6 +160,19 @@ test.describe("M2 tools", () => {
     expect(Math.abs(at!.angle)).toBeLessThan(1);
   });
 
+  test("A-COR-6 A-E2E-1 page numbers: custom text, skip first page", async ({ page }) => {
+    await loadApp(page, "/#/page-numbers");
+    await add(page, corpus("plain-3p"));
+    await readyRows(page, 1);
+    await page.getByTestId("pages-skip").check();
+    await page.getByTestId("text-input").fill("Page {n} of {total}");
+    await run(page);
+    const pages = await readPdf((await savePdf(page)).bytes);
+    expect(pages[0].text).not.toContain("Page 1");
+    expect(pages[1].text).toContain("Page 1 of 2");
+    expect(pages[2].text).toContain("Page 2 of 2");
+  });
+
   test("A-COR-6 A-E2E-1 page numbers: only pages 2-3, counting from 1", async ({ page }) => {
     await loadApp(page, "/#/page-numbers");
     await add(page, corpus("plain-3p"));
