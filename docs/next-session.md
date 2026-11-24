@@ -23,9 +23,9 @@ Continue work on **MossPDF** (repo `vincentwesley/mosspdf`, public). Live: https
 - Text: `ops/ufont.ts` `pickFont` (Helvetica → Noto Sans → Chinese font when on), client gate `core/winansi.ts` `badChars`.
 
 ## Current state
-- v1.11.0 (2026-11-24): conversions (D36-D37): Word pictures/bold, PDF to PowerPoint and Markdown, OCR scan clean-up, 17 OCR languages, HEIC via Safari. v1.10 workspace (D34-D35), v1.9 quality (D33). 43 tools + 4 workflows.
+- v1.12.0 (2026-11-24): fill and sign (D38): Create form, opt-in saved signatures/initials, date under signature. v1.11 conversions (D36-D37), v1.10 workspace (D34-D35), v1.9 quality (D33). 44 tools + 4 workflows. Next: v2.0 launch polish (ROADMAP).
 - **Plan: `docs/ROADMAP.md`** (v1.9 quality pass → v1.10 workspace → v1.11 conversions → v1.12 fill and sign → v2.0 launch polish). Work the next milestone.
-- Budget: main bundle 16.4 KB gzip of 20 (workspace shell lives in the tools chunk, D34).
+- Budget: main bundle 17.3 KB gzip of 20; `.gz` 27 MB (opt-in OCR languages).
 
 ## Known gaps
 - CI webkit install fixed in v1.11 (retry waits for the orphaned apt-get).
