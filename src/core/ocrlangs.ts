@@ -7,6 +7,19 @@ export const OCR_LANGS: readonly OcrLang[] = [
   { code: "chi_sim", label: "中文 (简体) Chinese", mb: 1.7 },
   { code: "msa", label: "Bahasa Melayu", mb: 1.2 },
   { code: "tam", label: "தமிழ் Tamil", mb: 1.5 },
+  { code: "chi_tra", label: "中文 (繁體) Chinese, Traditional", mb: 1.6 },
+  { code: "jpn", label: "日本語 Japanese", mb: 2.0 },
+  { code: "kor", label: "한국어 Korean", mb: 1.5 },
+  { code: "ind", label: "Bahasa Indonesia", mb: 1.2 },
+  { code: "vie", label: "Tiếng Việt Vietnamese", mb: 1.4 },
+  { code: "tha", label: "ไทย Thai", mb: 0.9 },
+  { code: "hin", label: "हिन्दी Hindi", mb: 1.4 },
+  { code: "ara", label: "العربية Arabic", mb: 1.6 },
+  { code: "spa", label: "Español", mb: 2.0 },
+  { code: "fra", label: "Français", mb: 0.7 },
+  { code: "deu", label: "Deutsch", mb: 1.3 },
+  { code: "ita", label: "Italiano", mb: 1.6 },
+  { code: "por", label: "Português", mb: 1.4 },
 ];
 /** The Tesseract engine itself (.wasm), MB. */
 export const OCR_ENGINE_MB = 2.9; // 2.86
