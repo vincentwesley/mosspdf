@@ -23,12 +23,13 @@ Continue work on **MossPDF** (repo `vincentwesley/mosspdf`, public). Live: https
 - Text: `ops/ufont.ts` `pickFont` (Helvetica → Noto Sans → Chinese font when on), client gate `core/winansi.ts` `badChars`.
 
 ## Current state
-- v1.10.0 (2026-11-24): workspace (D34-D35): file tray, cross-file page grid with undo, batch on 17 tools, My workflows. v1.9 quality pass (D33). 41 tools + 4 workflows.
+- v1.11.0 (2026-11-24): conversions (D36-D37): Word pictures/bold, PDF to PowerPoint and Markdown, OCR scan clean-up, 17 OCR languages, HEIC via Safari. v1.10 workspace (D34-D35), v1.9 quality (D33). 43 tools + 4 workflows.
 - **Plan: `docs/ROADMAP.md`** (v1.9 quality pass → v1.10 workspace → v1.11 conversions → v1.12 fill and sign → v2.0 launch polish). Work the next milestone.
 - Budget: main bundle 16.4 KB gzip of 20 (workspace shell lives in the tools chunk, D34).
 
 ## Known gaps
-- CI `e2e (webkit, webkit)` install failed in v1.8-v1.10: a timed-out attempt left apt-get holding the dpkg lock. Fix (wait for it before retrying) is on branch `v1110`; if it still fails only at install, mobile-safari covers WebKit.
+- CI webkit install fixed in v1.11 (retry waits for the orphaned apt-get).
+- Local full e2e (chromium + webkit, ~20 min) can be stopped by Claude Code when the PC runs low on memory; run per-spec locally and let CI do the full matrix if that happens.
 - Local e2e hang (webkit stall, WebKitWebProcess left behind): root cause not pinned down; made un-silent by the caps above. If a run is killed anyway, check for leftover `WebKitWebProcess`/`workerd` by command line before re-running. Heavy unit suites (compress, pwd) now have a 180 s test timeout for loaded machines.
 - Firefox offline test skipped (setOffline broken with service workers); keyboard-only tests skip on touch projects.
 - Repair uses about 3x the file size in memory (no streaming output in this qpdf build).
