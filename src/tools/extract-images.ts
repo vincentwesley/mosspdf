@@ -10,6 +10,7 @@ export const extractImagesTool: ToolDef = {
   id: "extract-images", title: "Extract images", heading: "Save the pictures inside a PDF", group: "Convert",
   blurb: "Save the pictures inside a PDF.",
   lede: "Save the pictures inside a PDF as they are. Several pictures come as one .zip. To save whole pages as pictures, use PDF to images.",
+  how: "Add a PDF, then save the pictures inside it.",
   accepts: "pdf",
   zipSuffix: "images",
   next: [],

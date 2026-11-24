@@ -22,6 +22,7 @@ const ACCEPT = {
   pdf: ".pdf,application/pdf",
   images: "image/jpeg,image/png,image/webp,image/heic,image/heif,.jpg,.jpeg,.png,.webp,.heic,.heif",
 } as const;
+const TAKES = { pdf: "Takes a PDF.", pdfs: "Takes two or more PDFs.", images: "Takes JPG, PNG or WebP pictures.", "pdf-pair": "Takes two PDFs: the original and the changed one." } as const;
 const stem = (name: string) => name.replace(/\.[^.]+$/, "");
 
 /** Tool title last opened, and whether the next open follows a "Use in another tool" hand-off (then carried files are expected). */
@@ -92,7 +93,7 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
       ofKind().slice(0, -2).forEach((f) => store.remove(f.id));
     });
   });
-  const dz = dropzone({ title: tool.dropTitle ?? DROP_TITLE[tool.accepts], accept: ACCEPT[kind === "image" ? "images" : "pdf"], label: CHOOSE[tool.accepts], hint: "They stay on this device." });
+  const dz = dropzone({ title: tool.dropTitle ?? DROP_TITLE[tool.accepts], accept: ACCEPT[kind === "image" ? "images" : "pdf"], label: CHOOSE[tool.accepts], hint: `${TAKES[tool.accepts]} They stay on this device.` });
   const soon = h("p", { class: "hs-banner hs-banner--info", text: "Coming soon. This tool is not built yet, so nothing here will run.", hidden: !!tool.run, attrs: { "data-testid": "coming-soon" } });
   const notice = h("p", { class: "hs-banner hs-banner--info", attrs: { role: "status", "data-testid": "notice" }, hidden: true });
   const fl = fileList({
@@ -303,7 +304,7 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
   const unsub = store.subscribe(() => update());
 
   const el = h("div", { class: "view tool" },
-    h("header", { class: "view__head" }, toolBox(tool.id, true), h1, h("p", { class: "view__lede", text: tool.lede })),
+    h("header", { class: "view__head" }, toolBox(tool.id, true), h1, h("p", { class: "view__lede", text: tool.lede }), ...(tool.how ? [h("p", { class: "view__how", text: tool.how, attrs: { "data-testid": "tool-how" } })] : [])),
     dz, soon, notice, carryBox, fl.el, tip, warnBox, optBox, gridBox, settings, resultBox, bar);
   update();
   return { el, destroy: () => { dropThumb(); unsub(); grid?.destroy(); abort?.abort(); tool.destroy?.(ctx); } };

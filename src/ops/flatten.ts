@@ -81,10 +81,10 @@ export async function flatten(file: InFile, opts: FlattenOptions, o: OpOptions, 
     if (fields) {
       try { form.updateFieldAppearances(); } catch { /* keep the appearances the file already has */ }
       form.flatten({ updateFieldAppearances: false });
-    } else if (!opts.annotations) throw new PdfError("unsupported", `"${file.name}" has no form fields to flatten.`, file.name);
+    } else if (!opts.annotations) throw new PdfError("unsupported", `"${file.name}" has no form fields to flatten. Choose "Forms and annotations" to flatten notes too, or pick another file.`, file.name);
   }
   const notes = opts.annotations ? bakeAnnotations(doc) : 0;
-  if (opts.annotations && !fields && !notes) throw new PdfError("unsupported", `"${file.name}" has no form fields or notes to flatten.`, file.name);
+  if (opts.annotations && !fields && !notes) throw new PdfError("unsupported", `"${file.name}" has no form fields or notes to flatten, so there is nothing to do. Pick another file.`, file.name);
   if (o.producerCredit) applyCredit(doc);
   return { bytes: await doc.save({ useObjectStreams: false, updateFieldAppearances: false }), name: file.name, warnings: p.warnings };
 }

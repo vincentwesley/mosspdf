@@ -29,13 +29,13 @@ export async function stampPage(file: InFile, input: StampInput, o: OpOptions, e
   const p = await prepare(file, o, e);
   const doc = await PDFDocument.load(p.bytes, { updateMetadata: false });
   const pages = doc.getPages();
-  if (!input.items.length) throw new PdfError("unsupported", "Nothing is placed yet. Add a signature or some text to a page first.", file.name);
+  if (!input.items.length) throw new PdfError("unsupported", "Nothing is placed yet. Click a page to place a signature or some text, then save.", file.name);
   const font = await pickFont(doc, input.items.flatMap((it) => (it.kind === "text" ? [it.text] : [])));
   const imgs: (PDFImage | undefined)[] = [];
   const img = async (i: number) => {
     const png = input.images[i];
-    if (!png) throw new PdfError("unsupported", "A placed picture is missing.", file.name);
-    try { return (imgs[i] ??= await doc.embedPng(png)); } catch { throw new PdfError("corrupt", "A picture could not be read as a PNG.", file.name); }
+    if (!png) throw new PdfError("unsupported", "A placed picture is missing. Remove it and place it again.", file.name);
+    try { return (imgs[i] ??= await doc.embedPng(png)); } catch { throw new PdfError("corrupt", "A picture could not be read. Remove it and place it again.", file.name); }
   };
   const finite = (...n: number[]) => n.every(Number.isFinite);
   // per page: the ops to draw, then one wrapped content stream
@@ -44,11 +44,11 @@ export async function stampPage(file: InFile, input: StampInput, o: OpOptions, e
     if (k % 25 === 0) checkAbort(o.signal);
     const targets = it.pages === "all" ? pages.map((_, i) => i) : it.pages;
     if (!finite(it.fx, it.fy) || !targets.length || targets.some((t) => !Number.isInteger(t) || t < 0 || t >= pages.length))
-      throw new PdfError("unsupported", `A placed item points at a page that doesn't exist in "${file.name}", which has ${pages.length} page${pages.length === 1 ? "" : "s"}.`, file.name);
+      throw new PdfError("unsupported", `A placed item points at a page that doesn't exist in "${file.name}", which has ${pages.length} page${pages.length === 1 ? "" : "s"}. Move it onto a page of the file.`, file.name);
     if (it.kind === "text") {
-      if (!finite(it.size) || it.size < 2 || it.size > 400) throw new PdfError("unsupported", "The text size must be between 2 and 400.", file.name);
+      if (!finite(it.size) || it.size < 2 || it.size > 400) throw new PdfError("unsupported", "The text size must be between 2 and 400. Change it and try again.", file.name);
       checkCovered(font, it.text, "The text");
-    } else if (!finite(it.fw) || it.fw <= 0 || it.fw > 4) throw new PdfError("unsupported", "A placed picture has a size that can't be used.", file.name);
+    } else if (!finite(it.fw) || it.fw <= 0 || it.fw > 4) throw new PdfError("unsupported", "A placed picture has a size that can't be used. Remove it and place it again.", file.name);
     const image = it.kind === "image" ? await img(it.image) : undefined;
     for (const t of targets) {
       const page = pages[t];

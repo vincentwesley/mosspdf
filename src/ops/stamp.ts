@@ -66,12 +66,12 @@ export function toUser(v: View, u: number, vv: number): [number, number] {
 
 export const hex = (c: string) => {
   const m = /^#([0-9a-f]{6})$/i.exec(c);
-  if (!m) throw new PdfError("unsupported", `"${c}" isn't a colour. Use the form #rrggbb.`);
+  if (!m) throw new PdfError("unsupported", `"${c}" isn't a colour. Enter it as #rrggbb, for example #ff0000.`);
   return [0, 2, 4].map((i) => (parseInt(m[1].slice(i, i + 2), 16) / 255).toFixed(3));
 };
 const num = (v: number | undefined, d: number, min: number, max: number, what: string) => {
   const x = v ?? d;
-  if (!Number.isFinite(x) || x < min || x > max) throw new PdfError("unsupported", `${what} must be between ${min} and ${max}.`);
+  if (!Number.isFinite(x) || x < min || x > max) throw new PdfError("unsupported", `${what} must be between ${min} and ${max}. Change it and try again.`);
   return x;
 };
 
@@ -130,11 +130,11 @@ export async function addPageNumbers(file: InFile, opts: PageNumberOptions, o: O
   const size = num(opts.fontSize, 10, 4, 72, "The font size");
   const margin = num(opts.margin, 36, 0, 300, "The margin");
   const start = num(opts.startAt, 1, -9999, 999999, "The first number");
-  if (!Number.isInteger(start)) throw new PdfError("unsupported", "The first number must be a whole number.");
+  if (!Number.isInteger(start)) throw new PdfError("unsupported", "The first number must be a whole number. Change it and try again.");
   const date = opts.date ?? new Date().toLocaleDateString(undefined, { dateStyle: "short" });
   const name = opts.fileName ?? file.name.replace(/\.pdf$/i, "");
-  if (!opts.allowPlain && !/\{n\}|\{total\}/.test(format)) throw new PdfError("unsupported", "The format needs {n} in it, for example \"Page {n} of {total}\".");
-  if (!format.trim()) throw new PdfError("unsupported", "Enter the text first.");
+  if (!opts.allowPlain && !/\{n\}|\{total\}/.test(format)) throw new PdfError("unsupported", "The format needs {n} in it so each page gets its number. For example \"Page {n} of {total}\".");
+  if (!format.trim()) throw new PdfError("unsupported", "Enter some text first, then try again.");
   const fill = (n: string, total: string) => format.replace(/\{n\}/g, n).replace(/\{total\}/g, total).replace(/\{date\}/g, () => date).replace(/\{file\}/g, () => name);
   const [vert, horiz] = position.split("-") as ["top" | "bottom", "left" | "center" | "right"];
   return await run(file, opts.pages, fill("0", "0"), "The text", o, e, (_doc, count) => {
@@ -155,7 +155,7 @@ export async function addPageNumbers(file: InFile, opts: PageNumberOptions, o: O
 }
 
 export async function watermark(file: InFile, opts: WatermarkOptions, o: OpOptions, e: Engines): Promise<OpResult> {
-  if (!opts.text?.trim()) throw new PdfError("unsupported", "Enter the watermark text first.");
+  if (!opts.text?.trim()) throw new PdfError("unsupported", "Enter the watermark text first, then try again.");
   const opacity = num(opts.opacity, 0.25, 0.01, 1, "The opacity");
   const angle = num(opts.angle, 45, -360, 360, "The angle");
   const size = num(opts.fontSize, 64, 4, 400, "The font size");

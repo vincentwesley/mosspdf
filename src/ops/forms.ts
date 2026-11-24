@@ -79,7 +79,7 @@ export async function fillForm(file: InFile, values: FormValues, opts: { flatten
   const hadXFA = form.hasXFA();
   const texts: string[] = [];
   const warnings = [...p.warnings];
-  const bad = (name: string, why: string) => new PdfError("unsupported", `The field "${name}" can't take that value: ${why}`, file.name);
+  const bad = (name: string, why: string) => new PdfError("unsupported", `The field "${name}" can't take that value. ${why}`, file.name);
   for (const [name, v] of Object.entries(values)) {
     checkAbort(o.signal);
     const f = form.getFieldMaybe(name);

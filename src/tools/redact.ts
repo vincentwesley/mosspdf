@@ -201,12 +201,14 @@ function paint(canvas: HTMLCanvasElement, rects: Rect[]) {
   g.fillStyle = "#000";
   for (const r of rects) g.fillRect(Math.floor(r.x * canvas.width), Math.floor(r.y * canvas.height), Math.ceil(r.w * canvas.width) + 1, Math.ceil(r.h * canvas.height) + 1);
 }
-const toJpeg = (c: HTMLCanvasElement) => new Promise<Blob>((res, rej) => c.toBlob((b) => (b ? res(b) : rej(new PdfError("unsupported", "This browser could not save the redacted page."))), "image/jpeg", 0.85));
+const toJpeg = (c: HTMLCanvasElement) => new Promise<Blob>((res, rej) => c.toBlob((b) => (b ? res(b) : rej(new PdfError("unsupported", "This browser could not save a redacted page. Close other tabs and try again."))), "image/jpeg", 0.85));
 
 export const redact: ToolDef = {
   id: "redact", title: "Redact", heading: "Redact a PDF", group: "Privacy",
   blurb: "Remove text, not just cover it.",
   lede: "Find NRIC and FIN numbers, phone numbers, emails and addresses, or search for words, then remove the boxed text from the file. Automatic search can miss items, so review the boxes and check the result.",
+  how: "Find text, review each hit, then it is removed from the file, not just covered.",
+  next: ["compress", "protect", "watermark"],
   accepts: "pdf",
   options(ctx) { return ui(ctx).root; },
   sync(ctx) {
@@ -234,7 +236,7 @@ export const redact: ToolDef = {
   },
   warnings(ctx) { const u = ui(ctx); return [...(u.signed ? [SIGNED_WARNING] : []), ...(u.chosen().length ? ["Automatic search can miss items, and redacted pages become pictures. Your original file is not changed. Check the result before you share it."] : [])]; },
   ready(ctx) { const u = ui(ctx); return !!ctx.file && !u.scanning && u.chosen().length > 0; },
-  primaryLabel(ctx) { const n = ui(ctx).chosen().length; return n ? `Redact ${plural(n, "item")}` : "Redact"; },
+  primaryLabel(ctx) { const n = ui(ctx).chosen().length; return n ? `Redact ${plural(n, "item")}` : "Redact text"; },
   destroy(ctx) { ui(ctx).pv.destroy(); },
   async run(ctx) {
     const u = ui(ctx);

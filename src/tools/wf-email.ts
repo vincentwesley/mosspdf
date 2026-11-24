@@ -18,13 +18,15 @@ export const wfEmail: ToolDef = {
   id: "wf-email", title: "Small enough to email", group: "Workflows",
   blurb: "Shrink a PDF to fit an email.",
   lede: "Shrinks the pictures as far as it takes, then tells you plainly whether the file fits your limit.",
+  how: "Add your PDF and set a size limit. Pictures shrink until it fits, and you are told if it does not.",
+  next: ["protect", "sign"],
   accepts: "pdf",
   options(ctx) {
     const u = ui(ctx);
     return h("div", { class: "wf" }, u.limit.el, u.steps.el);
   },
   summary: (ctx) => ui(ctx).sum,
-  primaryLabel: () => "Make it small",
+  primaryLabel: () => "Shrink PDF",
   async run(ctx) {
     const u = ui(ctx);
     const f = ctx.file!;

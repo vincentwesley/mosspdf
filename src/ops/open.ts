@@ -25,11 +25,11 @@ export function classify(stderr: string, f: InFile): PdfError {
   if (/invalid password/i.test(stderr)) {
     return f.password
       ? new PdfError("wrong-password", `That password doesn't open "${f.name}". Check it and try again.`, f.name)
-      : new PdfError("encrypted", `"${f.name}" is password-protected. Enter its password to continue.`, f.name);
+      : new PdfError("encrypted", `"${f.name}" is locked with a password. Enter the password to open it.`, f.name);
   }
-  if (/memory|alloc|enlarge/i.test(stderr)) return new PdfError("too-large", `"${f.name}" is too big to handle in this browser. Try splitting it first or closing other tabs.`, f.name);
-  if (/unsupported|not supported/i.test(stderr)) return new PdfError("unsupported", `"${f.name}" uses a feature MossPDF can't handle yet.`, f.name);
-  return new PdfError("corrupt", `"${f.name}" looks damaged and couldn't be repaired. Try re-downloading or re-exporting it from the original program.`, f.name);
+  if (/memory|alloc|enlarge/i.test(stderr)) return new PdfError("too-large", `"${f.name}" is too big to handle on this device. Close other tabs, or use a smaller file, and try again.`, f.name);
+  if (/unsupported|not supported/i.test(stderr)) return new PdfError("unsupported", `"${f.name}" uses a feature MossPDF can't handle yet. Try another PDF, or re-save this one from its original program.`, f.name);
+  return new PdfError("corrupt", `"${f.name}" looks damaged and couldn't be repaired. Download it again, or re-save it from the original program.`, f.name);
 }
 
 async function tryInspect(bytes: Bytes, f: InFile, e: Engines) {
@@ -59,8 +59,8 @@ async function repair(bytes: Bytes, f: InFile): Promise<Bytes> {
 }
 
 export async function openPdf(f: InFile, e: Engines, signal?: AbortSignal): Promise<Opened> {
-  if (f.bytes.length === 0) throw new PdfError("empty", `"${f.name}" is empty (0 bytes). Pick the right file and try again.`, f.name);
-  if (!hasHeader(f.bytes)) throw new PdfError("not-pdf", `"${f.name}" isn't a PDF, even though its name says so. Open the original file, or re-save it as a PDF.`, f.name);
+  if (f.bytes.length === 0) throw new PdfError("empty", `"${f.name}" is empty (0 bytes). Choose the right file and try again.`, f.name);
+  if (!hasHeader(f.bytes)) throw new PdfError("not-pdf", `"${f.name}" isn't a PDF, even though its name says so. Open the original file and save it as a PDF, then add it again.`, f.name);
   checkAbort(signal);
   let bytes = f.bytes;
   let a = await tryInspect(bytes, f, e);

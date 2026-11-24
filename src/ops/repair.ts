@@ -22,7 +22,7 @@ export async function repair(file: InFile, o: OpOptions, e: Engines): Promise<Re
   const plain = await authorise(file, e);
   const opened = await openPdf({ name: file.name, bytes: plain.bytes }, e, o.signal);
   const pagesAfter = opened.info.pageCount;
-  if (pagesAfter === 0) throw new PdfError("corrupt", `"${file.name}" looks damaged and no pages could be recovered.`, file.name);
+  if (pagesAfter === 0) throw new PdfError("corrupt", `"${file.name}" looks damaged and no pages could be recovered. Download it again, or re-save it from the original program.`, file.name);
   const r = await e.qpdf(["/in.pdf", "/out.pdf"], { "/in.pdf": opened.bytes }, ["/out.pdf"]);
   if (!r.files["/out.pdf"] || r.code === 2) throw classify(r.stderr, file);
 

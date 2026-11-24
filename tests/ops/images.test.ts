@@ -87,6 +87,6 @@ describe("split by bookmarks", () => {
     expect(r.map((x) => x.name)).toEqual(["One.pdf", "Two.pdf"]);
     expect((await PDFDocument.load(r[0].bytes)).getPageCount()).toBe(2);
     expect((await PDFDocument.load(r[1].bytes)).getPageCount()).toBe(3);
-    await expect(split(plain, { kind: "bookmarks" }, opts(), engines)).rejects.toThrow(/no top-level bookmarks/);
+    await expect(split(plain, { kind: "bookmarks" }, opts(), engines)).rejects.toThrow(/no bookmarks that point/);
   });
 });

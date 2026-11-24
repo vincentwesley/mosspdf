@@ -20,7 +20,7 @@ export interface OcrPage {
 }
 
 export async function addTextLayer(file: InFile, pages: OcrPage[], o: OpOptions, e: Engines): Promise<OpResult> {
-  if (!pages.length) throw new PdfError("unsupported", "There is no text to add.", file.name);
+  if (!pages.length) throw new PdfError("unsupported", "No text was found to add. Try again, or use a clearer scan.", file.name);
   const p = await prepare(file, o, e);
   const doc = await PDFDocument.load(p.bytes, { updateMetadata: false });
   await drawLayer(doc, pages, file, o);
@@ -36,7 +36,7 @@ export async function drawLayer(doc: PDFDocument, pages: OcrPage[], file: InFile
   for (const [k, pg] of pages.entries()) {
     checkAbort(o.signal);
     const page = all[pg.page];
-    if (!page) throw new PdfError("unsupported", `Page ${pg.page + 1} doesn't exist in "${file.name}".`, file.name);
+    if (!page) throw new PdfError("unsupported", `Page ${pg.page + 1} doesn't exist in "${file.name}". Add the file again and try again.`, file.name);
     const v = view(page);
     const [sx, sy] = [v.w / pg.width, v.h / pg.height];
     const a = (v.rot * Math.PI) / 180;

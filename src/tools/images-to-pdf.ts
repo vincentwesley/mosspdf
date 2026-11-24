@@ -32,7 +32,7 @@ function jpegOrientation(b: Uint8Array): number {
 }
 
 const toBlob = (c: HTMLCanvasElement, type: string, q?: number) =>
-  new Promise<Blob>((res, rej) => c.toBlob((b) => (b ? res(b) : rej(new PdfError("unsupported", "This browser could not prepare the picture."))), type, q));
+  new Promise<Blob>((res, rej) => c.toBlob((b) => (b ? res(b) : rej(new PdfError("unsupported", "This browser could not prepare a picture. Try a smaller picture, or close other tabs."))), type, q));
 
 /** The ImageInput contract: JPEG or PNG bytes that are already upright, with their pixel size. PNG stays PNG; JPEG is re-encoded only when its rotation flag had to be applied. */
 async function prepared(f: LoadedFile): Promise<ImageInput> {
@@ -72,6 +72,8 @@ export const imagesToPdf: ToolDef = {
   id: "images-to-pdf", title: "Images to PDF", heading: "Turn pictures into a PDF", group: "Convert",
   blurb: "Turn JPG, PNG or WebP pictures into one PDF.",
   lede: "Put your pictures in order, then save them as one PDF. Each picture gets its own page.",
+  how: "Add pictures, put them in order, then save one PDF with a page for each.",
+  next: ["sign", "compress", "protect", "page-numbers", "watermark"],
   accepts: "images",
   options(ctx) {
     const u = ui(ctx);

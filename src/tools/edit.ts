@@ -325,6 +325,7 @@ export const edit: ToolDef = {
   id: "edit", title: "Edit PDF", heading: "Edit a PDF", group: "Edit",
   blurb: "Add text, highlights and shapes.",
   lede: "Click a page to add text, a highlight, a rectangle or a line. White-out covers what is under it, but does not remove it.",
+  how: "Add a PDF, click a page to add text or shapes, then save the edited copy.",
   accepts: "pdf",
   next: ["sign", "compress", "protect"],
   options(ctx) {

@@ -60,6 +60,8 @@ export const pageNumbers: ToolDef = {
   id: "page-numbers", title: "Page numbers and headers", heading: "Add page numbers or a header", group: "Edit",
   blurb: "Number pages, add a header or footer.",
   lede: "Print a number or a line of text on each page. Use {n} for the page, {total} for the page count, {date} for today and {file} for the file name.",
+  how: "Add a PDF, choose where the number goes, then save the numbered copy.",
+  next: ["compress", "protect", "watermark", "sign"],
   accepts: "pdf", batch: true,
   options(ctx) {
     const u = ui(ctx);

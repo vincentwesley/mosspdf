@@ -84,6 +84,8 @@ export const safetyScan: ToolDef = {
   id: "safety-scan", title: "Safety scan", heading: "Safety scan", group: "Protect",
   blurb: "Check a PDF for risky parts.",
   lede: "Look for scripts, links and hidden parts, then save a cleaned copy.",
+  how: "Add a PDF to see what risky parts it holds, then save a cleaned copy.",
+  next: ["compress", "protect", "sign"],
   accepts: "pdf",
   options(ctx) { return ui(ctx).box; },
   sync(ctx) {
@@ -107,7 +109,7 @@ export const safetyScan: ToolDef = {
     draw(ctx);
   },
   ready: (ctx) => !!ui(ctx).s.report?.risky,
-  primaryLabel: () => "Download cleaned copy",
+  primaryLabel: () => "Save cleaned copy",
   async run(ctx) {
     const u = ui(ctx);
     const file = ctx.input(ctx.file!);

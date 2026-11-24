@@ -26,7 +26,7 @@ export async function editPages(file: InFile, input: EditInput, o: OpOptions, e:
   const p = await prepare(file, o, e);
   const doc = await PDFDocument.load(p.bytes, { updateMetadata: false });
   const pages = doc.getPages();
-  if (!input.items.length) throw new PdfError("unsupported", "Nothing is added yet. Add some text or a shape to a page first.", file.name);
+  if (!input.items.length) throw new PdfError("unsupported", "Nothing is added yet. Click a page to add some text or a shape, then save.", file.name);
   const font = await pickFont(doc, input.items.flatMap((it) => (it.kind === "text" ? [it.text] : [])));
   const imgs: (PDFImage | undefined)[] = [];
   let boldFont: Awaited<ReturnType<typeof doc.embedFont>> | undefined;
@@ -65,7 +65,7 @@ export async function editPages(file: InFile, input: EditInput, o: OpOptions, e:
         const src = input.images?.[it.image];
         if (!src) throw bad("A placed picture is missing.");
         let im: PDFImage;
-        try { im = (imgs[it.image] ??= src.jpeg ? await doc.embedJpg(src.bytes) : await doc.embedPng(src.bytes)); } catch { throw new PdfError("corrupt", "A picture could not be read.", file.name); }
+        try { im = (imgs[it.image] ??= src.jpeg ? await doc.embedJpg(src.bytes) : await doc.embedPng(src.bytes)); } catch { throw new PdfError("corrupt", "A picture on a page could not be read. Remove it and add it again.", file.name); }
         const name = node.newXObject("PHI", im.ref).decodeText();
         (draws.get(it.page) ?? draws.set(it.page, []).get(it.page)!).push(`q ${cm} ${f(px(it.w))} 0 0 ${f(it.h * v.h)} ${f(px(it.x))} ${f(py(it.y + it.h))} cm /${name} Do Q`);
         continue;

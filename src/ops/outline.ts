@@ -122,7 +122,7 @@ export function writeOutlineItems(doc: PDFDocument, items: BookmarkItem[]) {
         link(kids[i], refs[i]);
       }
       if (it.page !== null) {
-        if (!Number.isInteger(it.page) || it.page < 1 || it.page > pages.length) throw new PdfError("unsupported", `The bookmark "${it.title}" points to page ${it.page}, but the file has ${pages.length} page${pages.length === 1 ? "" : "s"}.`);
+        if (!Number.isInteger(it.page) || it.page < 1 || it.page > pages.length) throw new PdfError("unsupported", `The bookmark "${it.title}" points to page ${it.page}, but the file has ${pages.length} page${pages.length === 1 ? "" : "s"}. Change the page number and try again.`);
         d.set(N("Dest"), ctx.obj([pages[it.page - 1].ref, N("XYZ"), null, null, null]));
       }
     });

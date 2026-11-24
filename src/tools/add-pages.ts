@@ -26,6 +26,7 @@ export const addPages: ToolDef = {
   id: "add-pages", title: "Add blank pages", group: "Organize",
   blurb: "Insert empty pages where you need them.",
   lede: "Put blank pages at the start, the end, after every page or after one page. Bookmarks and links stay. Your original is never changed.",
+  how: "Add a PDF, choose where the blank pages go, then save.",
   accepts: "pdf", batch: true,
   next: ["organize", "page-numbers", "compress", "protect"],
   options(ctx) {

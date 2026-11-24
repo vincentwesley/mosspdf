@@ -16,8 +16,9 @@ export const wfApply: ToolDef = {
   id: "wf-apply", title: "Job application pack", group: "Workflows",
   blurb: "Join your documents into one numbered PDF.",
   lede: "Joins your PDFs in the order listed, numbers every page along the bottom, and can shrink the result.",
+  how: "Add your documents, put them in order, then get one numbered PDF.",
+  next: ["compress", "protect", "sign"],
   accepts: "pdfs",
-  dropTitle: "Drop your PDFs here",
   options(ctx) {
     const u = ui(ctx);
     return h("div", { class: "wf" },
@@ -25,7 +26,7 @@ export const wfApply: ToolDef = {
       u.small.el, u.steps.el);
   },
   warnings: pdfLossWarnings,
-  primaryLabel: () => "Make the pack",
+  primaryLabel: () => "Make application pack",
   async run(ctx) {
     const u = ui(ctx);
     const shrink = u.small.input.checked;

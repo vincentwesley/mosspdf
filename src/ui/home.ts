@@ -6,6 +6,10 @@ import { h } from "./dom";
 import { dropzone, setFilesHandler } from "./dropzone";
 import { toolBox } from "./toolicons";
 
+/** First-visit hint: dismissed for good in localStorage. */
+const HINT = "mosspdf.hint-home";
+const hintSeen = () => { try { return !!localStorage.getItem(HINT); } catch { return false; } };
+
 /** The last category chip, kept while this tab lives (not stored). */
 let lastChip = "All";
 
@@ -96,10 +100,13 @@ export function homeView(navigate: (hash: string) => void): { el: HTMLElement; d
     h("h2", { id: "recent-h", class: "hs-eyebrow", text: "Recently used" }),
     h("ul", { class: "recent__list", attrs: { role: "list" } }, ...recent.map((t) => h("li", {}, h("a", { class: "hs-btn hs-btn--secondary", text: t.title, attrs: { href: `#/${t.id}`, "data-testid": `recent-${t.id}` } })))));
 
+  const hint = h("p", { class: "hs-banner hs-banner--info hint", hidden: hintSeen(), attrs: { "data-testid": "home-hint" } },
+    h("span", { text: "Drop a file or paste it. It never leaves this device." }),
+    h("button", { class: "dlg__x", type: "button", text: "Close", attrs: { "aria-label": "Close hint", "data-testid": "home-hint-close" }, on: { click: () => { hint.hidden = true; try { localStorage.setItem(HINT, "1"); } catch { /* private mode */ } } } }));
   const el = h("div", { class: "view home" },
     h("header", { class: "hero" },
       h("h1", { text: "PDF tools that stay on your device.", attrs: { tabindex: -1, "data-testid": "view-heading" } }),
-      h("p", { class: "hero__lede" }, "Your files stay on this device. ", h("a", { href: "#/privacy", text: "See how to check" }), "."),
+      hint,
       h("ol", { class: "steps3", attrs: { "data-testid": "three-steps" } }, ...["Pick a tool.", "Add your file.", "Download."].map((t) => h("li", { text: t })))),
     dropzone({ hint: "Or paste them. They stay on this device." }),
     h("p", { class: "trust" }, h("a", { href: "#/privacy", text: "Files stay on this device · No account · Works offline after the first visit", attrs: { "data-testid": "trust-strip" } })),

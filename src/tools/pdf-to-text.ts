@@ -26,6 +26,7 @@ export const pdfToText: ToolDef = {
   id: "pdf-to-text", title: "PDF to text", heading: "Copy the text out of a PDF", group: "Convert",
   blurb: "Copy out all the text.",
   lede: "Get all the text of a PDF as a .txt file, or copy it. Pages are separated by a line.",
+  how: "Add a PDF, then copy its text or save a .txt file.",
   accepts: "pdf",
   next: [],
   options: (ctx) => ui(ctx).root,

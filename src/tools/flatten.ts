@@ -18,6 +18,7 @@ export const flatten: ToolDef = {
   id: "flatten", title: "Flatten PDF", group: "Edit",
   blurb: "Lock form fields and notes into the page.",
   lede: "Make form answers and notes part of the page so they can no longer be changed. Your original is never changed.",
+  how: "Add a PDF, then save a copy where form answers and notes are fixed in place.",
   accepts: "pdf", batch: true,
   next: ["compress", "protect", "sign", "page-numbers", "watermark"],
   options: (ctx) => h("div", {}, ui(ctx).what.el),
