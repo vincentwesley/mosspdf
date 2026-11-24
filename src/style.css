@@ -588,3 +588,13 @@ kbd { font: 600 0.85rem var(--font-mono); padding: 0.1rem 0.4rem; background: va
 .tray__name { overflow-wrap: anywhere; }
 .tray__item.is-dim { opacity: 0.6; }
 .tray__why { color: var(--fg-muted); font-size: 0.875rem; }
+/* Page grid across files: toolbar, file badges, selection (merge, organize) */
+.pg-bar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2); padding: var(--s2); }
+.pg-bar__btn { min-height: 48px; }
+.pg-bar__count { color: var(--fg-muted); font-size: 0.9rem; }
+.pg { position: relative; }
+.pg[data-tag] { --tag: var(--accent); --tag-ink: var(--accent); border-top: 3px solid var(--tag); }
+.pg[data-tag="1"] { --tag: var(--fx-2); --tag-ink: var(--fx-2-ink); }
+.pg[data-tag="2"] { --tag: var(--fx-3); --tag-ink: var(--fx-3-ink); }
+.pg__badge { position: absolute; top: 0.5rem; left: 0.5rem; min-width: 1.5rem; padding: 0 0.3rem; text-align: center; font: 700 0.8rem/1.4rem var(--font-mono, monospace); background: var(--bg-elev); color: var(--tag-ink, var(--accent)); border: 2px solid var(--tag, var(--accent)); pointer-events: none; }
+.pg__badge[hidden] { display: none; }
