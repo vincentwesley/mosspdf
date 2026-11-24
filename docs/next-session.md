@@ -23,8 +23,8 @@ Continue work on **MossPDF** (repo `vincentwesley/mosspdf`, public). Live: https
 - Text: `ops/ufont.ts` `pickFont` (Helvetica → Noto Sans → Chinese font when on), client gate `core/winansi.ts` `badChars`.
 
 ## Current state
-- **Open: PR #20 = v1.8.0** (branch `v180`: PDF to Excel, Extract images, split by bookmarks, header/footer text, design pass; D32 + CHANGELOG already on the branch, version 1.8.0). Local check + e2e (211) green; CI was running at hand-off. Next: `gh pr checks 20` → merge → deploy → smoke → release v1.8.0 → update this file.
-- v1.7.0 (2026-11-23): 36 tools + 3 workflows. v1.6 added Flatten, Remove blank pages, Pages per sheet, Add blank pages, tile drop, install offer (D29); v1.7 added PDF to Word, Bookmarks (+ Merge bookmark per file), Traditional Chinese/Japanese/Korean text (D30), Edit PDF pictures, undo/redo, bold (D31). CI green on 5 browser projects.
+- v1.8.0 (2026-11-24): 40 tools + 3 workflows. v1.6 page tools (D29), v1.7 Word, bookmarks, CJK text, Edit pictures/undo (D30-D31), v1.8 PDF to Excel, Extract images, split by bookmarks, headers (D32). CI green on 5 browser projects.
+- **Plan: `docs/ROADMAP.md`** (v1.9 quality pass → v1.10 workspace → v1.11 conversions → v1.12 fill and sign → v2.0 launch polish). Work the next milestone.
 - Budget: main bundle 26.8 KB gzip of 28 (icon data lives in `ui/icondata.ts`, tools chunk). Home-phone height cap 4800.
 
 ## Known gaps

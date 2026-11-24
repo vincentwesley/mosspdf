@@ -1,6 +1,6 @@
 # Handover
 
-Resume here. Plan: `docs/PLAN.md`. Checks: `docs/ACCEPTANCE.md`. Why things are the way they are: `docs/DECISIONS.md`. Session notes: `docs/next-session.md`.
+Resume here. Roadmap to 2.0: `docs/ROADMAP.md`. Original plan: `docs/PLAN.md`. Checks: `docs/ACCEPTANCE.md`. Why things are the way they are: `docs/DECISIONS.md`. Session notes: `docs/next-session.md`.
 
 ## Current state (2026-11-21, evening)
 - Repo https://github.com/vincentwesley/mosspdf (public). Live: https://mosspdf.pages.dev
