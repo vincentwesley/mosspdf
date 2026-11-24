@@ -8,10 +8,6 @@ import tcFontUrl from "../fonts/notosanstc-big5-400-normal.ttf?url";
 import jpFontUrl from "../fonts/notosansjp-jisx0208-400-normal.ttf?url";
 import krFontUrl from "../fonts/notosanskr-hangul-400-normal.ttf?url";
 import ocrWasmUrl from "tesseract.js-core/tesseract-core-simd-lstm.wasm?url";
-import engUrl from "@tesseract.js-data/eng/4.0.0_best_int/eng.traineddata.gz?url";
-import chiSimUrl from "@tesseract.js-data/chi_sim/4.0.0_best_int/chi_sim.traineddata.gz?url";
-import msaUrl from "@tesseract.js-data/msa/4.0.0_best_int/msa.traineddata.gz?url";
-import tamUrl from "@tesseract.js-data/tam/4.0.0_best_int/tam.traineddata.gz?url";
 import pdfjsDataUrl from "virtual:pdfjs-data";
 import opsWorkerUrl from "../workers/ops.worker.ts?worker&url";
 import ocrWorkerUrl from "../workers/ocr.worker.ts?worker&url";
@@ -64,7 +60,8 @@ registerEngine({
 
 // OCR (D16, D21): the engine (~3 MB) plus the chosen languages (1 to 3 MB each), so only a page that boots on #/ocr loads them, and only
 // the languages in the route (or this viewer's last choice). A sealed page cannot start it later (no new worker, no fetch).
-const LANG_URL: Record<string, string> = { eng: engUrl, chi_sim: chiSimUrl, msa: msaUrl, tam: tamUrl };
+// Every installed @tesseract.js-data/<code> package is picked up here; a language only shows once it is also listed in core/ocrlangs.ts.
+const LANG_URL: Record<string, string> = Object.fromEntries(Object.entries(import.meta.glob<string>("/node_modules/@tesseract.js-data/*/4.0.0_best_int/*.traineddata.gz", { query: "?url", import: "default", eager: true })).map(([k, v]) => [/([^/]+)\.traineddata\.gz$/.exec(k)![1], v]));
 export let ocrRpc: RpcClient | undefined;
 /** The language codes the loaded OCR engine was started with. */
 export let ocrLangs: string[] = [];

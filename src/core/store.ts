@@ -60,7 +60,7 @@ export const store = {
           const lf: LoadedFile = { id: nextId++, kind: "image", name: f.name, size: f.size, bytes: new Uint8Array(0), blob: f, status: "ready", ...(await decodeImage(f)) };
           store.files.push(lf);
         } catch {
-          notes.push(isHeic(f) ? `"${f.name}" is a HEIC photo this browser cannot read. Convert it to JPG first, then add it again.` : `"${f.name}" could not be read as an image.`);
+          notes.push(isHeic(f) ? `"${f.name}": this browser can't open HEIC pictures. Safari can, or convert them to JPG first.` : `"${f.name}" could not be read as an image.`);
         }
       } else skipped.push(f.name);
     }

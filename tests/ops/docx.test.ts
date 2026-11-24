@@ -1,7 +1,7 @@
 // PDF to Word: line and paragraph grouping, headings, and the .docx writer.
 import { strFromU8, unzipSync } from "fflate";
 import { expect, test } from "vitest";
-import { buildDocx, esc, toLines, toParas, type DocxItem } from "../../src/core/docx";
+import { buildDocx, esc, placeImages, toLines, toParas, type DocxItem } from "../../src/core/docx";
 
 const it = (str: string, y: number, size = 12, extra: Partial<DocxItem> = {}): DocxItem => ({ str, hasEOL: true, height: size, transform: [size, 0, 0, size, 72, y], ...extra });
 const items = [it("Big Title", 700, 24), it("first line", 650), it("second line", 636), it("next paragraph", 600, 12, { fontName: "Arial-BoldMT" })];
@@ -29,4 +29,29 @@ test("docx has the parts, escaped text, headings and page breaks", () => {
   expect(doc).toContain("<w:pageBreakBefore/>");
   const st = strFromU8(z["word/styles.xml"]);
   for (const id of ["Normal", "Heading1", "Heading2"]) expect(st).toContain(`w:styleId="${id}"`);
+});
+
+test("real font data wins over the font name", () => {
+  const ps = toParas(toLines([it("Heavy", 700, 12, { fontName: "g_f1" }), it("plain", 650, 12, { fontName: "Arial-BoldMT" })], (f) => (f === "g_f1" ? { bold: true, italic: true } : { bold: false, italic: false })), false);
+  expect(ps[0].runs[0]).toMatchObject({ bold: true, italic: true });
+  expect(ps[1].runs[0].bold).toBe(false);
+  const doc = strFromU8(unzipSync(buildDocx([ps]))["word/document.xml"]);
+  expect(doc).toContain("<w:rPr><w:b/><w:i/></w:rPr>");
+});
+
+test("pictures: placed before the lower paragraph, with part, relationship and content type", () => {
+  const png = new Uint8Array([137, 80, 78, 71]);
+  const paras = placeImages(toParas(toLines([it("above", 700), it("below", 300)]), false), [{ bytes: png, ext: "png", top: 500, wPt: 300, hPt: 150 }], 595);
+  expect(paras.map((p) => (p.image ? "img" : p.runs[0].text))).toEqual(["above", "img", "below"]);
+  expect(paras[1].image!.cx).toBeLessThanOrEqual(5731510);
+  const z = unzipSync(buildDocx([paras]));
+  expect(Object.keys(z)).toContain("word/media/image1.png");
+  expect(strFromU8(z["[Content_Types].xml"])).toContain('<Default Extension="png" ContentType="image/png"/>');
+  expect(strFromU8(z["word/_rels/document.xml.rels"])).toContain('Id="rIdImg1"');
+  expect(strFromU8(z["word/_rels/document.xml.rels"])).toContain('Target="media/image1.png"');
+  const doc = strFromU8(z["word/document.xml"]);
+  expect(doc).toContain('<a:blip r:embed="rIdImg1"/>');
+  expect(doc).toMatch(/<wp:extent cx="\d+" cy="\d+"\/>/);
+  expect(doc).toContain('xmlns:wp=');
+  expect(placeImages([], [{ bytes: png, ext: "jpg", top: 1, wPt: 10, hPt: 10 }], 595)).toHaveLength(1);
 });

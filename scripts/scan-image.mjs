@@ -64,3 +64,16 @@ export function grayPng({ w, h, gray }) {
 }
 
 export const SCAN_LINES = ["MOSSPDF OCR FIXTURE", "INVOICE 2026 TOTAL 480", "SCANNED PAGE ONE"];
+
+/** The page tilted `deg` degrees clockwise on a dark scanner bed (`bed` px of it on every side), as {w,h,gray}; for the scan-cleanup tests. */
+export function skewScan({ w, h, gray }, deg, bed = 60) {
+  const [W, H] = [w + 2 * bed, h + 2 * bed];
+  const out = new Uint8Array(W * H).fill(25);
+  const [c, s] = [Math.cos((deg * Math.PI) / 180), Math.sin((deg * Math.PI) / 180)];
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const [dx, dy] = [x - W / 2, y - H / 2];
+    const [sx, sy] = [Math.round(dx * c + dy * s + w / 2), Math.round(-dx * s + dy * c + h / 2)]; // the page point that lands here
+    if (sx >= 0 && sy >= 0 && sx < w && sy < h) out[y * W + x] = gray[sy * w + sx];
+  }
+  return { w: W, h: H, gray: out };
+}

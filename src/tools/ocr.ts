@@ -6,6 +6,7 @@ import { chosenLangs, hashFor, loadSize, OCR_LANGS, saveLangs } from "../core/oc
 import { store } from "../core/store";
 import type { OcrPage } from "../ops";
 import type { OcrWord } from "../engines/ocr";
+import { enhance, fixPage } from "../ops/scanfix";
 import { PdfError, type OpResult } from "../ops/types";
 import { h, plural } from "../ui/dom";
 import { checkField } from "../ui/fields";
@@ -32,7 +33,10 @@ const ui = (ctx: Ctx) => ctx.local(() => {
     langs, picked, load, msg,
     lang: h("fieldset", { class: "radios", attrs: { "data-testid": "ocr-langs" } }, h("legend", { text: "Languages" }), ...langs.map((f) => f.el)),
     skip: checkField({ id: "ocr-skip", label: "Skip pages that already have text", checked: true, testid: "ocr-skip", onChange: () => ctx.refresh() }),
-    clean: checkField({ id: "ocr-clean", label: "Clean up scans first (grey, stronger contrast)", checked: false, testid: "ocr-clean", onChange: () => ctx.refresh() }),
+    straighten: checkField({ id: "ocr-straighten", label: "Straighten crooked pages", checked: true, testid: "ocr-straighten", onChange: () => ctx.refresh() }),
+    crop: checkField({ id: "ocr-crop", label: "Crop to the page (trim dark scanner edges)", checked: true, testid: "ocr-crop", onChange: () => ctx.refresh() }),
+    clean: checkField({ id: "ocr-clean", label: "Clearer text (even out shadows, stronger contrast)", checked: true, testid: "ocr-clean", onChange: () => ctx.refresh() }),
+    keep: checkField({ id: "ocr-use-cleaned", label: "Use the straightened, cropped pages in the PDF (otherwise your original pages stay as they are)", checked: false, testid: "ocr-use-cleaned", onChange: () => ctx.refresh() }),
     pdf: checkField({ id: "ocr-out-pdf", label: "Searchable PDF", checked: true, testid: "ocr-out-pdf", onChange: () => ctx.refresh() }),
     txt: checkField({ id: "ocr-out-txt", label: "Plain text (.txt)", checked: false, testid: "ocr-out-txt", onChange: () => ctx.refresh() }),
     missing: h("div", { class: "hs-banner hs-banner--info", attrs: { "data-testid": "ocr-missing", role: "note" } }, msg, clears, load),
@@ -40,23 +44,8 @@ const ui = (ctx: Ctx) => ctx.local(() => {
   };
 });
 
-/** Grey and stretch the contrast (1% to 99% of the brightness range) so faint scans read better. */
-function cleanUp(canvas: HTMLCanvasElement) {
-  const g = canvas.getContext("2d", { willReadFrequently: true })!;
-  const img = g.getImageData(0, 0, canvas.width, canvas.height);
-  const d = img.data;
-  const hist = new Uint32Array(256);
-  for (let i = 0; i < d.length; i += 4) hist[(d[i] = d[i + 1] = d[i + 2] = (d[i] * 77 + d[i + 1] * 150 + d[i + 2] * 29) >> 8)]++;
-  const n = d.length / 4;
-  let lo = 0, hi = 255, acc = 0;
-  while (lo < 255 && (acc += hist[lo]) < n * 0.01) lo++;
-  acc = 0;
-  while (hi > 0 && (acc += hist[hi]) < n * 0.01) hi--;
-  if (hi - lo > 16) for (let i = 0; i < d.length; i += 4) d[i] = d[i + 1] = d[i + 2] = Math.max(0, Math.min(255, ((d[i] - lo) * 255) / (hi - lo)));
-  g.putImageData(img, 0, 0);
-}
-
-const toPng = (canvas: HTMLCanvasElement) => new Promise<Blob>((res, rej) => canvas.toBlob((b) => (b ? res(b) : rej(new PdfError("unsupported", "This browser could not prepare a page for reading. Close other tabs and try again."))), "image/png"));
+const toBlob = (canvas: HTMLCanvasElement, type: string, q?: number) => new Promise<Blob>((res, rej) => canvas.toBlob((b) => (b ? res(b) : rej(new PdfError("unsupported", "This browser could not prepare a page for reading. Close other tabs and try again."))), type, q));
+const toPng = (canvas: HTMLCanvasElement) => toBlob(canvas, "image/png");
 
 function pageText(words: OcrWord[]): string {
   return words.map((w) => w.text + (w.eop ? "\n\n" : w.eol ? "\n" : " ")).join("").trim();
@@ -72,7 +61,7 @@ export const ocr: ToolDef = {
   options(ctx) {
     const u = ui(ctx);
     window.addEventListener("mosspdf:sealed", () => ctx.refresh(), { once: true }); // the engine finishes loading just before the seal
-    return h("div", { class: "ocropts" }, u.missing, u.lang, u.skip.el, u.clean.el, h("fieldset", { class: "radios" }, h("legend", { text: "Save as" }), u.pdf.el, u.txt.el));
+    return h("div", { class: "ocropts" }, u.missing, u.lang, u.skip.el, h("fieldset", { class: "radios", attrs: { "data-testid": "ocr-cleanup" } }, h("legend", { text: "Clean up the scan first" }), u.straighten.el, u.crop.el, u.clean.el, u.keep.el), h("fieldset", { class: "radios" }, h("legend", { text: "Save as" }), u.pdf.el, u.txt.el));
   },
   sync(ctx) {
     const u = ui(ctx);
@@ -130,11 +119,34 @@ export const ocr: ToolDef = {
         } finally {
           signal?.removeEventListener("abort", stop);
         }
-        if (u.clean.input.checked) cleanUp(canvas);
+        const [origW, origH] = [canvas.width, canvas.height];
+        const g = canvas.getContext("2d", { willReadFrequently: true })!;
+        let fixed: ReturnType<typeof fixPage> | undefined;
+        let shown: OcrPage["image"];
+        if (u.straighten.input.checked || u.crop.input.checked) {
+          fixed = fixPage(g.getImageData(0, 0, origW, origH), { crop: u.crop.input.checked, straighten: u.straighten.input.checked });
+          canvas.width = fixed.img.width;
+          canvas.height = fixed.img.height;
+          g.putImageData(new ImageData(fixed.img.data as Uint8ClampedArray<ArrayBuffer>, fixed.img.width, fixed.img.height), 0, 0);
+        }
+        if (u.keep.input.checked) shown = { bytes: new Uint8Array(await (await toBlob(canvas, "image/jpeg", 0.85)).arrayBuffer()), jpeg: true, ptWidth: canvas.width / scale, ptHeight: canvas.height / scale };
+        if (u.clean.input.checked) {
+          const img = g.getImageData(0, 0, canvas.width, canvas.height);
+          enhance(img);
+          g.putImageData(img, 0, 0);
+        }
         const image = new Uint8Array(await (await toPng(canvas)).arrayBuffer());
-        const words = await rpc.call<OcrWord[]>("page", { image }, { signal, transfer: [image.buffer as ArrayBuffer] });
-        done.push({ page: i - 1, width: canvas.width, height: canvas.height, words });
+        let words = await rpc.call<OcrWord[]>("page", { image }, { signal, transfer: [image.buffer as ArrayBuffer] });
         texts.push(pageText(words));
+        if (fixed && !shown) { // the layer goes on the original page: put each word box back where it was before the clean-up
+          const { toOriginal } = fixed;
+          words = words.map((w) => {
+            const c = [toOriginal(w.x0, w.y0), toOriginal(w.x1, w.y0), toOriginal(w.x0, w.y1), toOriginal(w.x1, w.y1)];
+            const [xs, ys] = [c.map((p) => p[0]), c.map((p) => p[1])];
+            return { ...w, x0: Math.min(...xs), x1: Math.max(...xs), y0: Math.min(...ys), y1: Math.max(...ys) };
+          });
+        }
+        done.push({ page: i - 1, width: shown ? canvas.width : origW, height: shown ? canvas.height : origH, words, image: shown });
         page.cleanup();
         ctx.o.onProgress?.(i, total);
       }
@@ -142,7 +154,7 @@ export const ocr: ToolDef = {
       canvas.width = canvas.height = 0;
     }
     if (!done.length) throw new PdfError("unsupported", `${total === 1 ? "This page already has" : "Every page already has"} text, so there is nothing to read. Turn off "Skip pages that already have text" to read it anyway.`);
-    if (!done.some((p) => p.words.length)) throw new PdfError("unsupported", "No words were found. The pages may be blank, or too faint or small to read. Turn on \"Clean up scans first\" and try again.");
+    if (!done.some((p) => p.words.length)) throw new PdfError("unsupported", "No words were found. The pages may be blank, or too faint or small to read. Try turning on the clean-up options and try again.");
     const results: OpResult[] = [];
     if (u.pdf.input.checked) {
       ctx.note("Adding the text to your PDF");

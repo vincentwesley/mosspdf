@@ -17,12 +17,20 @@ export interface OcrPage {
   width: number;
   height: number;
   words: OcrWord[];
+  /** The cleaned picture to show instead of the original page (scan clean-up); then `width`/`height` are its pixels and `ptWidth`/`ptHeight` the new page size in points. */
+  image?: { bytes: Uint8Array; jpeg: boolean; ptWidth: number; ptHeight: number };
 }
 
 export async function addTextLayer(file: InFile, pages: OcrPage[], o: OpOptions, e: Engines): Promise<OpResult> {
   if (!pages.length) throw new PdfError("unsupported", "No text was found to add. Try again, or use a clearer scan.", file.name);
   const p = await prepare(file, o, e);
   const doc = await PDFDocument.load(p.bytes, { updateMetadata: false });
+  for (const pg of pages) {
+    if (!pg.image || pg.page >= doc.getPageCount()) continue;
+    const img = await (pg.image.jpeg ? doc.embedJpg(pg.image.bytes) : doc.embedPng(pg.image.bytes));
+    doc.removePage(pg.page);
+    doc.insertPage(pg.page, [pg.image.ptWidth, pg.image.ptHeight]).drawImage(img, { x: 0, y: 0, width: pg.image.ptWidth, height: pg.image.ptHeight });
+  }
   await drawLayer(doc, pages, file, o);
   if (o.producerCredit) applyCredit(doc);
   const name = safeName(file.name, "document").replace(/\.pdf$/i, "") + "-searchable.pdf";

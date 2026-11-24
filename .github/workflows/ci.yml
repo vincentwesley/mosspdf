@@ -80,8 +80,10 @@ jobs:
         # An Ubuntu mirror sometimes stalls the apt part for 25+ minutes; retry instead of waiting it out.
         run: |
           for i in 1 2 3; do
-            timeout 480 npm run pw -- install --with-deps ${{ matrix.browser }} && exit 0
+            timeout 600 npm run pw -- install --with-deps ${{ matrix.browser }} && exit 0
             echo "browser install attempt $i failed or stalled, retrying"
+            # timeout kills npm but not the apt-get it started; that orphan keeps the dpkg lock and every retry exits 100. Wait for it.
+            for _ in $(seq 1 60); do pgrep -x apt-get >/dev/null || pgrep -x dpkg >/dev/null || break; sleep 5; done
             sudo dpkg --configure -a || true
             sudo apt-get update -q || true # exit code 100 is usually a stale or half-synced mirror index
             sleep 20
