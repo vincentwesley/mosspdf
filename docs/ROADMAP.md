@@ -30,7 +30,7 @@
 - Batch mode on every tool where it makes sense.
 - Saved custom workflows: chain your own steps and keep them on this device.
 
-### v1.11 Conversions
+### v1.11 Conversions — shipped 1.11.0
 - PDF to Word: pictures and real bold/italic done (v1.11).
 - PDF to PowerPoint, with each page as a slide.
 - PDF to Markdown or HTML.

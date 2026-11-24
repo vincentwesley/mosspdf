@@ -38,7 +38,7 @@ export function estimateSkew(img: Px): number {
   for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
     let s = 0;
     for (let j = 0; j < f; j++) for (let i = 0; i < f; i++) s += lum(d, ((y * f + j) * W + x * f + i) * 4);
-    hist[(g[y * w + x] = s / (f * f))]++;
+    hist[(g[y * w + x] = (s / (f * f)) | 0)]++; // | 0: a fractional index is silently ignored on a typed array
   }
   // Otsu threshold
   let sumAll = 0;
@@ -121,7 +121,7 @@ export function enhance(img: Px): void {
     for (let x = 0; x < W; x++) {
       const gx = (x - B / 2) / B, bx = Math.floor(gx), fx = gx - bx;
       const p = (at(bx, by) * (1 - fx) + at(bx + 1, by) * fx) * (1 - fy) + (at(bx, by + 1) * (1 - fx) + at(bx + 1, by + 1) * fx) * fy;
-      hist[(g[y * W + x] = Math.min(255, (g[y * W + x] * 255) / p))]++;
+      hist[(g[y * W + x] = Math.min(255, ((g[y * W + x] * 255) / p) | 0))]++;
     }
   }
   const n = W * H;

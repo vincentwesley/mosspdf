@@ -12,8 +12,8 @@ const rgba = ({ w, h, gray }: { w: number; h: number; gray: Uint8Array }): Px =>
 };
 const toGray = (p: Px) => ({ w: p.width, h: p.height, gray: Uint8Array.from({ length: p.width * p.height }, (_, i) => p.data[i * 4]) });
 /** Ruled lines (ink 20 on paper 240), `deg` clockwise. */
-const lines = (deg: number) => {
-  const [w, h] = [800, 1000];
+const lines = (deg: number, k = 1) => {
+  const [w, h] = [800 * k, 1000 * k];
   const g = new Uint8Array(w * h).fill(240);
   const t = Math.tan((deg * Math.PI) / 180);
   for (let y = 60; y < h - 60; y += 28) for (let x = 40; x < w - 40; x++) for (let k = 0; k < 4; k++) { const yy = Math.round(y + k + (x - w / 2) * t); if (yy >= 0 && yy < h) g[yy * w + x] = 20; }
@@ -23,6 +23,9 @@ const lines = (deg: number) => {
 describe("scan clean-up", () => {
   it.each([-7, -2.5, 0, 1, 4.3, 12])("finds a skew of %d degrees within half a degree", (deg) => {
     expect(Math.abs(estimateSkew(lines(deg)) - deg)).toBeLessThan(0.5);
+  });
+  it("finds the skew on a full-size scan too (downscaled grey values are whole numbers)", () => {
+    expect(Math.abs(estimateSkew(lines(3, 3)) - 3)).toBeLessThan(0.5);
   });
 
   it("returns 0 for a blank page", () => {

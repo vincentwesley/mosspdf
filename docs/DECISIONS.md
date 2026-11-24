@@ -224,3 +224,11 @@ Symptom: a `worker-src` CSP violation on page load in Firefox, seen twice in a f
 
 ## D36. PDF to Word: bold/italic and pictures (2026-11-24)
 - Bold/italic come from the real pdf.js font (`commonObjs`: `.bold`, `.italic`, `.black`, name) after `getOperatorList`; the font id name is the fallback. Pictures: image ops in the operator list (CTM tracked through save/restore/transform), decoded by pdf.js, encoded as PNG via canvas, placed as inline pictures before the first paragraph that sits lower; skipped under 32 px; masks, repeats of one object at one place and sub-8pt pictures are dropped. "Text only" turns pictures off.
+
+## D37. PowerPoint, Markdown, scan clean-up, more OCR languages (2026-11-24)
+- **PDF to PowerPoint** (`core/pptx.ts`): pages rendered at 150 dpi, JPEG q 0.85, one full-bleed picture per slide on a minimal master/blank layout/theme; slide size from the first page. Opened and checked with python-pptx (2 slides, picture shapes, Blank layout). Speaker notes left out: not verifiable here without risking an invalid file.
+- **PDF to Markdown** (`core/markdown.ts`): reuses the docx line/paragraph grouping; headings, paragraphs, bullet and numbered lists; Markdown specials escaped.
+- **Scan clean-up** (`ops/scanfix.ts`): skew by projection-profile variance (±15°, within 0.5° on synthetic tests), dark-border trim (at most half the page), contrast clean-up for OCR input. With "use the cleaned pages" off, word boxes map back to the original page; on, the page becomes a JPEG and its links are lost.
+- **OCR languages**: 13 more `@tesseract.js-data/*@1.0.0` packages (4.0.0_best_int, MIT package, Apache-2.0 model), found by glob in `core/engines.ts`, loaded only when chosen (D21) and not precached. The `.gz` budget rose from 7.4 to 27 MB because it sums every opt-in language file; nothing loads by default.
+- **HEIC**: only native decoding (`createImageBitmap`, Safari). libheif is LGPL, so no decoder library.
+

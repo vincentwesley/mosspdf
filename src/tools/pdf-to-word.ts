@@ -48,7 +48,7 @@ async function pagePics(page: PDFPageProxy, ops: { fnArray: number[]; argsArray:
     else if (fn === RESTORE) ctm = stack.pop() ?? ctm;
     else if (fn === TRANSFORM) ctm = mul(a as Mat, ctm);
     else if (fn === IMG || fn === IMG_REPEAT || fn === IMG_INLINE) {
-      const raw = fn === IMG_INLINE ? a[0] as RawImg : (typeof a[0] === "string" && page.objs.has(a[0]) ? page.objs.get(a[0]) as RawImg : null);
+      const raw = fn === IMG_INLINE ? a[0] as RawImg : (typeof a[0] === "string" ? (page.objs.has(a[0]) ? page.objs.get(a[0]) as RawImg : page.commonObjs.has(a[0]) ? page.commonObjs.get(a[0]) as RawImg : null) : null);
       if (!raw || raw.width < MIN_PX || raw.height < MIN_PX) continue;
       const key = typeof a[0] === "string" ? `${a[0]}@${ctm.join(",")}` : "";
       if (key && seen.has(key)) continue;

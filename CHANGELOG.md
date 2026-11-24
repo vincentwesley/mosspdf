@@ -4,6 +4,16 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 
 ## [Unreleased]
 
+## [1.11.0] - 2026-11-24
+Conversions (roadmap v1.11, D36-D37).
+- PDF to Word keeps pictures, bold and italic (read from the real font data).
+- PDF to PowerPoint: each page becomes a full-slide picture (text is not editable, the tool says so).
+- PDF to Markdown: headings, paragraphs and lists as a .md file.
+- OCR cleans up scans first: straighten, crop off dark scanner edges, clearer text; optionally use the cleaned pages in the PDF.
+- 13 more OCR languages, loaded only when chosen: Traditional Chinese, Japanese, Korean, Indonesian, Vietnamese, Thai, Hindi, Arabic, Spanish, French, German, Italian, Portuguese.
+- HEIC photos in Images to PDF where the browser opens them itself (Safari).
+- CI: the browser install retry now waits for a leftover apt-get instead of failing on its lock.
+
 ## [1.10.0] - 2026-11-24
 Workspace (roadmap v1.10, D34-D35).
 - File tray: files stay loaded while you move between tools ("N files ready" on home), with remove, clear all and undo; files a tool can't use are dimmed with the reason. Kept only while the tab is open.
