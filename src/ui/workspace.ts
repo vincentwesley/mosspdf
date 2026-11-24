@@ -24,7 +24,7 @@ const ACCEPT = {
   pdf: ".pdf,application/pdf",
   images: "image/jpeg,image/png,image/webp,image/heic,image/heif,.jpg,.jpeg,.png,.webp,.heic,.heif",
 } as const;
-const TAKES = { pdf: "Takes a PDF.", pdfs: "Takes two or more PDFs.", images: "Takes JPG, PNG or WebP pictures.", "pdf-pair": "Takes two PDFs: the original and the changed one." } as const;
+const TAKES = { pdf: "Takes a PDF.", pdfs: "Takes two or more PDFs.", images: "Takes JPG, PNG or WebP pictures (HEIC in Safari).", "pdf-pair": "Takes two PDFs: the original and the changed one." } as const;
 const stem = (name: string) => name.replace(/\.[^.]+$/, "");
 
 /** Tool title last opened, and whether the next open follows a "Use in another tool" hand-off (then carried files are expected). */

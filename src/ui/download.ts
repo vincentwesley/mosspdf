@@ -3,7 +3,7 @@ import type { OpResult } from "../ops/types";
 
 type Picker = (o: { suggestedName: string; types: { description: string; accept: Record<string, string[]> }[] }) => Promise<{ createWritable(): Promise<{ write(b: Blob): Promise<void>; close(): Promise<void> }> }>;
 
-const MIME: Record<string, string> = { pdf: "application/pdf", png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", webp: "image/webp", zip: "application/zip", txt: "text/plain", docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document", json: "application/json", xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", csv: "text/csv" };
+const MIME: Record<string, string> = { pdf: "application/pdf", png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", webp: "image/webp", zip: "application/zip", txt: "text/plain", docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document", json: "application/json", xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", csv: "text/csv", md: "text/markdown", pptx: "application/vnd.openxmlformats-officedocument.presentationml.presentation" };
 const extOf = (name: string) => name.split(".").pop()!.toLowerCase();
 
 /** Save with the native file picker where it exists, else a blob link. The picker needs a click, so call this from one. */
