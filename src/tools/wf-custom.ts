@@ -148,7 +148,7 @@ function build(ctx: Ctx) {
       h("button", { class: `hs-btn hs-btn--sm${i === sel ? "" : " hs-btn--secondary"}`, type: "button", text: `${i + 1}. ${s.tool.title}`, attrs: { "aria-pressed": String(i === sel), "data-testid": `wfc-step-${i}` }, on: { click: () => { sel = i; paint(); } } }),
       ...(i > 0 ? [btn("Up", `Move step ${i + 1} up`, () => { [slots[i - 1], slots[i]] = [slots[i], slots[i - 1]]; sel = i - 1; paint(); })] : []),
       ...(i < slots.length - 1 ? [btn("Down", `Move step ${i + 1} down`, () => { [slots[i + 1], slots[i]] = [slots[i], slots[i + 1]]; sel = i + 1; paint(); })] : []),
-      btn("Remove", `Remove step ${i + 1}`, () => { slots.splice(i, 1); sel = Math.min(sel, slots.length - 1); paint(); }, `wfc-remove-${i}`))));
+      btn("Remove", `Remove step ${i + 1}`, () => { slots.splice(i, 1); if (i < sel) sel--; else sel = Math.min(sel, slots.length - 1); paint(); }, `wfc-remove-${i}`))));
     panel.replaceChildren(...(sel >= 0 ? [h("h3", { text: `Settings for ${slots[sel].tool.title}` }), slots[sel].root] : [h("p", { class: "field__hint", text: "Add a step, then pick it to set it up." })]));
     if (live) ctx.refresh();
   }
@@ -166,14 +166,14 @@ function build(ctx: Ctx) {
       btn("Edit", `Edit ${f.name}`, () => load(f, f.id)),
       btn("Export", `Export ${f.name}`, () => void saveResult(flowFile(f))),
       btn("Delete", `Delete ${f.name}`, () => {
-        const was = flows.slice();
+        const at = flows.findIndex((x) => x.id === f.id);
         flows = flows.filter((x) => x.id !== f.id);
         saveFlows(flows);
         unregister(f.id);
         if (editId === f.id) editId = "";
         paintSaved();
         ctx.refresh();
-        toast(`Deleted ${f.name}.`, { label: "Undo", run: () => { flows = was; saveFlows(flows); register(f); paintSaved(); ctx.refresh(); } });
+        toast(`Deleted ${f.name}.`, { label: "Undo", run: () => { if (flows.some((x) => x.id === f.id)) return; flows.splice(Math.min(at, flows.length), 0, f); saveFlows(flows); register(f); paintSaved(); ctx.refresh(); } });
       }))));
   }
 

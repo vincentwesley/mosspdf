@@ -215,3 +215,9 @@ Symptom: a `worker-src` CSP violation on page load in Firefox, seen twice in a f
 ## D34. File tray; shell moved into the tools chunk (2026-11-24)
 - **Chunk.** `src/tools/all.ts` re-exports `workspace`, so the tool-page shell (and fields, pagegrid, download, preview) loads in the pre-seal tools chunk, not main. main gzip 27.6 to 16.3 KB; `main-gzip` budget 28 to 20.
 - **Tray.** `src/ui/tray.ts` lists every file held in memory (home chip "N files ready" and tool pages) with remove (44px+ X, undo toast) and Clear all; "Kept only while this tab is open". Inside a tool, files it won't use are dimmed with a reason (`src/core/trayfit.ts`: wrong kind, or not the newest PDF for one-PDF tools). Fitting files are used automatically, as before; "Continue with" results land in the tray.
+
+## D35. Cross-file page grid, batch everywhere, saved workflows (2026-11-24)
+- **Page grid** (`ui/gridlogic.ts`, `tools/pages.ts`): Organize takes several PDFs; Merge "Edit pages" and Organize show one grid with per-file badges; Ctrl/Shift/Select-mode multi-select; Alt+Arrow moves the selection; 50-step undo/redo like Edit PDF. Output via `assemble`; bookmarks are still dropped once the grid is edited (existing warning). No blank-page insert (assemble has no blank source; Add blank pages covers it).
+- **Batch**: enabled where the op is per-file and option-only (17 tools). Skipped: tools needing per-file interaction, multi-input tools, heavy/report-only tools. Per-file failures are listed on the result card instead of stopping the run.
+- **My workflows** (`tools/wf-custom.ts`, `wf-store.ts`): 2-5 steps from a chainable set using each tool's own options UI; stored in `mosspdf.workflows` (max 20, name ≤ 60, strict schema, known tool ids only, values typed and length-capped; import ≤ 64 KB, `JSON.parse` only). Password tools are never chainable, so no password is stored.
+

@@ -24,7 +24,7 @@
 - Large files: profile open and render on 100 MB+ files, lazy thumbnails, cancel everywhere, and memory warnings before the browser tab crashes.
 - Test health: find the cause of the local e2e hangs, fix the flaky logo test, and give every e2e run a time cap.
 
-### v1.10 Workspace
+### v1.10 Workspace — shipped 1.10.0
 - Files stay loaded when you move between tools ("Continue with" already chains one result). Add a visible file tray.
 - Merge and organize: drag pages across files in one grid. Undo in Organize.
 - Batch mode on every tool where it makes sense.
