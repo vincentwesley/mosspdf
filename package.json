@@ -23,6 +23,7 @@
     "test:e2e": "node scripts/pw.mjs test",
     "check": "npm run typecheck && npm run lint && npm test && npm run build",
     "check:budgets": "node scripts/check-budgets.mjs",
+    "perf:browser": "node scripts/perf-browser.mjs",
     "knip": "knip",
     "deploy": "npm run build && npx --yes wrangler@4.165.0 pages deploy dist --project-name mosspdf --branch main",
     "pw": "node scripts/pw.mjs",
