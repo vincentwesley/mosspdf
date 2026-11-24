@@ -92,7 +92,7 @@ function swPrecache(): Plugin {
     enforce: "post",
     closeBundle() {
       const dist = "dist";
-      const files = walk(dist).map((f) => "/" + relative(dist, f).split("\\").join("/")).filter((f) => f !== "/sw.js" && f !== "/_headers" && f !== "/index.html" && !/^\/assets\/(tesseract-core|notosans(sc-gb2312|tc-big5|jp-jisx0208|kr-hangul)-400-normal|(eng|chi_sim|msa|tam)\.traineddata)-/.test(f)).sort(); // OCR engine and CJK fonts: cached on first use instead (D16, D24)
+      const files = walk(dist).map((f) => "/" + relative(dist, f).split("\\").join("/")).filter((f) => f !== "/sw.js" && f !== "/_headers" && f !== "/index.html" && !/^\/assets\/(tesseract-core|notosans(sc-gb2312|tc-big5|jp-jisx0208|kr-hangul)-400-normal|[a-z_]+\.traineddata)-/.test(f)).sort(); // OCR engine and CJK fonts: cached on first use instead (D16, D24)
       const list = ["/", ...files];
       const hash = createHash("sha256").update(JSON.stringify(list)).update(readFileSync(join(dist, "index.html"))).digest("hex").slice(0, 10);
       const sw = readFileSync(join(dist, "sw.js"), "utf8").replace("__PRECACHE__", JSON.stringify(list)).replace("__VERSION__", `${pkg.version}-${hash}`);

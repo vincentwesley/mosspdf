@@ -3,7 +3,9 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import type { Page } from "@playwright/test";
 import { test, expect, downloadAndCheck, loadApp, qpdfCheck, waitForSeal } from "./fixtures";
+import { PDFDocument } from "@cantoo/pdf-lib";
 import { readPdf } from "../tests/helpers/qpdf";
+import { grayPng, scanGray, skewScan, SCAN_LINES } from "../scripts/scan-image.mjs";
 
 const corpus = (n: string) => resolve("tests/corpus/generated", `${n}.pdf`);
 const add = (page: Page, path: string) => page.getByTestId("file-input").setInputFiles([path]);
@@ -16,8 +18,30 @@ async function savePdf(page: Page, i = 0) {
   return dl;
 }
 
+/** The scan fixture tilted 4 degrees on a dark scanner bed, as a one-page image-only PDF. */
+async function skewedScan() {
+  const doc = await PDFDocument.create();
+  const sk = skewScan(scanGray(SCAN_LINES), 4);
+  const img = await doc.embedPng(grayPng(sk));
+  doc.addPage([sk.w * 0.48, sk.h * 0.48]).drawImage(img, { x: 0, y: 0, width: sk.w * 0.48, height: sk.h * 0.48 });
+  return { name: "skewed-scan.pdf", mimeType: "application/pdf", buffer: Buffer.from(await doc.save()) };
+}
+
 test.describe("M5 OCR", () => {
   test.setTimeout(180_000);
+
+  test("A-OCR-5 a crooked scan on a dark bed is straightened and cropped first, and still reads", async ({ page }) => {
+    await loadApp(page, "/#/ocr");
+    await expect(page.getByTestId("ocr-straighten")).toBeChecked(); // on by default
+    await expect(page.getByTestId("ocr-use-cleaned")).not.toBeChecked();
+    await page.getByTestId("file-input").setInputFiles([await skewedScan()]);
+    await expect(page.locator('[data-testid="file-row"][data-status="ready"]')).toHaveCount(1);
+    await page.getByTestId("ocr-use-cleaned").check();
+    await page.getByTestId("primary-action").click();
+    await expect(page.getByTestId("results")).toBeVisible(SLOW);
+    const pages = await readPdf((await savePdf(page)).bytes);
+    for (const w of ["OCR", "FIXTURE", "SCANNED"]) expect(pages[0].text).toContain(w);
+  });
 
   test("A-OCR-1 a scan booted on #/ocr becomes a searchable PDF and a text file, with no request after the seal", async ({ page }) => {
     await loadApp(page, "/#/ocr");
