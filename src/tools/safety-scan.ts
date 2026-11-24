@@ -107,6 +107,7 @@ export const safetyScan: ToolDef = {
     draw(ctx);
   },
   ready: (ctx) => !!ui(ctx).s.report?.risky,
+  whyDisabled: (ctx) => (ctx.file ? "Nothing risky to remove." : "Add a PDF first."),
   primaryLabel: () => "Download cleaned copy",
   async run(ctx) {
     const u = ui(ctx);

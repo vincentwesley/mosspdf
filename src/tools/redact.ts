@@ -234,6 +234,7 @@ export const redact: ToolDef = {
   },
   warnings(ctx) { const u = ui(ctx); return [...(u.signed ? [SIGNED_WARNING] : []), ...(u.chosen().length ? ["Automatic search can miss items, and redacted pages become pictures. Your original file is not changed. Check the result before you share it."] : [])]; },
   ready(ctx) { const u = ui(ctx); return !!ctx.file && !u.scanning && u.chosen().length > 0; },
+  whyDisabled: (ctx) => (ctx.file ? "Pick what to redact first." : "Add a PDF first."),
   primaryLabel(ctx) { const n = ui(ctx).chosen().length; return n ? `Redact ${plural(n, "item")}` : "Redact"; },
   destroy(ctx) { ui(ctx).pv.destroy(); },
   async run(ctx) {

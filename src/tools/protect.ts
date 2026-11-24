@@ -58,6 +58,7 @@ export const protect: ToolDef = {
     const p = problems(ctx);
     return !!ctx.file && u.f.pw.input.value !== "" && u.f.confirm.input.value === u.f.pw.input.value && !p.needOwner && !p.sameOwner;
   },
+  whyDisabled: (ctx) => (ctx.file ? "Type the password twice, the same both times." : "Add a PDF first."),
   primaryLabel: () => "Add password",
   async run(ctx) {
     const { f, perms } = ui(ctx);

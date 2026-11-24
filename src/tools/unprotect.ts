@@ -27,6 +27,7 @@ export const unprotect: ToolDef = {
   },
   warnings: (ctx) => (ctx.file?.info && !ctx.file.info.encrypted ? ["This PDF has no password, so there is nothing to remove."] : []),
   ready: (ctx) => !!ctx.file?.info?.encrypted && ui(ctx).pw.input.value !== "",
+  whyDisabled: (ctx) => (!ctx.file ? "Add a PDF first." : ctx.file.info?.encrypted ? "Type the password." : "This PDF has no password."),
   primaryLabel: () => "Remove password",
   async run(ctx) {
     return [await ctx.call<OpResult>("unprotect", { file: ctx.input(ctx.file!), p: { password: ui(ctx).pw.input.value }, o: { producerCredit: ctx.producerCredit } })];

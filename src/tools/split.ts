@@ -78,6 +78,7 @@ export const split: ToolDef = {
   },
   warnings: pdfLossWarnings,
   ready: (ctx) => !!plan(ctx),
+  whyDisabled: (ctx) => (ctx.file ? "Check the split settings above." : "Add a PDF first."),
   primaryLabel(ctx) { const n = plan(ctx)?.parts?.length; return n ? `Split into ${plural(n, "file")}` : "Split"; },
   run: (ctx) => ops.split(ctx.file!, plan(ctx)!.mode, ctx.o),
 };
