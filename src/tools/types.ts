@@ -67,6 +67,8 @@ export interface ToolDef {
   accepts: Accepts;
   /** accepts "pdf" only: several PDFs may be added and `run` is called once per file (ctx.file is the current one), results as a list and a .zip. */
   batch?: true;
+  /** No input files: the tool is its own form (workflow builder). The dropzone and file list stay hidden. */
+  noFiles?: true;
   /** Show the page grid (reorder, rotate, delete, optionally select). */
   grid?: boolean | GridOpts;
   /** Dropzone heading when the default for `accepts` does not fit. */

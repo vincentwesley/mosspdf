@@ -165,7 +165,7 @@ test.describe("Batch", () => {
   });
 
   test("A-E2E-9 a single-file tool still replaces the file, with undo", async ({ page }) => {
-    await loadApp(page, "/#/organize");
+    await loadApp(page, "/#/extract");
     await add(page, "plain-3p");
     await readyRows(page, 1);
     await add(page, "mixed-sizes");

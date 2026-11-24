@@ -1,4 +1,4 @@
-// Pointer-event drag reordering (mouse, touch, pen). Buttons/keys are provided by callers (WCAG 2.5.7).
+// Pointer-event drag reordering (mouse, touch, pen). Moves are heard on the document: re-inserting the handle drops its pointer capture. Buttons/keys are provided by callers (WCAG 2.5.7).
 // `longPress`: on touch, holding this selector's element (the thumbnail) for 450 ms also starts a drag.
 export function sortable(list: HTMLElement, o: { item: string; handle: string; longPress?: string; onCommit: () => void }): void {
   let dragging = false;
@@ -20,15 +20,15 @@ export function sortable(list: HTMLElement, o: { item: string; handle: string; l
     };
     const end = () => {
       dragging = false;
-      handle.removeEventListener("pointermove", move);
-      handle.removeEventListener("pointerup", end);
-      handle.removeEventListener("pointercancel", end);
+      document.removeEventListener("pointermove", move);
+      document.removeEventListener("pointerup", end);
+      document.removeEventListener("pointercancel", end);
       item.classList.remove("is-dragging");
       o.onCommit();
     };
-    handle.addEventListener("pointermove", move);
-    handle.addEventListener("pointerup", end);
-    handle.addEventListener("pointercancel", end);
+    document.addEventListener("pointermove", move);
+    document.addEventListener("pointerup", end);
+    document.addEventListener("pointercancel", end);
   }
 
   list.addEventListener("pointerdown", (e) => {

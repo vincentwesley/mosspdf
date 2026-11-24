@@ -22,7 +22,7 @@ export const pdfToExcel: ToolDef = {
   blurb: "Pull tables out into a spreadsheet.",
   lede: "Find the rows and columns on each page and save them as an Excel file or CSV.",
   how: "Add a PDF, check the tables found, then save an Excel file or CSV.",
-  accepts: "pdf",
+  accepts: "pdf", batch: true,
   next: [],
   options: (ctx) => ui(ctx).root,
   whyDisabled: () => "Add a PDF first.",

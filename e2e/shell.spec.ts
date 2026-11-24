@@ -10,7 +10,7 @@ const image = (n: string) => resolve("tests/fixtures/images", n);
 const input = (page: Page) => page.getByTestId("file-input");
 const GROUPS = ["Workflows", "Organize", "Convert", "Edit", "Protect", "Fill and sign", "OCR", "Privacy", "Compare"];
 // Live = the tool file defines `run` (same rule as src/tools/index.ts isLive); the rest are planned.
-const TOOL_IDS = readdirSync("src/tools").map((f) => f.replace(/\.ts$/, "")).filter((id) => !["index", "all", "types", "pages", "pagesel"].includes(id));
+const TOOL_IDS = readdirSync("src/tools").map((f) => f.replace(/\.ts$/, "")).filter((id) => !["index", "all", "types", "pages", "pagesel", "wf-store"].includes(id));
 const isLive = (id: string) => /^\s*(async\s+)?run\s*[(:]/m.test(readFileSync(`src/tools/${id}.ts`, "utf8"));
 const LIVE = TOOL_IDS.filter(isLive);
 const PLANNED = TOOL_IDS.filter((id) => !isLive(id));

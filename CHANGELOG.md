@@ -4,6 +4,14 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 
 ## [Unreleased]
 
+## [1.10.0] - 2026-11-24
+Workspace (roadmap v1.10, D34-D35).
+- File tray: files stay loaded while you move between tools ("N files ready" on home), with remove, clear all and undo; files a tool can't use are dimmed with the reason. Kept only while the tab is open.
+- One page grid across files in Merge and Organize: file badges, drag pages between files, multi-select to move, rotate or delete, undo and redo.
+- Batch on 17 tools, and a failing file no longer stops the rest.
+- My workflows: chain 2-5 steps (repair, rotate, crop, flatten, watermark, page numbers, add pages, pages per sheet, compress), save them on this device, export and import them.
+- Faster first load: the tool-page shell moved out of the main bundle (27.6 → 16.4 KB gzip).
+
 ## [1.9.0] - 2026-11-24
 Quality pass (D33, roadmap v1.9).
 - Clearer everywhere: buttons say what they do ("Merge PDFs", "Shrink PDF"), each tool has a one-line "how it works", the drop area says which files it takes, and about 70 error messages now say what happened and what to do.

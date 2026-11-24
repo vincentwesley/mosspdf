@@ -16,6 +16,7 @@ import { openDoc, renderThumb } from "../core/render";
 import { newItem, pageGrid } from "./pagegrid";
 import { saveResult, saveZip } from "./download";
 import { toolBox } from "./toolicons";
+import { tray } from "./tray";
 
 const DROP_TITLE = { pdf: "Drop a PDF here", pdfs: "Drop PDFs here", images: "Drop images here", "pdf-pair": "Drop the two PDFs here" } as const;
 const CHOOSE = { pdf: "Choose a PDF", pdfs: "Choose PDF files", images: "Choose images", "pdf-pair": "Choose two PDFs" } as const;
@@ -52,6 +53,7 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
   let local: unknown;
   let batchFile: LoadedFile | undefined;
   let batchNote = "";
+  let failed: string[] = [];
   const ofKind = () => store.files.filter((f) => f.kind === kind);
   /** Single-PDF tools work on the newest file; the others on all of their kind. */
   const mine = () => (single ? ofKind().slice(-1) : ofKind());
@@ -102,10 +104,11 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
     visible: () => (single ? ofKind().slice(-1) : ofKind()),
     label: tool.accepts === "pdf-pair" ? (_f, i) => (i === 0 ? "Original" : "Changed") : undefined,
   });
+  const tr = tray({ kind, single });
   const carryTxt = h("span", { attrs: { "data-testid": "carry-text" } });
   const carryBox = h("p", { class: "hs-banner hs-banner--info", hidden: true, attrs: { role: "status", "data-testid": "carry-over" } }, carryTxt,
     h("button", { class: "hs-btn hs-btn--ghost", type: "button", text: "Clear", attrs: { "data-testid": "carry-clear" }, on: { click: () => startOver() } }));
-  const tip = h("p", { class: "tip", hidden: multi }, "Want to combine files? ", h("a", { href: "#/merge", text: "Use Merge", attrs: { "data-testid": "tip-merge" } }));
+  const tip = h("p", { class: "tip", hidden: multi || !!tool.noFiles }, "Want to combine files? ", h("a", { href: "#/merge", text: "Use Merge", attrs: { "data-testid": "tip-merge" } }));
   const warnBox = h("div", { class: "warns", attrs: { "data-testid": "warnings" } });
   const optSet = h("fieldset", { class: "opts__set" });
   const optBox = h("section", { class: "opts hs-card", hidden: !tool.options, attrs: { "aria-label": "Options" } }, optSet);
@@ -192,6 +195,7 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
     optSet.disabled = busy;
     credit.disabled = busy;
     dz.toggleAttribute("inert", busy);
+    dz.hidden = fl.el.hidden = !!tool.noFiles;
     dz.classList.toggle("dz--compact", store.files.length > 0);
     resultBox.hidden = results.length === 0;
   }
@@ -203,6 +207,7 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
     memBox.hidden = !mem || memKey === key;
     if (!memBox.hidden) { memText.textContent = mem; memOk.focus(); return; }
     results = [];
+    failed = [];
     resultBox.hidden = true;
     status.textContent = "";
     errBox.textContent = "";
@@ -223,8 +228,13 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
           jobNote = `${batchNote}Working…`;
           status.textContent = jobNote;
           prog.removeAttribute("value");
-          try { results.push(...await tool.run(ctx)); } finally { batchFile = undefined; }
+          try { results.push(...await tool.run(ctx)); } catch (e) {
+            if (e instanceof PdfError && e.code === "cancelled") throw e;
+            const m = errorMessage(e); // one bad file does not stop the others
+            failed.push(m.includes(f.name) ? m : `"${f.name}": ${m}`);
+          } finally { batchFile = undefined; }
         }
+        if (!results.length) throw new PdfError("unsupported", failed.join(" "));
       } else results = await tool.run(ctx);
       status.textContent = "";
       announce(`Done. ${results.length === 1 ? "1 file" : `${results.length} files`} ready to download.`);
@@ -290,6 +300,7 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
           h("span", { class: "out__size", text: fmtSize(r.bytes.length) }),
           h("button", { class: "hs-btn out__dl", type: "button", text: "Download", attrs: { "aria-label": `Download ${r.name}`, "data-testid": "result-download" }, on: { click: () => void saveResult(r) } })))),
       ...(results.length > 1 ? [h("div", { class: "outs__all" }, h("button", { class: "hs-btn hs-btn--secondary", type: "button", text: "Download all (.zip)", attrs: { "data-testid": "download-zip" }, on: { click: () => void saveZip(results, zipName) } }))] : []),
+      ...failed.map((m) => h("p", { class: "hs-banner hs-banner--warn", text: `Skipped. ${m}`, attrs: { role: "note", "data-testid": "batch-failed" } })),
       ...warns.map((w) => h("p", { class: "hs-banner hs-banner--warn", text: w.message, attrs: { role: "note" } })),
       h("div", { class: "res__next" },
         ...(next.length ? [h("h3", { id: "next-h", text: "Continue with" }), h("ul", { class: "res__tools", attrs: { role: "list", "aria-labelledby": "next-h" } }, ...next.map((t) =>
@@ -317,7 +328,7 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
 
   const el = h("div", { class: "view tool" },
     h("header", { class: "view__head" }, toolBox(tool.id, true), h1, h("p", { class: "view__lede", text: tool.lede }), ...(tool.how ? [h("p", { class: "view__how", text: tool.how, attrs: { "data-testid": "tool-how" } })] : [])),
-    dz, soon, notice, carryBox, fl.el, tip, warnBox, optBox, gridBox, settings, resultBox, bar);
+    dz, tr.el, soon, notice, carryBox, fl.el, tip, warnBox, optBox, gridBox, settings, resultBox, bar);
   update();
-  return { el, destroy: () => { dropThumb(); unsub(); grid?.destroy(); abort?.abort(); tool.destroy?.(ctx); } };
+  return { el, destroy: () => { tr.destroy(); dropThumb(); unsub(); grid?.destroy(); abort?.abort(); tool.destroy?.(ctx); } };
 }
