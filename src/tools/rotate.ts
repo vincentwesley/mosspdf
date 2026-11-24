@@ -59,6 +59,7 @@ export const rotate: ToolDef = {
   id: "rotate", title: "Rotate PDF", group: "Organize",
   blurb: "Turn pages the right way up.",
   lede: "Turn every page, or only some, so they read the right way up. Your original is never changed.",
+  how: "Add a PDF, choose a turn and the pages, then save the rotated copy.",
   accepts: "pdf", batch: true,
   next: ["organize", "compress", "page-numbers", "watermark", "protect"],
   options(ctx) {

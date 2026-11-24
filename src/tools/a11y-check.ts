@@ -38,6 +38,7 @@ export const a11yCheck: ToolDef = {
   id: "a11y-check", title: "Accessibility check", group: "Edit",
   blurb: "Basic check of screen-reader signals in a PDF.",
   lede: "Checks tags, language, title, picture descriptions, fonts, real text and bookmarks, with a plain note on how to fix each.",
+  how: "Add a PDF to get a plain-words report on screen-reader signals.",
   accepts: "pdf",
   options(ctx) { draw(ctx); return ui(ctx).box; },
   sync(ctx) {
@@ -55,7 +56,7 @@ export const a11yCheck: ToolDef = {
       .finally(() => { if (u.s.key === key) draw(ctx); ctx.refresh(); });
   },
   ready: (ctx) => !!ui(ctx).s.report,
-  primaryLabel: () => "Save report (.txt)",
+  primaryLabel: () => "Save report",
   summary: () => "The report is a plain text file.",
   async run(ctx) {
     const f = ctx.file!;

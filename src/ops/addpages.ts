@@ -15,7 +15,7 @@ export interface AddPagesOptions {
 }
 
 export async function addBlankPages(file: InFile, opts: AddPagesOptions, o: OpOptions, e: Engines): Promise<OpResult> {
-  if (!Number.isInteger(opts.count) || opts.count < 1 || opts.count > 10) throw new PdfError("unsupported", "Add 1 to 10 blank pages at a time.");
+  if (!Number.isInteger(opts.count) || opts.count < 1 || opts.count > 10) throw new PdfError("unsupported", "You can add 1 to 10 blank pages at a time. Change the number and try again.");
   const p = await prepare(file, o, e);
   const doc = await PDFDocument.load(p.bytes, { updateMetadata: false });
   const n = doc.getPageCount();

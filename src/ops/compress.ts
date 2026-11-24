@@ -158,7 +158,7 @@ async function recompressImages(doc: PDFDocument, level: "balanced" | "strong", 
 }
 
 export async function compress(file: InFile, opts: { level: CompressLevel }, o: OpOptions, e: Engines): Promise<CompressResult> {
-  if (!["light", "balanced", "strong"].includes(opts.level)) throw new PdfError("unsupported", "Pick a compression level: light, balanced or strong.");
+  if (!["light", "balanced", "strong"].includes(opts.level)) throw new PdfError("unsupported", "Choose a compression level (light, balanced or strong) and try again.");
   const p = await prepare(file, o, e);
   let bytes = p.bytes;
   // pdf-lib pass only when there is something to do in it (images, or the credit); a plain text file at "light" with the credit off skips the parse.

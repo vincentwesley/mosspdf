@@ -21,8 +21,8 @@ export const MIN_SIDE = 18; // pt left over, so a page never collapses to nothin
 
 export async function cropPages(file: InFile, opts: CropOptions, o: OpOptions, e: Engines): Promise<OpResult> {
   const m = [opts.top, opts.right, opts.bottom, opts.left];
-  if (m.some((n) => !Number.isFinite(n) || n < 0)) throw new PdfError("unsupported", "Margins must be numbers, 0 or more.");
-  if (m.every((n) => n === 0)) throw new PdfError("unsupported", "Set at least one margin to cut.");
+  if (m.some((n) => !Number.isFinite(n) || n < 0)) throw new PdfError("unsupported", "Margins must be numbers, 0 or more. Fix the margins and try again.");
+  if (m.every((n) => n === 0)) throw new PdfError("unsupported", "No margin is set, so nothing would be cut. Enter at least one margin.");
   const p = await prepare(file, o, e);
   const sel = selectPages(opts.pages, p.info, file);
   const doc = await PDFDocument.load(p.bytes, { updateMetadata: false });
@@ -32,7 +32,7 @@ export async function cropPages(file: InFile, opts: CropOptions, o: OpOptions, e
     const page = all[i];
     const v = view(page);
     if (v.w - opts.left - opts.right < MIN_SIDE || v.h - opts.top - opts.bottom < MIN_SIDE)
-      throw new PdfError("unsupported", `The margins leave nothing of page ${i + 1}. Use smaller margins.`, file.name);
+      throw new PdfError("unsupported", `The margins leave nothing of page ${i + 1}. Enter smaller margins and try again.`, file.name);
     const a = toUser(v, opts.left, opts.bottom);
     const b = toUser(v, v.w - opts.right, v.h - opts.top);
     const [x, y, w, h] = [Math.min(a[0], b[0]), Math.min(a[1], b[1]), Math.abs(b[0] - a[0]), Math.abs(b[1] - a[1])];

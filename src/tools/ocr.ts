@@ -56,7 +56,7 @@ function cleanUp(canvas: HTMLCanvasElement) {
   g.putImageData(img, 0, 0);
 }
 
-const toPng = (canvas: HTMLCanvasElement) => new Promise<Blob>((res, rej) => canvas.toBlob((b) => (b ? res(b) : rej(new PdfError("unsupported", "This browser could not prepare the page for reading."))), "image/png"));
+const toPng = (canvas: HTMLCanvasElement) => new Promise<Blob>((res, rej) => canvas.toBlob((b) => (b ? res(b) : rej(new PdfError("unsupported", "This browser could not prepare a page for reading. Close other tabs and try again."))), "image/png"));
 
 function pageText(words: OcrWord[]): string {
   return words.map((w) => w.text + (w.eop ? "\n\n" : w.eol ? "\n" : " ")).join("").trim();
@@ -66,6 +66,8 @@ export const ocr: ToolDef = {
   id: "ocr", title: "OCR", heading: "Make a scan searchable", group: "OCR",
   blurb: "Make scans searchable.",
   lede: "Read the words on scanned pages and add them to the PDF, so you can search and copy from it. Reading happens on this device. Results can contain mistakes, especially on blurry, skewed or handwritten pages, so check them.",
+  how: "Add a scanned PDF. MossPDF reads the words and adds them as hidden text you can search.",
+  next: ["compress", "redact", "protect"],
   accepts: "pdf",
   options(ctx) {
     const u = ui(ctx);
@@ -84,7 +86,7 @@ export const ocr: ToolDef = {
     u.clears.hidden = store.files.length === 0;
   },
   ready(ctx) { const u = ui(ctx); return !!ctx.file && !!ocrRpc && same(u.picked(), ocrLangs) && (u.pdf.input.checked || u.txt.input.checked); },
-  primaryLabel: () => "Read the text",
+  primaryLabel: () => "Make PDF searchable",
   async run(ctx) {
     const u = ui(ctx);
     const rpc = ocrRpc!;
@@ -140,7 +142,7 @@ export const ocr: ToolDef = {
       canvas.width = canvas.height = 0;
     }
     if (!done.length) throw new PdfError("unsupported", `${total === 1 ? "This page already has" : "Every page already has"} text, so there is nothing to read. Turn off "Skip pages that already have text" to read it anyway.`);
-    if (!done.some((p) => p.words.length)) throw new PdfError("unsupported", "No words were found. The pages may be blank, or too faint or small to read. Try \"Clean up scans first\".");
+    if (!done.some((p) => p.words.length)) throw new PdfError("unsupported", "No words were found. The pages may be blank, or too faint or small to read. Turn on \"Clean up scans first\" and try again.");
     const results: OpResult[] = [];
     if (u.pdf.input.checked) {
       ctx.note("Adding the text to your PDF");

@@ -142,7 +142,7 @@ test.describe("safety", () => {
     await expect(page.getByTestId("group-high")).toBeVisible();
     await expect(page.getByTestId("scan-disclaimer")).toContainText("not an antivirus");
     await expect(page.locator('[data-testid=scan-item][data-kind=uri]').first()).toContainText("https://");
-    await expect(primary(page)).toHaveText("Download cleaned copy");
+    await expect(primary(page)).toHaveText("Save cleaned copy");
     const dl = await downloadAndCheck(page, () => primary(page).click());
     expect(dl.name).toBe("risk-everything-clean.pdf");
     expect(qpdfCheck(dl.path).ok).toBe(true);

@@ -26,13 +26,14 @@ const plan = (ctx: Ctx) => {
 };
 
 function toBlob(canvas: HTMLCanvasElement, type: string, quality?: number): Promise<Blob> {
-  return new Promise((res, rej) => canvas.toBlob((b) => (b ? res(b) : rej(new PdfError("unsupported", "This browser could not save a picture of the page. Try a lower sharpness."))), type, quality));
+  return new Promise((res, rej) => canvas.toBlob((b) => (b ? res(b) : rej(new PdfError("unsupported", "This browser could not save a picture of a page. Choose a lower sharpness and try again."))), type, quality));
 }
 
 export const pdfToImages: ToolDef = {
   id: "pdf-to-images", title: "PDF to images", heading: "Turn a PDF into pictures", group: "Convert",
   blurb: "Save each page as a picture.",
   lede: "Save the pages of a PDF as PNG or JPG pictures. Several pages come as one .zip.",
+  how: "Add a PDF, pick the pages and the picture type, then save the pictures.",
   accepts: "pdf",
   options(ctx) {
     const u = ui(ctx);

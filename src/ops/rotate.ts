@@ -12,7 +12,7 @@ export interface RotateOptions {
 }
 
 export async function rotatePages(file: InFile, opts: RotateOptions, o: OpOptions, e: Engines): Promise<OpResult> {
-  if (![90, 180, 270].includes(opts.angle)) throw new PdfError("unsupported", "Choose a turn of 90, 180 or 270 degrees.");
+  if (![90, 180, 270].includes(opts.angle)) throw new PdfError("unsupported", "Choose a turn of 90, 180 or 270 degrees and try again.");
   const p = await prepare(file, o, e);
   const sel = selectPages(opts.pages, p.info, file);
   const doc = await PDFDocument.load(p.bytes, { updateMetadata: false });

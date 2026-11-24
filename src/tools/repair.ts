@@ -23,10 +23,12 @@ export const repair: ToolDef = {
   id: "repair", title: "Repair", heading: "Repair a PDF", group: "Protect",
   blurb: "Fix a damaged PDF.",
   lede: "Try to rescue a PDF that will not open properly.",
+  how: "Add a PDF that will not open. MossPDF rebuilds it and saves what it can recover.",
+  next: ["compress", "organize", "ocr", "protect", "page-numbers"],
   accepts: "pdf", batch: true,
   options(ctx) { show(ctx); return ui(ctx).box; },
   sync: show,
-  primaryLabel: () => "Repair",
+  primaryLabel: () => "Repair PDF",
   async run(ctx) {
     const u = ui(ctx);
     const r = await ctx.call<RepairResult>("repair", { file: ctx.input(ctx.file!), o: { producerCredit: ctx.producerCredit } });

@@ -39,6 +39,8 @@ export const watermark: ToolDef = {
   id: "watermark", title: "Watermark", heading: "Add a watermark", group: "Edit",
   blurb: "Stamp text on every page.",
   lede: "Stamp a line of text across your pages, such as DRAFT or CONFIDENTIAL.",
+  how: "Add a PDF, type the stamp text, then save the stamped copy.",
+  next: ["compress", "protect", "sign"],
   accepts: "pdf", batch: true,
   options(ctx) {
     const u = ui(ctx);

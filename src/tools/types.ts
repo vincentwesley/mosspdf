@@ -62,6 +62,8 @@ export interface ToolDef {
   group: GroupName;
   /** One sentence under the heading. */
   lede: string;
+  /** One line of how it works, under the lede: add, choose, save. */
+  how?: string;
   accepts: Accepts;
   /** accepts "pdf" only: several PDFs may be added and `run` is called once per file (ctx.file is the current one), results as a list and a .zip. */
   batch?: true;

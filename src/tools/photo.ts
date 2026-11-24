@@ -48,7 +48,7 @@ function paintPhoto(c: HTMLCanvasElement, bmp: ImageBitmap, boxes: Rect[], mode:
 const isPng = async (b: Blob) => { const s = new Uint8Array(await b.slice(0, 4).arrayBuffer()); return s[0] === 0x89 && s[1] === 0x50; };
 const isJpeg = async (b: Blob) => { const s = new Uint8Array(await b.slice(0, 2).arrayBuffer()); return s[0] === 0xff && s[1] === 0xd8; };
 const toBlob = (c: HTMLCanvasElement, type: string, q?: number) =>
-  new Promise<Blob>((res, rej) => c.toBlob((b) => (b ? res(b) : rej(new PdfError("unsupported", "This browser could not save the picture."))), type, q));
+  new Promise<Blob>((res, rej) => c.toBlob((b) => (b ? res(b) : rej(new PdfError("unsupported", "This browser could not save the picture. Try a smaller photo, or close other tabs."))), type, q));
 
 const ui = (ctx: Ctx) => ctx.local(() => {
   const s = {
@@ -174,6 +174,7 @@ export const photo: ToolDef = {
   id: "photo", title: "Photo clean", heading: "Clean a photo", group: "Privacy",
   blurb: "Strip location and details.",
   lede: "Remove location and camera details from photos, and pixelate or blur parts. Draw boxes over faces, number plates or screens. MossPDF doesn't detect them automatically.",
+  how: "Add photos, draw boxes over parts to hide, then save clean copies.",
   accepts: "images",
   options(ctx) { return ui(ctx).root; },
   sync(ctx) {

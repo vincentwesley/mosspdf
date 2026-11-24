@@ -88,9 +88,9 @@ async function build(files: InFile[], opened: Opened[], pages: PageSpec[], name:
 }
 
 function validate(files: InFile[], pages: PageSpec[]) {
-  if (!files.length) throw new PdfError("unsupported", "Add at least one PDF first.");
-  if (!pages.length) throw new PdfError("unsupported", "No pages are selected. Pick at least one page.");
-  if (files.reduce((s, f) => s + f.bytes.length, 0) > MAX_TOTAL_BYTES) throw new PdfError("too-large", "These files are too big to handle together in the browser. Try fewer or smaller files.");
+  if (!files.length) throw new PdfError("unsupported", "There is no PDF to work on. Add a PDF and try again.");
+  if (!pages.length) throw new PdfError("unsupported", "No pages are selected. Pick at least one page and try again.");
+  if (files.reduce((s, f) => s + f.bytes.length, 0) > MAX_TOTAL_BYTES) throw new PdfError("too-large", "These files are too big to handle together on this device. Remove some files, or use smaller ones, and try again.");
 }
 
 function checkBounds(files: InFile[], opened: Opened[], pages: PageSpec[]) {
@@ -98,7 +98,7 @@ function checkBounds(files: InFile[], opened: Opened[], pages: PageSpec[]) {
     const n = opened[p.source]?.info.pageCount;
     if (n === undefined || p.page < 0 || p.page >= n) {
       const f = files[p.source];
-      throw new PdfError("unsupported", `Page ${p.page + 1} doesn't exist in "${f?.name}"${n === undefined ? "." : `, which has ${n} page${n === 1 ? "" : "s"}.`}`, f?.name);
+      throw new PdfError("unsupported", `Page ${p.page + 1} doesn't exist in "${f?.name}"${n === undefined ? "." : `, which has ${n} page${n === 1 ? "" : "s"}.`} Pick a page that is in the file.`, f?.name);
     }
   }
 }
@@ -141,7 +141,7 @@ async function addFileBookmarks(res: OpResult, files: InFile[], opened: Opened[]
 }
 
 export async function merge(files: InFile[], o: OpOptions, e: Engines, mo: { bookmarks?: boolean } = {}): Promise<OpResult> {
-  if (!files.length) throw new PdfError("unsupported", "Add at least one PDF first.");
+  if (!files.length) throw new PdfError("unsupported", "There is no PDF to work on. Add a PDF and try again.");
   const used = new Set(files.keys());
   const step = { n: 0, total: used.size + 1 };
   const opened = await openUsed(files, used, o, e, step);
@@ -189,13 +189,13 @@ export async function split(file: InFile, mode: SplitMode, o: OpOptions, e: Engi
   let groups: number[][] = [];
   if (mode.kind === "ranges") groups = parseRanges(mode.ranges, count);
   else if (mode.kind === "every") {
-    if (!Number.isInteger(mode.n) || mode.n < 1) throw new PdfError("unsupported", "Enter how many pages each file should have (1 or more).");
+    if (!Number.isInteger(mode.n) || mode.n < 1) throw new PdfError("unsupported", "Enter how many pages each file should have (1 or more) and try again.");
     for (let i = 0; i < count; i += mode.n) groups.push(Array.from({ length: Math.min(mode.n, count - i) }, (_, k) => i + k));
   }
   if (mode.kind === "bookmarks") {
     const p = await prepare(file, o, e);
     const parts = bookmarkParts(readOutlineItems(await PDFDocument.load(p.bytes, { updateMetadata: false })).items, count);
-    if (!parts.length) throw new PdfError("unsupported", `"${file.name}" has no top-level bookmarks that point to a page, so there is nothing to split by.`, file.name);
+    if (!parts.length) throw new PdfError("unsupported", `"${file.name}" has no bookmarks that point to a page, so there is nothing to split by. Choose a different way to split.`, file.name);
     for (const [i, g] of parts.entries()) {
       out.push(await build([file], opened, spec(g.pages), `${g.name}.pdf`, o, e));
       o.onProgress?.(i + 1, parts.length);
@@ -212,7 +212,7 @@ export async function split(file: InFile, mode: SplitMode, o: OpOptions, e: Engi
 
   // Size mode: estimate pages per part from the average page size, then halve a part until it fits.
   // ponytail: average-size estimate + retry; exact bin packing only if parts often come out much smaller than the limit.
-  if (!(mode.maxBytes > 0)) throw new PdfError("unsupported", "Enter a maximum file size greater than zero.");
+  if (!(mode.maxBytes > 0)) throw new PdfError("unsupported", "Enter a maximum file size above zero and try again.");
   let n = Math.max(1, Math.floor(mode.maxBytes / (file.bytes.length / count)));
   for (let i = 0; i < count; ) {
     const take = Math.min(n, count - i);

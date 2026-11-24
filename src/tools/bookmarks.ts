@@ -74,6 +74,7 @@ export const bookmarks: ToolDef = {
   id: "bookmarks", title: "Bookmarks", group: "Edit",
   blurb: "Add, rename or remove the bookmarks list.",
   lede: "Bookmarks are the clickable list of sections beside a PDF. Edit them here. Your original is never changed.",
+  how: "Add a PDF, edit its bookmark list, then save.",
   accepts: "pdf",
   next: ["compress", "protect", "page-numbers", "organize", "watermark"],
   options(ctx) {

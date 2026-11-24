@@ -26,6 +26,8 @@ export const compress: ToolDef = {
   id: "compress", title: "Compress", heading: "Compress a PDF", group: "Convert",
   blurb: "Make a PDF smaller.",
   lede: "Make a PDF smaller so it is easier to email or upload. Pictures are the part that shrinks.",
+  how: "Add a PDF, pick how small it should be, then save the smaller copy.",
+  next: ["protect", "sign", "watermark", "page-numbers", "organize"],
   accepts: "pdf", batch: true,
   options(ctx) {
     const u = ui(ctx);

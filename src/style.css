@@ -66,6 +66,9 @@ body.is-dropping::after { content: "Drop to add"; position: fixed; inset: var(--
 .view { display: grid; gap: var(--s5); }
 .hero { padding-top: var(--s5); }
 .hero h1 { max-width: 18ch; }
+.hint { display: flex; align-items: center; justify-content: space-between; gap: var(--s3); max-width: 40rem; margin: 0; }
+.hint[hidden] { display: none; }
+.hint .dlg__x { margin: -0.5rem -0.5rem -0.5rem 0; }
 .hero__lede { font-size: var(--step-1); color: var(--fg-muted); max-width: 40rem; }
 .dz { display: flex; align-items: center; justify-content: space-between; gap: var(--s4); flex-wrap: wrap; padding: var(--s6); border: 0; outline: 2px dashed var(--border-strong); outline-offset: -8px; }
 .dz__title { font: 700 var(--step-2) var(--font-head); margin: 0; }
@@ -98,6 +101,7 @@ a.tile__in:focus-visible { box-shadow: var(--fx-card-shadow); }
 /* ---- tool views ---- */
 .view__head { display: grid; gap: 0.25rem; }
 .view__head h1 { font-size: var(--step-3); margin: 0; }
+.view__how { margin: 0; max-width: 40rem; font-weight: 600; }
 .view__lede { color: var(--fg-muted); margin: 0; max-width: 40rem; }
 .files { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s3); }
 .file { display: flex; gap: var(--s3); align-items: flex-start; padding: var(--s3) var(--s4); background: var(--bg-elev); box-shadow: var(--pix); }
@@ -489,7 +493,7 @@ kbd { font: 600 0.85rem var(--font-mono); padding: 0.1rem 0.4rem; background: va
 /* tool page heading: icon beside the title */
 .view__head { grid-template-columns: auto 1fr; column-gap: var(--s4); align-items: center; }
 .view__head > .ibox { grid-row: 1 / span 2; }
-.view__head .view__lede { grid-column: 2; }
+.view__head .view__lede, .view__head .view__how { grid-column: 2; }
 @media (max-width: 30rem) { .ibox--lg { width: 3rem; height: 3rem; } .ibox--lg .tico { width: 24px; height: 24px; } }
 
 /* sticky action: bottom right on desktop */

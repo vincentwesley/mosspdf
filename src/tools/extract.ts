@@ -27,6 +27,8 @@ export const extract: ToolDef = {
   id: "extract", title: "Extract pages", group: "Organize",
   blurb: "Keep only the pages you pick.",
   lede: "Pick the pages you want to keep. Your original is never changed.",
+  how: "Add a PDF, tick the pages you want, then save only those.",
+  next: ["organize", "compress", "protect", "merge"],
   accepts: "pdf", grid: { selectable: true },
   options: (ctx) => field(ctx).el,
   sync(ctx) {

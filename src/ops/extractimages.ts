@@ -140,7 +140,7 @@ export async function extractImages(file: InFile, opts: ExtractImagesOptions, o:
     o.onProgress?.(pi + 1, pages.length);
   }
   if (!out.length) {
-    throw new PdfError("unsupported", skipped ? `The ${skipped === 1 ? "picture" : `${skipped} pictures`} in this PDF can't be saved here (unusual formats).` : opts.skipTiny ? "No pictures of 64 px or more were found. Try \"All pictures\"." : "This PDF has no pictures to save. Text and drawings are not pictures.", file.name);
+    throw new PdfError("unsupported", skipped ? `The ${skipped === 1 ? "picture" : `${skipped} pictures`} in this PDF can't be saved here because of their format. Use PDF to images to save whole pages instead.` : opts.skipTiny ? "No pictures of 64 px or more were found. Choose \"All pictures\" and try again." : "This PDF has no pictures to save. Text and drawings do not count as pictures.", file.name);
   }
   if (skipped) out[0].warnings.push({ code: "skipped-images", message: `${skipped} ${skipped === 1 ? "picture was" : "pictures were"} skipped because ${skipped === 1 ? "its" : "their"} format isn't supported.` });
   return out;
