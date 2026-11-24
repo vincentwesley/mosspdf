@@ -1,6 +1,6 @@
 // Sign: make a signature or initials (draw, type, upload), or a date or some text, and place it on the pages: click or tap a page
 // (or use "Place on page"), drag to move, drag the corner or press + and - to resize, arrow keys to nudge, Delete to remove.
-// It is a picture on the page, not a certified digital signature (D15). Nothing is stored.
+// It is a picture on the page, not a certified digital signature (D15). Nothing is stored unless the user ticks "Keep on this device" (opt-in, saved in localStorage by ui/savedsigs).
 import type { StampInput, StampItem } from "../ops/sign";
 import type { OpResult } from "../ops/types";
 import { announce, h } from "../ui/dom";
@@ -10,6 +10,7 @@ import { PEN, sigMaker, toPng } from "../ui/sigmaker";
 type Maker = ReturnType<typeof sigMaker>;
 import { formInfo, SIGNED_WARNING } from "../ui/formstate";
 import { badChars, ZH_HINT, zhWouldHelp } from "../core/winansi";
+import { loadSaved, MAX_SAVED, toB64, writeSaved, type Saved } from "../ui/savedsigs";
 import type { Ctx, ToolDef } from "./types";
 
 interface Item {
@@ -59,6 +60,10 @@ const ui = (ctx: Ctx) => ctx.local(() => {
     kind: radioGroup({ name: "sg-kind", legend: "What to place", value: "signature", testid: (v) => `kind-${v}`, onChange: () => { if (/^(signature|initials)$/.test(s.kind.value())) fold.open = true; ctx.refresh(); }, options: [["signature", "Signature"], ["initials", "Initials"], ["date", "Date"], ["text", "Text"]] }),
     dateFmt: selectField({ id: "sg-datefmt", label: "Date format", testid: "sg-datefmt", onInput: () => ctx.refresh(), options: [["long", ""], ["dmy", ""], ["iso", ""]] }),
     text: textField({ id: "sg-text", label: "Text to place", testid: "sg-text", msgTestId: "sg-text-msg", reserve: true, onInput: () => ctx.refresh() }),
+    dateUnder: checkField({ id: "sg-date-under", label: "Add today's date under it", testid: "sg-date-under" }),
+    keep: checkField({ id: "sg-keep", label: "Keep on this device for next time", testid: "sg-keep" }),
+    savedRow: h("div", { class: "sg-saved", attrs: { "data-testid": "sg-saved" }, hidden: true }),
+    saved: [] as { saved: Saved; canvas: HTMLCanvasElement }[],
     all: checkField({ id: "sg-all", label: "Put it on every page", testid: "sg-all" }),
     pageNo: numberField({ id: "sg-pageno", label: "Page number", value: 1, min: 1, step: 1, testid: "sg-pageno", onInput: () => ctx.refresh() }),
     place: h("button", { class: "hs-btn hs-btn--secondary", type: "button", text: "Place on page", attrs: { "data-testid": "sg-place" } }),
@@ -72,7 +77,7 @@ const ui = (ctx: Ctx) => ctx.local(() => {
   const ini: Maker = sigMaker({ id: "sg-ini", name: "initials", colour: () => PEN[s.pen.value() as keyof typeof PEN], onChange: () => ctx.refresh() });
   const sigBox = h("div", { class: "sg-make", attrs: { "data-testid": "sg-sig-box" } }, h("h4", { text: "Your signature" }), sig.el);
   const iniBox = h("div", { class: "sg-make", attrs: { "data-testid": "sg-ini-box" } }, h("h4", { text: "Your initials" }), ini.el);
-  const note = h("p", { class: "sg-note", text: "MossPDF does not save your signature. It stays in this tab until you close it." });
+  const note = h("p", { class: "sg-note", text: "Saved only in this browser on this device. Never uploaded. Unless you tick Keep on this device, your signature stays in this tab until you close it." });
   const disclaimer = h("p", { class: "hs-banner hs-banner--info", text: "This adds a picture of your signature. It is not a certified digital signature, and some organisations require one. It does not prove who signed or that the file has not changed. Whether it is accepted depends on the recipient.", attrs: { role: "note", "data-testid": "sign-disclaimer" } });
   const today = new Date();
   [...s.dateFmt.input.options].forEach((o) => { o.textContent = DATES[o.value](today); });
@@ -86,13 +91,49 @@ const ui = (ctx: Ctx) => ctx.local(() => {
     h("div", { class: "sg-layout" },
       h("div", { class: "sg-side" },
         h("section", { class: "sg-step" }, fold),
-        step(2, "Choose what to place", s.kind.el, s.dateFmt.el, s.text.el),
+        step(2, "Choose what to place", s.savedRow, s.kind.el, s.dateFmt.el, s.text.el, s.dateUnder.el, s.keep.el),
         step(3, "Place it",
           h("p", { class: "sg-help", text: "Click or tap a page to place it there. Drag to move, drag the corner or press + and - to resize, arrow keys nudge (Shift for bigger steps), Delete removes." }),
           h("div", { class: "sg-where" }, s.pageNo.el, s.place, s.all.el), s.msg),
         placed, disclaimer),
       s.pv.el));
+  void loadSaved().then((l) => { s.saved = l; renderSaved(); });
   return Object.assign(s, { sig, ini, add, renderList, begin });
+
+  function persist(): void { writeSaved(s.saved.map((o) => o.saved)); renderSaved(); }
+  async function keepIt(kind: "signature" | "initials", canvas: HTMLCanvasElement): Promise<void> {
+    const blob = await new Promise<Blob | null>((ok) => canvas.toBlob(ok, "image/png"));
+    if (!blob) return;
+    const png = toB64(new Uint8Array(await blob.arrayBuffer()));
+    if ((png.length * 3) / 4 > 200 * 1024) { s.msg.textContent = "That signature is too large to keep. It is still placed."; return; }
+    if (s.saved.some((o) => o.saved.png === png)) return;
+    s.saved.push({ saved: { kind, png }, canvas });
+    while (s.saved.length > MAX_SAVED) s.saved.shift();
+    persist();
+  }
+  function renderSaved(): void {
+    s.savedRow.hidden = !s.saved.length;
+    s.savedRow.replaceChildren(...(s.saved.length ? [
+      h("h4", { text: "Saved on this device" }),
+      h("p", { class: "sg-note", text: "Saved only in this browser on this device. Never uploaded." }),
+      h("ul", { class: "sg-saved__list", attrs: { role: "list" } }, ...s.saved.map((o, k) => {
+        const what = o.saved.kind === "signature" ? "signature" : "initials";
+        const thumb = Object.assign(document.createElement("canvas"), { width: o.canvas.width, height: o.canvas.height, className: "sg-saved__img" });
+        thumb.getContext("2d")!.drawImage(o.canvas, 0, 0);
+        thumb.setAttribute("aria-hidden", "true");
+        return h("li", { class: "sg-saved__item" },
+          h("button", { class: "sg-saved__use", type: "button", attrs: { "aria-label": `Place saved ${what} ${k + 1}`, "data-testid": "sg-saved-use" }, on: { click: () => placeSaved(o) } }, thumb),
+          h("button", { class: "sg-saved__x", type: "button", text: "\u00d7", attrs: { "aria-label": `Forget saved ${what} ${k + 1}`, "data-testid": "sg-saved-x" }, on: { click: () => { s.saved.splice(s.saved.indexOf(o), 1); persist(); announce("Saved signature forgotten."); } } }));
+      })),
+      h("button", { class: "hs-btn hs-btn--secondary", type: "button", text: "Forget all saved signatures", attrs: { "data-testid": "sg-forget-all" }, on: { click: () => { s.saved.length = 0; persist(); announce("All saved signatures forgotten."); } } }),
+    ] : []));
+  }
+  function placeSaved(o: { saved: Saved; canvas: HTMLCanvasElement }): void {
+    const i = Number(s.pageNo.input.value) - 1;
+    const slot = s.pv.slots[i];
+    if (!slot) { s.msg.textContent = "Type a page number that exists in this PDF."; return; }
+    void s.pv.ensure(i).then(() => { slot.wrap.scrollIntoView({ block: "center" }); add(slot, 0.5, 0.8, o); });
+  }
 
   function describe(it: Item): string {
     return `${it.what} on page ${it.page + 1}${it.all ? ", repeated on every page" : ""}. Arrow keys move it, plus and minus resize it, Delete removes it.`;
@@ -187,15 +228,15 @@ const ui = (ctx: Ctx) => ctx.local(() => {
   }
 
   /** Puts the chosen thing on `slot` at (cx, cy), fractions of the page. Says why when it can't. */
-  function add(slot: Slot, cx: number, cy: number): void {
+  function add(slot: Slot, cx: number, cy: number, pre?: { saved: Saved; canvas: HTMLCanvasElement }): void {
     const vp = slot.vp;
     s.msg.textContent = "";
     if (!vp) return;
-    const kind = s.kind.value();
+    const kind = pre ? pre.saved.kind : s.kind.value();
     const base = { id: nextId++, page: slot.index, all: s.all.input.checked, pw: vp.width, ph: vp.height, fx: 0, fy: 0, fw: 0, size: 0 };
     let it: Item;
     if (kind === "signature" || kind === "initials") {
-      const canvas = (kind === "signature" ? sig : ini).result();
+      const canvas = pre ? pre.canvas : (kind === "signature" ? sig : ini).result();
       if (!canvas) { fold.open = true; s.msg.textContent = kind === "signature" ? "Make your signature first: draw it, type it or upload it." : "Make your initials first: draw them, type them or upload them."; return; }
       const fw = kind === "signature" ? 0.28 : 0.1;
       const fh = (fw * vp.width * (canvas.height / canvas.width)) / vp.height;
@@ -207,10 +248,22 @@ const ui = (ctx: Ctx) => ctx.local(() => {
       const size = kind === "date" ? 12 : 14;
       it = { ...base, what: kind === "date" ? "Date" : "Text", text, size, fx: clamp(cx, 0, 0.95), fy: clamp(cy - (size * 0.6) / vp.height, 0, 0.97) };
     }
-    s.items.push(it);
-    mount(it, slot);
-    clampIn(it, s.els.get(it.id)!, slot.overlay);
-    layout(it, s.els.get(it.id)!);
+    const added = [it];
+    if (it.canvas) {
+      if (s.keep.input.checked && !pre) void keepIt(kind as "signature" | "initials", it.canvas);
+      if (s.dateUnder.input.checked) {
+        let text = new Date().toLocaleDateString(undefined, { dateStyle: "short" });
+        if (badChars(text).length) text = DATES.iso(new Date()); // locale digits the PDF font can't draw
+        const ih = (it.fw * vp.width * (it.canvas.height / it.canvas.width)) / vp.height;
+        added.push({ ...base, id: nextId++, what: "Date", text, size: 10, fx: it.fx, fy: Math.min(it.fy + ih + 0.004, 0.97) });
+      }
+    }
+    for (const a of added) {
+      s.items.push(a);
+      mount(a, slot);
+      clampIn(a, s.els.get(a.id)!, slot.overlay);
+      layout(a, s.els.get(a.id)!);
+    }
     renderList();
     if (it.canvas && phone.matches) fold.open = false;
     announce(`${it.what} placed on page ${it.page + 1}.`);
@@ -275,6 +328,7 @@ export const sign: ToolDef = {
     u.pen.el.hidden = (k !== "signature" && k !== "initials") || (k === "initials" ? u.ini : u.sig).tab() === "upload";
     u.dateFmt.el.hidden = k !== "date";
     u.text.el.hidden = k !== "text";
+    u.dateUnder.el.hidden = u.keep.el.hidden = k !== "signature" && k !== "initials";
     const bad = badChars(u.text.input.value);
     u.text.setMessage(k === "text" && bad.length ? `These characters cannot be used yet: ${bad.map((c) => `"${c}"`).join(" ")}. Use Latin, Greek or Cyrillic letters, digits and basic punctuation.${zhWouldHelp(bad) ? ZH_HINT : ""}` : "", k === "text" && bad.length > 0);
   },
