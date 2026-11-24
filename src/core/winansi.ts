@@ -27,3 +27,6 @@ export const badChars = (text: string, lang = cjkLang()) => {
 };
 /** True when `bad` has characters a CJK font would draw that the chosen one does not, i.e. changing "Extra text" helps. */
 export const zhWouldHelp = (bad: string[], lang = cjkLang()) => bad.some((c) => CJK_ANY.test(c) && !(lang && CJK_OK[lang].test(c)));
+
+/** A form field name made by Create form: letters, digits, space, dash, underscore, 1 to 40. */
+export const FIELD_NAME = /^[A-Za-z0-9 _-]{1,40}$/;

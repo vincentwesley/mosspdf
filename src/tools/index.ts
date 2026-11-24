@@ -25,6 +25,7 @@ export const TOOLS: ToolMeta[] = [
   { id: "safety-scan", title: "Safety scan", blurb: "Check a PDF for risky parts.", group: "Protect", next: ["compress", "protect", "sign"] },
   { id: "repair", title: "Repair", blurb: "Fix a damaged PDF.", group: "Protect", next: ["compress", "organize", "ocr", "protect", "page-numbers"] },
   { id: "fill", title: "Fill forms", blurb: "Fill in a PDF form.", group: "Fill and sign", next: ["sign", "flatten", "compress", "protect"] },
+  { id: "create-form", title: "Create form", blurb: "Add fields people can fill in.", group: "Fill and sign", next: ["fill", "protect", "compress"] },
   { id: "sign", title: "Sign", blurb: "Add your signature.", group: "Fill and sign", next: ["flatten", "compress", "protect"] },
   { id: "ocr", title: "OCR", blurb: "Make scans searchable.", group: "OCR", next: ["compress", "redact", "protect"] },
   { id: "redact", title: "Redact", blurb: "Remove text, not just cover it.", group: "Privacy", next: ["compress", "protect", "watermark"] },

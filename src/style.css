@@ -546,6 +546,11 @@ kbd { font: 600 0.85rem var(--font-mono); padding: 0.1rem 0.4rem; background: va
 .ed-line__svg { display: block; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
 .ed-line__svg line { stroke-linecap: round; }
 .ed .sg-list:empty::before { content: "Nothing added yet."; }
+.cf .sg-list:empty::before { content: "No fields yet."; }
+.cf-field { box-sizing: border-box; border: 1px solid #14673a; background: rgb(79 224 160 / 0.22); overflow: hidden; font-size: 11px; padding: 0 2px; }
+.cf-field__name { display: block; pointer-events: none; overflow: hidden; text-overflow: ellipsis; }
+.cf-checkbox .cf-field__name { display: none; }
+.cf-row { align-items: flex-start; }
 
 /* Tools 3: rotate preview strip, crop preview, text preview (D28) */
 .rot__strip { display: flex; flex-wrap: wrap; gap: var(--s3); margin-block: var(--s3); }
