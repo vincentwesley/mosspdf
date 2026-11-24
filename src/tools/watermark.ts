@@ -60,6 +60,7 @@ export const watermark: ToolDef = {
   },
   warnings: pdfLossWarnings,
   ready(ctx) { const p = plan(ctx); return !!ctx.file && !!p.text.trim() && !p.bad.length && !!p.sel && p.opacityOk && p.sizeOk && p.angleOk; },
+  whyDisabled: (ctx) => (ctx.file ? "Check the watermark settings above." : "Add a PDF first."),
   primaryLabel: () => "Add watermark",
   async run(ctx) {
     const u = ui(ctx);
