@@ -61,7 +61,7 @@ function show(ctx: Ctx) {
   if (!f || !u.ratios) { u.strip.replaceChildren(); u.thumbs = ""; return; }
   const b = blanks(ctx);
   const n = f.info!.pageCount;
-  u.status.textContent = !b.length ? "No blank pages found. Try a looser setting." : b.length === n ? "Every page looks blank, so nothing would be left. Keep the file as it is, or change the blank-page setting. Try a stricter setting."
+  u.status.textContent = !b.length ? "No blank pages found. Try a looser setting." : b.length === n ? "Every page looks blank, so nothing would be left. Keep the file as it is, or try a stricter setting."
     : `${plural(b.length, "blank page")} will be removed: ${compress(b.map((i) => i + 1))}.`;
   const shown = b.slice(0, SHOWN);
   const cells = shown.map((i) => ({ i, canvas: h("canvas", { class: "rot__page", attrs: { "aria-hidden": "true" } }) }));

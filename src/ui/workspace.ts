@@ -199,7 +199,7 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
   async function run() {
     if (!tool.run || !primaryEnabled || store.busy) return;
     const key = ctx.files.map((f) => f.id).join();
-    const mem = memoryWarning(tool.id, ctx.files.reduce((n, f) => n + f.size, 0));
+    const mem = memoryWarning(tool.id, tool.batch ? Math.max(0, ...ctx.files.map((f) => f.size)) : ctx.files.reduce((n, f) => n + f.size, 0)); // batch runs one file at a time
     memBox.hidden = !mem || memKey === key;
     if (!memBox.hidden) { memText.textContent = mem; memOk.focus(); return; }
     results = [];

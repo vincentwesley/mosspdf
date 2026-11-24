@@ -17,7 +17,7 @@
 
 ## Milestones
 
-### v1.9 Quality pass (trust and polish)
+### v1.9 Quality pass (trust and polish) — shipped 1.9.0
 - A full a11y audit (axe, keyboard walk-through, screen-reader labels) of all 40 tools, with fixes.
 - Consistency sweep: the same intake, options, action bar and result card everywhere. The same error wording. Empty states.
 - Onboarding: first-visit hints on home (drop or paste, nothing uploaded) and a short "how it works" line per tool.

@@ -155,7 +155,13 @@ export const ops = {
 export function errorMessage(e: unknown): string {
   if (e instanceof PdfError) {
     const who = e.fileName && !e.message.includes(e.fileName) ? `"${e.fileName}": ` : "";
-    return `${who}${e.message}${e.code === "cancelled" && !/nothing was changed/i.test(e.message) ? " Nothing was changed." : ""}`;
+    // Fallback next step for one-sentence messages (e.g. from the worker or password flow) that don't say what to do.
+    const next: Record<string, string> = {
+      "not-pdf": "Choose a PDF instead.", empty: "Choose a different file.", corrupt: "Open it in another app, save a fresh copy, then add it again.",
+      encrypted: "Enter its password to open it.", "wrong-password": "Check the password and try again.", "too-large": "Try a smaller file, or split it first.", cancelled: "Nothing was changed.",
+    };
+    const oneSentence = !/[.!?]\s+\S/.test(e.message.trim());
+    return `${who}${e.message}${oneSentence && next[e.code] ? ` ${next[e.code]}` : ""}`;
   }
   return "Something went wrong with this file. Your files are still here. Try again, or remove the file and add it again.";
 }
