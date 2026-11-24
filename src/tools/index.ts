@@ -42,6 +42,8 @@ export const TOOLS: ToolMeta[] = [
   { id: "extract-images", title: "Extract images", blurb: "Save the pictures inside a PDF.", group: "Convert", next: [] },
   { id: "pdf-to-text", title: "PDF to text", blurb: "Copy out all the text.", group: "Convert", next: [] },
   { id: "pdf-to-word", title: "PDF to Word", blurb: "Turn the text into an editable .docx.", group: "Convert", next: [] },
+  { id: "pdf-to-ppt", title: "PDF to PowerPoint", blurb: "Each page becomes a slide.", group: "Convert", next: [] },
+  { id: "pdf-to-markdown", title: "PDF to Markdown", blurb: "Text, headings and lists as Markdown.", group: "Convert", next: [] },
   { id: "pdf-to-excel", title: "PDF to Excel", blurb: "Pull tables out into a spreadsheet.", group: "Convert", next: [] },
 ];
 
