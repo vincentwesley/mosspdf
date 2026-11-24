@@ -15,7 +15,7 @@ export const unprotect: ToolDef = {
   lede: "Remove the password from a PDF you can already open.",
   how: "Add the locked PDF, enter its password, then save an unlocked copy.",
   next: ["compress", "organize", "sign", "page-numbers", "watermark"],
-  accepts: "pdf",
+  accepts: "pdf", batch: true,
   options(ctx) { return ui(ctx).box; },
   sync(ctx) {
     const u = ui(ctx);

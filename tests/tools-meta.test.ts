@@ -4,7 +4,7 @@ import { expect, test } from "vitest";
 import { TOOLS } from "../src/tools";
 
 test("every tool module has exactly one matching registry row", () => {
-  const files = readdirSync("src/tools").map((f) => f.replace(/\.ts$/, "")).filter((f) => !["index", "all", "types", "pages", "pagesel"].includes(f));
+  const files = readdirSync("src/tools").map((f) => f.replace(/\.ts$/, "")).filter((f) => !["index", "all", "types", "pages", "pagesel", "wf-store"].includes(f));
   expect(TOOLS).toHaveLength(files.length);
   const all = readFileSync("src/tools/all.ts", "utf8");
   for (const t of TOOLS) {

@@ -42,7 +42,7 @@ export const crop: ToolDef = {
   blurb: "Trim the edges of pages.",
   lede: "Cut a margin off each edge. The shaded border in the preview is what gets hidden.",
   how: "Add a PDF, set how much to trim from each edge, then save.",
-  accepts: "pdf",
+  accepts: "pdf", batch: true,
   next: ["compress", "redact", "page-numbers", "watermark", "protect"],
   options(ctx) {
     const u = ui(ctx);

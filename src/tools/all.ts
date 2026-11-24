@@ -36,7 +36,14 @@ import { flatten } from "./flatten";
 import { removeBlank } from "./remove-blank";
 import { bookmarks } from "./bookmarks";
 import { extractImagesTool } from "./extract-images";
+import { registerSaved, registry, wfCustom } from "./wf-custom";
 import type { ToolDef } from "./types";
 export { workspace } from "../ui/workspace"; // tool-page shell: only needed once a tool opens, so it rides with the tools (D25)
 
-export const DEFS: ToolDef[] = [wfEmail, wfShare, wfApply, merge, split, organize, extract, imagesToPdf, pdfToImages, compress, pageNumbers, watermark, metadata, protect, unprotect, safetyScan, repair, fill, sign, ocr, redact, photo, compare, a11yCheck, edit, rotate, crop, nup, addPages, pdfToText, pdfToWord, pdfToExcel, flatten, removeBlank, bookmarks, extractImagesTool];
+export const DEFS: ToolDef[] = [wfEmail, wfShare, wfApply, wfCustom, merge, split, organize, extract, imagesToPdf, pdfToImages, compress, pageNumbers, watermark, metadata, protect, unprotect, safetyScan, repair, fill, sign, ocr, redact, photo, compare, a11yCheck, edit, rotate, crop, nup, addPages, pdfToText, pdfToWord, pdfToExcel, flatten, removeBlank, bookmarks, extractImagesTool];
+
+DEFS.forEach((d) => registry.set(d.id, d));
+/** The router reads this map; saved workflows join it. */
+export const defs = registry;
+/** Route ids of the workflows saved on this device. */
+export const SAVED = registerSaved();
