@@ -197,7 +197,7 @@ test.describe("drag hint", () => {
     await link(page).scrollIntoViewIfNeeded();
     await expect(logo(page)).not.toHaveAttribute("data-hint");
     await link(page).hover();
-    await expect.poll(() => page.locator(`${SIGN} .bl-right`).evaluate((el) => parseFloat(getComputedStyle(el).translate))).toBeLessThan(0);
+    await expect.poll(() => page.locator(`${SIGN} .bl-right`).evaluate((el) => parseFloat(getComputedStyle(el).translate)), POLL).toBeLessThan(0);
   });
 
   test("reduced motion: no tug at all, the tooltip stays", async ({ page }) => {

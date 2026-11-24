@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { cleanCopy, PdfError, protect, repair, unprotect } from "../../src/ops";
 import { corpus, engines, opts } from "../helpers/env";
 import { qpdfCli, showEncryption } from "../helpers/m3";
@@ -6,6 +6,7 @@ import { qpdfCheck, readPdf } from "../helpers/qpdf";
 
 const P3 = ["PAGE-MARKER p1", "PAGE-MARKER p2", "PAGE-MARKER p3"];
 
+vi.setConfig({ testTimeout: 180_000 }); // qpdf spawns and AES work: slow when e2e runs alongside
 describe("add password", () => {
   it("@A-PWD-1 writes AES-256 R6, opens with the user password, not without", async () => {
     const r = await protect(corpus("plain-3p"), { userPassword: "open-me", ownerPassword: "boss" }, opts(), engines);

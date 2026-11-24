@@ -1,4 +1,4 @@
-﻿import { defineConfig, devices } from "@playwright/test";
+import { defineConfig, devices } from "@playwright/test";
 
 // BASE_URL set => test that deployment and skip the local server. Port avoids 4397 (unknown process on the owner's machine).
 const PORT = Number(process.env.PH_PORT ?? 4811); // PH_PORT lets parallel worktrees run side by side
@@ -12,7 +12,10 @@ export default defineConfig({
   retries: 1,
   expect: { timeout: 10_000 }, // qpdf/pdf.js work in a loaded run outlasts the 5 s default
   forbidOnly: !!process.env.CI,
-  workers: process.env.CI ? 2 : 3, // WASM + pdf.js in six parallel browsers exhausts a 16 GB dev machine (Firefox content process crashes)
+  timeout: 60_000, // default 30 s is too tight for WASM work under load; a hung test still ends in a minute
+  // Never hang silently: local runs end after 40 min whatever happens (pw.mjs adds its own kill-the-tree watchdog). CI has job timeouts.
+  globalTimeout: process.env.CI ? undefined : 40 * 60_000,
+  workers: process.env.CI ? 2 : process.platform === "win32" ? 2 : 3, // WASM + pdf.js in six parallel browsers exhausts a 16 GB dev machine (Firefox content process crashes)
   use: {
     baseURL: BASE_URL,
     headless: true,
@@ -34,7 +37,7 @@ export default defineConfig({
         command: `npm run build && npx --yes wrangler@4.165.0 dev -c scripts/wrangler.dev.jsonc --ip 127.0.0.1 --port ${PORT}`,
         url: BASE_URL,
         reuseExistingServer: !process.env.CI,
-        timeout: 180_000,
+        timeout: 240_000, // build + wrangler start; fail loudly instead of waiting forever
         env: {
           WRANGLER_SEND_METRICS: "false",
           XDG_CONFIG_HOME: ".wrangler/xdg",

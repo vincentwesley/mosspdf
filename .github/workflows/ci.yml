@@ -83,6 +83,7 @@ jobs:
             timeout 480 npm run pw -- install --with-deps ${{ matrix.browser }} && exit 0
             echo "browser install attempt $i failed or stalled, retrying"
             sudo dpkg --configure -a || true
+            sudo apt-get update -q || true # exit code 100 is usually a stale or half-synced mirror index
             sleep 20
           done
           exit 1
