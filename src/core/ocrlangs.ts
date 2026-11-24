@@ -1,4 +1,5 @@
 // OCR languages (D21): the allowlist, and the choice kept in the route (`#/ocr?langs=eng+msa`) and, per viewer, in localStorage.
+// Adding a language: `npm i @tesseract.js-data/<code>` (pinned, Apache-2.0 data) and one line below; the bundler picks the data up by itself.
 // Nothing is ever built from raw input: the route is only ever matched against this list.
 export interface OcrLang { code: string; label: string; /** Gzipped model size in MB (best_int). */ mb: number }
 export const OCR_LANGS: readonly OcrLang[] = [
