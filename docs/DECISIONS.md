@@ -232,3 +232,8 @@ Symptom: a `worker-src` CSP violation on page load in Firefox, seen twice in a f
 - **OCR languages**: 13 more `@tesseract.js-data/*@1.0.0` packages (4.0.0_best_int, MIT package, Apache-2.0 model), found by glob in `core/engines.ts`, loaded only when chosen (D21) and not precached. The `.gz` budget rose from 7.4 to 27 MB because it sums every opt-in language file; nothing loads by default.
 - **HEIC**: only native decoding (`createImageBitmap`, Safari). libheif is LGPL, so no decoder library.
 
+## D38. Create form, saved signatures (2026-11-24)
+- **Create form** (`ops/createform.ts`, `tools/create-form.ts`): fields placed like Edit PDF boxes; pdf-lib AcroForm fields with appearances generated for the new fields only; existing fields kept; `NeedAppearances` false only when the file had no form. Names `FIELD_NAME` (40 chars, letters/digits/space/-/_), choices WinAnsi only. Date = text field with a hint (no `AFDate_FormatEx`: that needs JavaScript in the file). Signature = labelled text area, not a `/Sig` certificate field. XFA refused.
+- **Saved signatures** (`ui/savedsigs.ts`): opt-in checkbox (default off), saved when placed; `mosspdf.saved-sigs` holds up to 4 `{kind, png}` entries, each ≤ 200 KB, base64 + PNG magic checked on load and decoded with `createImageBitmap`; bad entries are dropped. Thumbnails are canvas-drawn (CSP). "Forget all" removes the key. Privacy wording changed from "never stored" to "never stored unless you choose Keep on this device".
+- **Certificate signing**: not done (roadmap default; owner decision in NEEDS-VIN).
+

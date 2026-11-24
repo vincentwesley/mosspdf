@@ -4,6 +4,12 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 
 ## [Unreleased]
 
+## [1.12.0] - 2026-11-24
+Fill and sign (roadmap v1.12, D38).
+- Create form: add text, multi-line, checkbox, date, dropdown and signature-area fields to a PDF so others can fill it in; then test it in Fill forms.
+- Sign: keep signatures and initials on this device for next time (off by default; up to 4; "Forget all"); add today's date under a signature.
+- Privacy page updated: signatures are never stored unless you choose to keep them.
+
 ## [1.11.0] - 2026-11-24
 Conversions (roadmap v1.11, D36-D37).
 - PDF to Word keeps pictures, bold and italic (read from the real font data).

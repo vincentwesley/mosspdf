@@ -2,7 +2,7 @@
 import { resolve } from "node:path";
 import { PDFDocument } from "@cantoo/pdf-lib";
 import type { Page } from "@playwright/test";
-import { test, expect, checkA11y, downloadAndCheck, expectNoOverflow, loadApp, qpdfCheck, setTheme, type Theme } from "./fixtures";
+import { test, expect, checkA11y, downloadAndCheck, expectNoOverflow, loadApp, qpdfCheck, setTheme, waitForSeal, type Theme } from "./fixtures";
 import { readPdf } from "../tests/helpers/qpdf";
 
 const corpus = (n: string) => resolve("tests/corpus/generated", `${n}.pdf`);
@@ -176,8 +176,8 @@ test.describe("Sign", () => {
     await expect(page.getByTestId("sg-row")).toHaveCount(2); // signature + its date
     await expect(page.getByTestId("sg-saved-use")).toHaveCount(1);
     await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem("mosspdf.saved-sigs") ?? "[]").length)).toBe(1);
-    await page.reload();
-    await loadApp(page, "/#/sign");
+    await page.reload(); // one navigation only: a second goto right after cancels the reload's workers (WebKit reports that as an error)
+    await waitForSeal(page);
     await add(page, "plain-3p");
     await ready(page);
     await expect(page.getByTestId("sg-saved-use")).toHaveCount(1);

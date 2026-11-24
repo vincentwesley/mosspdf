@@ -37,7 +37,7 @@
 - Images to PDF: HEIC input only if a permissively licensed decoder exists. libheif is LGPL, so check first.
 - Scan pipeline: deskew, crop to the page and contrast, then OCR in one flow. More OCR languages, loaded on demand.
 
-### v1.12 Fill and sign, done properly
+### v1.12 Fill and sign, done properly — shipped 1.12.0 (certificate signing skipped)
 - Create form fields: text, checkbox, date and signature boxes.
 - Saved signatures and initials kept on this device, opt-in, with one-click clear.
 - Certificate (digital) signing with a user-supplied .p12 file, if pkijs (BSD) holds up. Needs a full security review.
