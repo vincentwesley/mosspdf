@@ -126,8 +126,8 @@ test.describe("tools", () => {
     expect(markers(file.pages)).toEqual(["p1", "p3"]);
   });
 
-  test("A-E2E-1 organize replaces the current PDF with a closable toast and undo", async ({ page }) => {
-    await loadApp(page, "/#/organize");
+  test("A-E2E-1 extract replaces the current PDF with a closable toast and undo", async ({ page }) => {
+    await loadApp(page, "/#/extract");
     await add(page, "plain-3p");
     await expect(page.getByTestId("page-card")).toHaveCount(3);
     await add(page, "rotated");

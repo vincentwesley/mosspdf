@@ -4,10 +4,10 @@ import type { ToolDef } from "./types";
 export const organize: ToolDef = {
   id: "organize", title: "Organize pages", group: "Organize",
   blurb: "Reorder, rotate, delete.",
-  lede: "Reorder, rotate or delete pages, then save a new PDF.",
-  how: "Add a PDF, then drag, rotate or delete pages and save the new file.",
+  lede: "Reorder, rotate or delete pages, from one PDF or several, then save a new PDF.",
+  how: "Add one or more PDFs, then drag, rotate or delete pages and save the new file.",
   next: ["compress", "protect", "page-numbers", "watermark", "sign"],
-  accepts: "pdf", grid: true,
+  accepts: "pdfs", grid: true,
   warnings: pdfLossWarnings,
   ready: (ctx) => ctx.items.length > 0,
   primaryLabel: () => "Save organized PDF",
