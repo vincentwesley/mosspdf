@@ -69,3 +69,25 @@ Costs left, by size:
 
 ### Memory guard
 `src/core/memguard.ts`: before an op runs, `estimateNeed` = input bytes x factor (compress 5, repair 4, safety scan 4, ocr 4, everything else 3, from the RSS multiples above). If the file is 50 MB or more and the estimate is over the tab budget (a quarter of `navigator.deviceMemory`, or 1.5 GB when the browser does not say), the action bar shows a plain warning with a "Try anyway" button instead of running. It never blocks. Tests: `tests/core/memguard.test.ts`, `e2e/memguard.spec.ts`.
+
+## Lighthouse (v2.0, 2026-11-26)
+Lighthouse 12.8 in headless Chromium against `dist/` served by `wrangler dev` (production `_headers`, so the real CSP), default simulated throttling. Mobile = Moto G Power profile on slow 4G; desktop = `--preset=desktop`. Target: 95+ in every category.
+
+Two fixes got there (first run in brackets):
+- **CLS**: `#app` is empty until the first view renders, so the footer started in view and then jumped (0.16 mobile, 0.26 desktop). The empty `#app` now reserves a full viewport: CLS 0.001.
+- **LCP on tool pages**: the tool code and the multi-MB engines (qpdf, pdf.js, fonts) started downloading together, so on a slow link the tool view waited for bandwidth (simulated LCP 19 s on `/#/merge` mobile; observed locally 0.2 s). The seal now loads the tool code first, lets the view paint, then the engines (`first` flag on an engine entry). The seal lands at about the same time.
+
+Merged v2.0 build (`v200`), median of runs; first run before the fixes in brackets:
+
+| Page | Device | Performance | Accessibility | Best practices | SEO | LCP | CLS |
+|---|---|---|---|---|---|---|---|
+| `/` | mobile | 96 (92) | 100 | 100 | 92* | 2.4 s | 0.001 |
+| `/` | desktop | 100 (86) | 100 | 100 | 92* | 0.6 s | 0 |
+| `/#/merge` | mobile | 98 (72) | 100 | 100 | 92* | 2.4 s | 0.001 |
+| `/#/merge` | desktop | 100 (98) | 100 | 100 | 92* | 0.5 s | 0.037 |
+| `/tools/merge/` | mobile | 99 | 100 | 100 | 100 | 1.7 s | 0 |
+| `/tools/merge/` | desktop | 100 | 100 | 100 | 100 | 0.4 s | 0 |
+| `/help/` | mobile | 99 | 100 | 100 | 100 | 1.7 s | 0 |
+| `/help/` | desktop | 100 | 100 | 100 | 100 | 0.4 s | 0 |
+
+\* The one failing SEO audit on the app is "robots.txt is not valid: unable to download". robots.txt is served fine (see the static pages, and `e2e/headers.spec.ts`); Lighthouse fetches it from inside the page, and the app has sealed itself against the network by then (D14). That is the privacy model working, not a crawler problem, so it stays. Mobile performance on `/` varies 93-96 between runs (total blocking time).

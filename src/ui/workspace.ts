@@ -171,11 +171,13 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
     const busy = store.busy;
     if (full) fl.render();
     memBox.hidden = true;
+    tip.hidden = multi || !!tool.noFiles || ofKind().length < 2; // only when more than one PDF was added to a one-file tool
     notice.hidden = !store.notice;
     notice.textContent = store.notice;
     syncItems();
     warnBox.replaceChildren(...(tool.warnings?.(ctx) ?? []).map((t) => h("p", { class: "hs-banner hs-banner--warn", text: t, attrs: { role: "note" } })));
     tool.sync?.(ctx);
+    if (tool.options) optBox.hidden = [...optSet.children].every((c) => (c as HTMLElement).hidden); // no empty card while a tool hides all its options
     gridBox.hidden = !grid || !ctx.pagesOpen || ctx.items.length === 0;
     primaryEnabled = !!tool.run && (tool.ready ? tool.ready(ctx) : tool.accepts === "pdf-pair" ? ctx.files.length === 2 : ctx.files.length > 0);
     primary.textContent = tool.run ? (tool.primaryLabel?.(ctx) ?? tool.title) + (tool.batch && ctx.files.length > 1 ? ` (${ctx.files.length} files)` : "") : "Coming soon";
@@ -287,12 +289,14 @@ export function workspace(tool: ToolDef): { el: HTMLElement; destroy: () => void
     const delta = inBytes ? Math.round(((inBytes - outBytes) / inBytes) * 100) : 0;
     // Only a saving is news; most tools add a little (fonts, a text layer), and "67% larger" on a 2 KB file reads like a fault.
     const change = delta > 0 ? `Saved ${delta}%.` : "";
+    // A size change only means something PDF to PDF; "Saved 98%" on a .md or .docx would mislead (the file sizes are on the rows).
+    const allPdf = results.every((r) => /\.pdf$/i.test(r.name));
     const single = results.length === 1 && /\.pdf$/i.test(results[0].name);
     const next = single ? nextTools(tool) : [];
     const zipName = `${stem(ctx.file?.name ?? "mosspdf")}-${tool.zipSuffix ?? tool.id}.zip`;
     resultBox.append(
       h("h2", { id: "res-h", text: results.length > 1 ? `Done. ${results.length} files are ready.` : "Done. Your file is ready.", attrs: { tabindex: -1 } }),
-      ...(tool.summary ? [h("p", { class: "res__sum", text: tool.summary(ctx), attrs: { "data-testid": "result-summary" } })] : inBytes ? [h("p", { class: "res__sum", text: `${fmtSize(inBytes)} → ${fmtSize(outBytes)}. ${change}`.trim(), attrs: { "data-testid": "result-summary" } })] : []),
+      ...(tool.summary ? [h("p", { class: "res__sum", text: tool.summary(ctx), attrs: { "data-testid": "result-summary" } })] : inBytes && allPdf ? [h("p", { class: "res__sum", text: `${fmtSize(inBytes)} → ${fmtSize(outBytes)}. ${change}`.trim(), attrs: { "data-testid": "result-summary" } })] : []),
       h("ul", { class: "outs", attrs: { role: "list" } }, ...results.map((r) =>
         h("li", { class: "out", attrs: { "data-testid": "result-row" } },
           ...(r === results[0] ? [thumb()] : []),

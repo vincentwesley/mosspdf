@@ -25,7 +25,7 @@ self.addEventListener("fetch", (e) => {
   if (req.method !== "GET" || url.origin !== location.origin || url.pathname === "/sw.js") return;
   if (req.mode === "navigate") {
     // network-first so a fresh deploy shows up; the cached copy keeps it working offline
-    e.respondWith(fetch(req).then((r) => { if (r.ok) caches.open(CACHE).then((c) => c.put("/", r.clone())); return r; }).catch(() => caches.match("/").then((r) => r || Response.error())));
+    e.respondWith(fetch(req).then((r) => { if (r.ok && url.pathname === "/") caches.open(CACHE).then((c) => c.put("/", r.clone())); return r; }).catch(() => caches.match("/").then((r) => r || Response.error())));
     return;
   }
   // OCR engine files and the optional Chinese font (D24) are not precached (about 6 MB, D16): kept the first time OCR loads, so it then works offline.

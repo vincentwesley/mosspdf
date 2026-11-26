@@ -2,7 +2,10 @@
 
 > The target: **the free, private alternative to iLovePDF.** Every common PDF job, done on the device, nothing uploaded, works offline, clear enough for anyone, solid on a phone. Version 2.0 is the "finished and polished" release. Point releases (1.9, 1.10 ...) get there.
 
-## Where we are (v1.8.0)
+## Where we are (v2.0.0)
+- 36 tools and 4 workflows; every milestone below has shipped.
+
+## Where we were (v1.8.0)
 - 40 tools and 3 workflows. Covered: organize, convert (Word, Excel, text, images), edit, fill and sign, OCR, redact, compare, protect.
 - Privacy model is done: the page seals itself, there are no uploads and no trackers, and it works offline.
 - Missing: the polish a first-time visitor notices (speed on big files, help, onboarding, consistency), a "workspace" feel (files that follow you between tools), and a few big expected features.
@@ -42,10 +45,10 @@
 - Saved signatures and initials kept on this device, opt-in, with one-click clear.
 - Certificate (digital) signing with a user-supplied .p12 file, if pkijs (BSD) holds up. Needs a full security review.
 
-### v2.0 Launch polish
-- A page per tool with its own title and description, for search. A help page with an FAQ. Refresh COMPARISON.md.
-- Final design review at 375, 768 and 1280 px, in dark and light. Lighthouse 95+ on every page.
-- Fresh-clone acceptance run, final legal review, a launch video (`brag`) and README media.
+### v2.0 Launch polish — shipped 2.0.0 (D39)
+- A page per tool with its own title and description, for search. A help page with an FAQ. Refresh COMPARISON.md. Done.
+- Final design review at 375, 768 and 1280 px, in dark and light. Lighthouse 95+ (home, Merge, a tool page and help: docs/PERF.md). Done.
+- Fresh-clone acceptance run, final legal review and README media. Done. A launch video (`brag`) is left to the owner (needs the owner's machine).
 
 ## Not doing (and why)
 - **Server features** (cloud storage, accounts, e-sign workflows with email): they break the "nothing leaves the device" promise.

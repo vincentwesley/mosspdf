@@ -3,7 +3,7 @@
 import { test, expect } from "./fixtures";
 import AxeBuilder from "@axe-core/playwright";
 
-const PATHS = ["/"]; // add each new page
+const PATHS = ["/", "/tools/merge/", "/help/"]; // add each new page (static pages from seo.ts)
 
 for (const path of PATHS) {
   for (const theme of ["dark", "light"] as const) {

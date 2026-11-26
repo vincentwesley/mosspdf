@@ -1,4 +1,4 @@
-// File tray: every file held in memory, with remove and Clear all. Files that don't suit the open tool are dimmed with a reason.
+// File tray: every file held in memory, with remove and Clear all. On home it lists them all; inside a tool only the files it won't use, dimmed with a reason.
 import { store } from "../core/store";
 import { unfitReason, type Fit } from "../core/trayfit";
 import { announce, h, plural } from "./dom";
@@ -24,9 +24,11 @@ export function tray(fit?: Fit): { el: HTMLElement; destroy: () => void } {
     const files = store.files;
     el.hidden = !files.length;
     count.textContent = `${files.length} ${files.length === 1 ? "file" : "files"} ready`;
-    list.replaceChildren(...files.map((f) => {
-      const why = unfitReason(f, files, fit);
-      return h("li", { class: `tray__item${why ? " is-dim" : ""}`, attrs: { "data-testid": "tray-item", "data-fit": why ? "no" : "yes" } },
+    // Inside a tool its own file list already shows the files it uses; the tray then lists only the ones it leaves out, with why.
+    const shown = files.map((f) => ({ f, why: unfitReason(f, files, fit) })).filter((x) => !fit || x.why);
+    list.hidden = !shown.length;
+    list.replaceChildren(...shown.map(({ f, why }) =>
+      h("li", { class: `tray__item${why ? " is-dim" : ""}`, attrs: { "data-testid": "tray-item", "data-fit": why ? "no" : "yes" } },
         h("span", { class: "tray__name", text: f.name }),
         why && h("span", { class: "tray__why", text: why, attrs: { "data-testid": "tray-why" } }),
         h("button", { class: "dlg__x", type: "button", disabled: store.busy, attrs: { "aria-label": `Remove ${f.name} from the tray`, "data-testid": "tray-remove" }, on: { click: () => {
@@ -34,8 +36,7 @@ export function tray(fit?: Fit): { el: HTMLElement; destroy: () => void } {
           store.remove(f.id);
           announce(`${f.name} removed.`);
           toast(`Removed ${f.name}.`, { label: "Undo", run: () => store.restore(snap) });
-        } } }, icon("close")));
-    }));
+        } } }, icon("close")))));
   };
   render();
   return { el, destroy: store.subscribe(render) };
