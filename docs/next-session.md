@@ -25,6 +25,11 @@ Continue work on **MossPDF** (repo `vincentwesley/mosspdf`, public). Live: https
 ## Current state
 - v1.12.0 (2026-11-24): fill and sign (D38): Create form, opt-in saved signatures/initials, date under signature. v1.11 conversions (D36-D37), v1.10 workspace (D34-D35), v1.9 quality (D33). 44 tools + 4 workflows. Next: v2.0 launch polish (ROADMAP).
 - **Plan: `docs/ROADMAP.md`** (v1.9 quality pass → v1.10 workspace → v1.11 conversions → v1.12 fill and sign → v2.0 launch polish). Work the next milestone.
+- **v2.0 in progress (stopped at a usage limit, 2026-11-24).** Two unfinished branches are pushed:
+  - `seo` (9609f40): a build-time generator `seo.ts` (repo root, wired in vite.config.ts) for static `/tools/<id>/` pages, `/help/`, sitemap.xml, robots.txt, JSON-LD; footer Help link, palette entry, sw.js only caches `/` navigations, tests/seo.test.ts and an e2e/headers.spec.ts extension. Not yet run green: finish it, run `npm run check` + `e2e/headers.spec.ts e2e/privacy.spec.ts e2e/house.spec.ts`, refresh docs/COMPARISON.md (44 tools).
+  - `finish` (f3fa6df): e2e/screens.spec.ts gained scenes for the v1.9-v1.12 additions. Still to do: shoot at 375/768/1280 dark and light, look at the PNGs, fix blockers/highs (max 3 rounds), then Lighthouse ≥ 95 on `/` and `/#/merge` (scores into docs/PERF.md).
+  - Then: merge both into a `v200` branch, `npm run acceptance` (fresh-clone check), update LEGAL-REVIEW.md, README (features, screenshots in docs/media), CHANGELOG 2.0.0, DECISIONS D39, ROADMAP marked shipped, version 2.0.0, PR → CI → merge → deploy → smoke → release.
+  - **Cloud sessions can't deploy** (no Cloudflare login there, and no secrets may be added): they stop after the PR is green and merged-ready; deploy + release are done from the owner's PC (`npm run deploy`, `npm run smoke:prod`, `npm run release`, tag, `gh release create`).
 - Budget: main bundle 17.3 KB gzip of 20; `.gz` 27 MB (opt-in OCR languages).
 
 ## Known gaps
