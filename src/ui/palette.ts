@@ -35,6 +35,7 @@ export function initPalette(act: PaletteActions): { open(opener?: HTMLElement): 
   const cmds: Cmd[] = [
     { id: "cmd-theme", label: "Switch theme", hint: "Command", blurb: "dark light appearance", run: () => act.switchTheme() },
     { id: "cmd-privacy", label: "Privacy log", hint: "Command", blurb: "requests seal network", run: () => { skipRefocus = true; act.openPrivacy(opener ?? document.body); } },
+    { id: "cmd-help", label: "Help", hint: "Command", blurb: "faq questions offline limits browsers", run: () => { location.href = "/help/"; } },
     { id: "cmd-clear", label: "Clear all files", hint: "Command", blurb: "remove delete files", run: () => {
       const snap = store.files.slice();
       store.clear();

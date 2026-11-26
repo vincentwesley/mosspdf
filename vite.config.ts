@@ -3,6 +3,7 @@ import type { Plugin } from "vite";
 import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { join, relative } from "node:path";
+import { seoFiles } from "./seo";
 
 const pkg = JSON.parse(readFileSync("package.json", "utf8")) as { version: string };
 const PDFJS = "node_modules/pdfjs-dist";
@@ -83,6 +84,24 @@ function licencesTxt(): Plugin {
   };
 }
 
+/** Emits /tools/<id>/, /help/, sitemap.xml and robots.txt (seo.ts), linking the entry's hashed CSS. `how` lines are read from the tool sources. */
+function seoPages(): Plugin {
+  return {
+    name: "mosspdf-seo-pages",
+    apply: "build",
+    generateBundle(_o, bundle) {
+      const css = Object.values(bundle).flatMap((c) => (c.type === "chunk" && c.isEntry ? [...(c.viteMetadata?.importedCss ?? [])] : [])).map((f) => "/" + f);
+      if (!css.length) this.error("seo pages: entry CSS not found");
+      const hows: Record<string, string> = {};
+      for (const f of readdirSync("src/tools")) {
+        const m = /\bhow:\s*("(?:[^"\\]|\\.)*")/.exec(readFileSync(join("src/tools", f), "utf8"));
+        if (m) hows[f.replace(/\.ts$/, "")] = JSON.parse(m[1]);
+      }
+      for (const [fileName, source] of Object.entries(seoFiles(css, hows))) this.emitFile({ type: "asset", fileName, source });
+    },
+  };
+}
+
 /** Stamps public/sw.js (copied into dist) with the precache list of the finished build and a version derived from it. */
 function swPrecache(): Plugin {
   const walk = (d: string): string[] => readdirSync(d).flatMap((n) => (statSync(join(d, n)).isDirectory() ? walk(join(d, n)) : [join(d, n)]));
@@ -92,7 +111,7 @@ function swPrecache(): Plugin {
     enforce: "post",
     closeBundle() {
       const dist = "dist";
-      const files = walk(dist).map((f) => "/" + relative(dist, f).split("\\").join("/")).filter((f) => f !== "/sw.js" && f !== "/_headers" && f !== "/index.html" && !/^\/assets\/(tesseract-core|notosans(sc-gb2312|tc-big5|jp-jisx0208|kr-hangul)-400-normal|[a-z_]+\.traineddata)-/.test(f)).sort(); // OCR engine and CJK fonts: cached on first use instead (D16, D24)
+      const files = walk(dist).map((f) => "/" + relative(dist, f).split("\\").join("/")).filter((f) => f !== "/sw.js" && f !== "/_headers" && f !== "/index.html" && !/^\/(tools|help)\//.test(f) && f !== "/sitemap.xml" && !/^\/assets\/(tesseract-core|notosans(sc-gb2312|tc-big5|jp-jisx0208|kr-hangul)-400-normal|[a-z_]+\.traineddata)-/.test(f)).sort(); // OCR engine and CJK fonts: cached on first use instead (D16, D24)
       const list = ["/", ...files];
       const hash = createHash("sha256").update(JSON.stringify(list)).update(readFileSync(join(dist, "index.html"))).digest("hex").slice(0, 10);
       const sw = readFileSync(join(dist, "sw.js"), "utf8").replace("__PRECACHE__", JSON.stringify(list)).replace("__VERSION__", `${pkg.version}-${hash}`);
@@ -103,7 +122,7 @@ function swPrecache(): Plugin {
 
 export default defineConfig({
   define: { __APP_VERSION__: JSON.stringify(pkg.version) },
-  plugins: [pdfjsData(), licencesTxt(), swPrecache()],
+  plugins: [pdfjsData(), licencesTxt(), seoPages(), swPrecache()],
   build: { assetsInlineLimit: 0 }, // CSP script-src 'self': nothing may be inlined
   worker: {
     format: "es",
