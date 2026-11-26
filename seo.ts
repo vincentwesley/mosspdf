@@ -14,7 +14,7 @@ export const ldJson = (name: string, url: string, description: string) =>
     "@context": "https://schema.org", "@type": "SoftwareApplication", name, url, description,
     applicationCategory: "BusinessApplication", operatingSystem: "Any (web browser)",
     offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-    publisher: { "@type": "Organization", name: "Vin's Atelier", url: "https://vwesley.dev", founder: { "@type": "Person", name: "Vincent Wesley", alternateName: "Vin" } },
+    publisher: { "@type": "Organization", name: "Vin's Atelier", url: "https://vwesley.dev" },
   }).replace(/</g, "\\u003c");
 
 interface Page { title: string; description: string; path: string; body: string; ld?: string }
@@ -46,7 +46,7 @@ ${css.map((c) => `<link rel="stylesheet" href="${c}">`).join("\n")}
 ${p.ld ? `<script type="application/ld+json">${p.ld}</script>\n` : ""}</head>
 <body>
 <a class="hs-skip" href="#main">Skip to content</a>
-<header class="top"><a class="wordmark" href="/" aria-label="MossPDF, home">MossPDF</a></header>
+<header class="top sp__top"><a class="wordmark" href="/" aria-label="MossPDF, home">MossPDF</a></header>
 <main id="main" class="sp">
 ${p.body}
 </main>
@@ -63,15 +63,15 @@ export function toolPage(css: string[], t: ToolMeta, how?: string): { path: stri
   const title = `${t.title} — free, private PDF tool | MossPDF`;
   const description = `${t.blurb} ${PRIVATE}`;
   const body = `<h1>${esc(t.title)}</h1>
-<p class="sp__lede">${esc(how ?? t.blurb)}</p>
+<p class="sp__lede">${esc(t.blurb)} ${PRIVATE}</p>
 <p><a class="hs-btn hs-btn--primary sp__cta" href="/#/${t.id}">Open ${esc(t.title)}</a></p>
 <h2>How it works</h2>
 <ol>
-<li>Open ${esc(t.title)} and add your file. Drop it on the page or pick it from your device.</li>
+<li>Open ${esc(t.title)} and add your files: drop them on the page or pick them from your device.</li>
 <li>${esc(how ?? t.blurb)}</li>
-<li>Download the result. Nothing is uploaded, so there are no accounts, limits or watermarks.</li>
+<li>Download the result. Nothing is uploaded, and there are no accounts, ads or watermarks.</li>
 </ol>
-<p>${PRIVATE} Need a hand? See the <a href="/help/">help page</a>.</p>${related.length ? `
+<p>Need a hand? See the <a href="/help/">help page</a>.</p>${related.length ? `
 <h2>Often used next</h2>
 <ul>
 ${related.map((r) => `<li><a href="/tools/${r.id}/">${esc(r.title)}</a>: ${esc(r.blurb)}</li>`).join("\n")}
@@ -83,7 +83,7 @@ const FAQ: [string, string][] = [
   ["Are my files uploaded?", "No. MossPDF does every job inside your browser and seals the page against the network after it loads. To check, tap the seal badge at the top of the app: it shows the network requests the page has made, and none carry your files."],
   ["Does it work offline?", "Yes. Open MossPDF once, then install it from your browser (Install app, or Add to Home Screen on a phone). After that it opens and works with no connection."],
   ["What are the limits?", "There is no file count or size cap from us, but your device decides how much it can hold. Very big files (hundreds of megabytes) can run out of memory, especially on phones. MossPDF shows a memory warning before that happens. If it does, split the file first or close other tabs."],
-  ["Why is something not supported?", "PDF/A conversion and certificate (digital ID) signing are not available. Both need heavy engines or a server. Editing existing text in Tamil is not supported either, because complex scripts cannot be re-shaped reliably. OCR can still read English, Chinese (Simplified), Malay and Tamil."],
+  ["Why is something not supported?", "PDF/A conversion and certificate (digital ID) signing are not available. Both need heavy engines or a server. Adding Tamil text to a page is not supported either, because the PDF library cannot shape that script. OCR can still read Tamil, along with 16 other languages."],
   ["Which browsers work?", "Current Chrome, Edge, Firefox and Safari, on desktop and phones. Older browsers may miss features the tools need."],
   ["How do I report a problem?", `Open an issue on GitHub: ${ISSUES}. Please never attach private files. Describe the tool, what you did and what you saw.`],
   ["Licences and terms", "MossPDF is open source under the MIT licence. Terms and privacy notes are in the app; third-party licences are listed in licences.txt."],
