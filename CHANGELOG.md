@@ -4,6 +4,8 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 
 ## [Unreleased]
 
+- New MossPDF app icon and favicon.
+
 ## [2.0.0] - 2026-11-26
 Launch polish (roadmap v2.0, D39).
 - A page for every tool (`/tools/merge/` and so on) with a short how-to and links to related tools, a help page with answers about privacy, offline use, limits and browsers, plus a sitemap and robots.txt. Same strict security headers as the app; no trackers.

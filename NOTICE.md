@@ -6,4 +6,4 @@ The Vin's Atelier logo (the morphing SVG in the credits sign-off and the shapes 
 
 The credits character art (`public/creator.webp`) is the owner's own work, all rights reserved, not covered by the MIT licence.
 
-The favicon and app icons (`public/icons/icon.svg`, `icon-192.png`, `icon-512.png`, `icon-maskable-512.png`) and the logo mark in the top bar of `index.html` are Vin's Atelier marks, all rights reserved, not covered by the MIT licence.
+The favicon and app icons (`public/icons/icon.svg`, `icon-192.png`, `icon-512.png`, `icon-maskable-512.png`) are MossPDF's own hand-drawn marks, all rights reserved, not covered by the MIT licence.
