@@ -61,6 +61,7 @@ for (const scene of SCENES) {
   for (const theme of ["dark", "light"] as Theme[]) {
     test(`A-E2E-9 screenshot ${scene.name} (${theme})`, async ({ page }) => {
       test.skip(test.info().project.name !== "chromium", "screenshots are taken in desktop Chromium");
+      test.setTimeout(180_000); // up to three widths, each re-running the scene (OCR included)
       for (const w of scene.widths) {
         await page.setViewportSize({ width: w, height: w < 600 ? 800 : 900 });
         await scene.open(page);

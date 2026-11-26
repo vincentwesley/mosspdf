@@ -65,11 +65,13 @@ const LANG_URL: Record<string, string> = Object.fromEntries(Object.entries(impor
 export let ocrRpc: RpcClient | undefined;
 /** The language codes the loaded OCR engine was started with. */
 export let ocrLangs: string[] = [];
+// The route the page booted on, read now: the engines load after the tool code has painted (D39), and the user may have moved on by then.
+const bootHash = location.hash, bootRoute = routeOf(bootHash);
 registerEngine({
   name: "ocr",
   async load() {
-    if (routeOf(location.hash) !== "ocr") return;
-    const codes = chosenLangs();
+    if (bootRoute !== "ocr") return;
+    const codes = chosenLangs(bootHash);
     const [wasm, ...gzs] = await Promise.all([fetchBytes(ocrWasmUrl), ...codes.map((c) => fetchBytes(LANG_URL[c]))]);
     const langs = codes.map((code, i) => ({ code, gz: gzs[i] }));
     const rpc = new RpcClient(new Worker(scriptUrl(ocrWorkerUrl), { type: "module" }));
