@@ -4,6 +4,18 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-11-26
+Launch polish (roadmap v2.0, D39).
+- A page for every tool (`/tools/merge/` and so on) with a short how-to and links to related tools, a help page with answers about privacy, offline use, limits and browsers, plus a sitemap and robots.txt. Same strict security headers as the app; no trackers.
+- Help is linked in the footer and the command palette.
+- Design pass on phones, tablets and desktops in dark and light:
+  - Inside a tool the file tray now lists only files that tool won't use (with the reason), so the tool's options start higher on phones.
+  - Conversions (Word, Markdown, PowerPoint...) no longer show a misleading "Saved 98%".
+  - My workflows: the step buttons line up.
+  - The remove button stays on the file's row on phones; no empty options box while a file is still locked; the "Use Merge" tip only shows when it helps; the privacy log header no longer breaks mid-word.
+- Faster first view on slow connections: the tool code loads before the PDF engines, and the footer no longer jumps while the page starts. Lighthouse 96-100 on the home and Merge pages (docs/PERF.md).
+- COMPARISON, LEGAL-REVIEW and README refreshed (36 tools and 4 workflows).
+
 ## [1.12.0] - 2026-11-24
 Fill and sign (roadmap v1.12, D38).
 - Create form: add text, multi-line, checkbox, date, dropdown and signature-area fields to a PDF so others can fill it in; then test it in Fill forms.

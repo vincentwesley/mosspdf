@@ -1,6 +1,6 @@
 # Legal review
 
-A plain checklist of the legal and licensing points for MossPDF, as of 2026-11-20. It is an engineering review, not legal advice. Items that need the owner's decision are marked **Owner**.
+A plain checklist of the legal and licensing points for MossPDF, first written 2026-11-20 and reviewed again for v2.0 on 2026-11-26. It is an engineering review, not legal advice. Items that need the owner's decision are marked **Owner**.
 
 ## Licences
 
@@ -21,13 +21,15 @@ A plain checklist of the legal and licensing points for MossPDF, as of 2026-11-2
 | Remove password | Only with the correct password (owner password to lift restrictions) | Never cracks or bypasses protection (D13). No DRM removal |
 | Clean copy to share | Removes scripts, actions, attachments, metadata, annotation authors, unsafe links | Redaction stays a separate, manual step; warnings are shown if anything risky remains |
 | Accessibility check | Basic structural checks | "Not a PDF/UA certification" |
-| OCR | Tesseract (English, Chinese (Simplified), Malay, Tamil) | The app says results can contain mistakes and should be checked |
+| OCR | Tesseract, 17 languages (models under Apache-2.0), each loaded only when chosen | The app says results can contain mistakes and should be checked |
+| Conversions (PDF to Word, Excel, PowerPoint, Markdown, text) | Text, headings, lists, tables, pictures, bold and italic read from the PDF in the browser | Each tool says what is not kept (layout, tables, editable slide text); no claim of a faithful copy |
+| Create form, saved signatures | AcroForm fields written by pdf-lib; signatures kept only with "Keep on this device" | Saved only in this browser, never uploaded; "Forget all" removes them |
 
 ## Privacy (PDPA, GDPR)
 
 - The operator collects no personal data: there are no accounts, analytics, cookies, server logs of file contents or third-party hosts.
 - Cloudflare serves the static files. Its standard request logs (IP, user agent) apply to page loads, as for any website. The privacy page says so.
-- The browser's local storage holds only the theme, the logo form, recently used tools, the OCR languages chosen and a small counter for the logo tip. Files are never stored. Signatures and initials are never stored unless you choose "Keep on this device"; you can forget them any time.
+- The browser's local storage holds only settings: the theme, the logo form, recently used tools, the OCR languages and Extra text font chosen, dismissed hints and install offer, and workflows you save yourself. Files are never stored. Signatures and initials are never stored unless you choose "Keep on this device"; you can forget them any time.
 
 ## Names and marks
 
@@ -49,3 +51,12 @@ The README and LICENSE state "provided as is, no warranty". The app repeats the 
 - Softened claims: "stay on this device", "remove text, not just cover it", OCR and redaction accuracy warnings, signature and photo wording, seal log "that the browser reports".
 - Liberation Sans dropped (D22), so no GPL material ships.
 - Export rules: the encryption is open-source AES, publicly available. **Owner:** may send the courtesy notice to BIS/NSA.
+
+## 2026-11-26 review (v2.0)
+
+- **New public pages** (`/tools/<id>/`, `/help/`, `sitemap.xml`, `robots.txt`): plain HTML generated at build time, under the same strict CSP and headers as the app, no scripts except the theme pre-paint and a schema.org data block. The data block names only the studio ("Vin's Atelier") as publisher, no person. No third-party hosts, fonts or trackers; the only outbound links are GitHub issues and the studio site.
+- **Claims on those pages** match the app: "Runs in your browser; files never leave your device" (same basis as above), "no accounts, ads or watermarks". The earlier "no limits" wording was dropped there because the device's memory is a real limit, which the help page explains.
+- **Help page** states what is not supported (PDF/A, certificate signing, adding Tamil text) and asks people never to attach private files to GitHub issues.
+- **COMPARISON.md** gained rows for v1.6-v1.12 features. Competitor cells that were not re-researched say "Not checked" instead of guessing; competitor names are used only descriptively.
+- **Licences:** no new runtime dependencies since v1.12; `npm run licences` passes (44 production packages, all allowlisted). Lighthouse is a scratch tool for measurements only and is not a project dependency.
+- Nothing new for the owner beyond the open items in `NEEDS-VIN.md` (trademark check, optional export notice).
