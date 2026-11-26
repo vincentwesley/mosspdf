@@ -2,7 +2,7 @@
 // Add an engine (pdfium, tesseract...) with registerEngine(); nothing else changes.
 import { netlog } from "./netlog";
 
-export interface EngineEntry { name: string; load: () => Promise<void> }
+export interface EngineEntry { name: string; load: () => Promise<void>; /** Needed for the first paint (the tool code): loaded before the heavy engines so they don't compete for bandwidth. */ first?: boolean }
 export type SealStatus = "preparing" | "sealed" | "failed";
 
 /** Policy D from docs/spikes/csp.md. Workers already running are covered by their own header (connect-src 'none'). */
@@ -37,11 +37,19 @@ async function preloadStatic(): Promise<void> {
   await document.fonts.ready;
 }
 
+/** Resolves once the view has had a frame to paint (or after 200 ms when frames are paused, as in a background tab). */
+const afterPaint = () => new Promise<void>((ok) => {
+  const t = setTimeout(ok, 200);
+  requestAnimationFrame(() => setTimeout(() => { clearTimeout(t); ok(); }, 0));
+});
+
 let booted: Promise<void> | undefined;
 export function bootAndSeal(): Promise<void> {
   return (booted ??= (async () => {
     try {
-      await Promise.all([...engines.map((e) => e.load()), preloadStatic()]);
+      await Promise.all(engines.filter((e) => e.first).map((e) => e.load()));
+      await afterPaint();
+      await Promise.all([...engines.filter((e) => !e.first).map((e) => e.load()), preloadStatic()]);
       const meta = document.createElement("meta");
       meta.httpEquiv = "Content-Security-Policy";
       meta.content = SEAL_CSP;

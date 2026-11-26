@@ -90,7 +90,7 @@ const toolsReady = import("./tools/all").then((m) => {
   const r = routeOf(location.hash); // saved workflows were not known when home or their own route first drew
   if (m.SAVED.length && (!r || m.SAVED.includes(r))) render();
 });
-registerEngine({ name: "tools", load: () => toolsReady });
+registerEngine({ name: "tools", load: () => toolsReady, first: true });
 
 function resolve(): { el: HTMLElement; destroy: () => void } {
   const route = routeOf(location.hash);

@@ -28,8 +28,11 @@ test("tray: files follow you home and into another tool; remove, clear all, dimm
   await expect(page.getByTestId("file-row")).toHaveCount(0);
 
   await go(page, "#/merge");
+  await expect(page.getByTestId("tray-item")).toHaveCount(0); // a tool's own file list shows the files it uses; the tray lists only the rest
+  await go(page, "#/");
   await page.getByTestId("tray-remove").first().click();
   await expect(page.getByTestId("tray-count")).toHaveText("1 file ready");
+  await go(page, "#/merge");
   await page.getByTestId("tray-clear").click();
   await expect(page.getByTestId("tray")).toBeHidden();
   await expect(page.getByTestId("file-row")).toHaveCount(0);
@@ -42,5 +45,5 @@ test("tray: a chained result shows up in the tray", async ({ page }) => {
   await page.getByTestId("primary-action").click();
   await page.getByTestId("next-compress").click();
   await expect(page.getByTestId("tray-count")).toHaveText("1 file ready");
-  await expect(page.getByTestId("tray-item")).toContainText("merged");
+  await expect(page.getByTestId("file-row")).toContainText("merged"); // the tool's own list; the tray lists only files a tool leaves out
 });

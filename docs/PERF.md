@@ -69,3 +69,19 @@ Costs left, by size:
 
 ### Memory guard
 `src/core/memguard.ts`: before an op runs, `estimateNeed` = input bytes x factor (compress 5, repair 4, safety scan 4, ocr 4, everything else 3, from the RSS multiples above). If the file is 50 MB or more and the estimate is over the tab budget (a quarter of `navigator.deviceMemory`, or 1.5 GB when the browser does not say), the action bar shows a plain warning with a "Try anyway" button instead of running. It never blocks. Tests: `tests/core/memguard.test.ts`, `e2e/memguard.spec.ts`.
+
+## Lighthouse (v2.0, 2026-11-26)
+Lighthouse 12.8 in headless Chromium against `dist/` served by `wrangler dev` (production `_headers`, so the real CSP), default simulated throttling. Mobile = Moto G Power profile on slow 4G; desktop = `--preset=desktop`. Target: 95+ in every category.
+
+Two fixes got there (first run in brackets):
+- **CLS**: `#app` is empty until the first view renders, so the footer started in view and then jumped (0.16 mobile, 0.26 desktop). The empty `#app` now reserves a full viewport: CLS 0.001.
+- **LCP on tool pages**: the tool code and the multi-MB engines (qpdf, pdf.js, fonts) started downloading together, so on a slow link the tool view waited for bandwidth (simulated LCP 19 s on `/#/merge` mobile; observed locally 0.2 s). The seal now loads the tool code first, lets the view paint, then the engines (`first` flag on an engine entry). The seal lands at about the same time.
+
+| Page | Device | Performance | Accessibility | Best practices | SEO | LCP | CLS |
+|---|---|---|---|---|---|---|---|
+| `/` | mobile | 96 (92) | 100 | 100 | 100 (91) | 2.4 s | 0.001 |
+| `/` | desktop | 100 (86) | 100 | 100 | 100 (91) | 0.5 s | 0.001 |
+| `/#/merge` | mobile | 96 (72) | 100 | 100 | 100 (91) | 2.3 s | 0.001 |
+| `/#/merge` | desktop | 100 (98) | 100 | 100 | 100 (91) | 0.6 s | 0.038 |
+
+SEO was 91 only for a missing robots.txt, which the static pages work (branch `seo`) adds; the SEO column is from the merged build (see the `v200` table below once filled).
