@@ -144,11 +144,12 @@ function build(ctx: Ctx) {
     h("button", { class: "hs-btn hs-btn--secondary hs-btn--sm", type: "button", text, attrs: { "aria-label": label, ...(testid ? { "data-testid": testid } : {}) }, on: { click: run } });
 
   function paint(): void {
-    list.replaceChildren(...slots.map((s, i) => h("li", { class: "steps__row" },
-      h("button", { class: `hs-btn hs-btn--sm${i === sel ? "" : " hs-btn--secondary"}`, type: "button", text: `${i + 1}. ${s.tool.title}`, attrs: { "aria-pressed": String(i === sel), "data-testid": `wfc-step-${i}` }, on: { click: () => { sel = i; paint(); } } }),
+    list.replaceChildren(...slots.map((s, i) => h("li", { class: "wfc__row" },
+      h("button", { class: `hs-btn hs-btn--sm wfc__step${i === sel ? "" : " hs-btn--secondary"}`, type: "button", text: `${i + 1}. ${s.tool.title}`, attrs: { "aria-pressed": String(i === sel), "data-testid": `wfc-step-${i}` }, on: { click: () => { sel = i; paint(); } } }),
+      h("span", { class: "wfc__ctl" },
       ...(i > 0 ? [btn("Up", `Move step ${i + 1} up`, () => { [slots[i - 1], slots[i]] = [slots[i], slots[i - 1]]; sel = i - 1; paint(); })] : []),
       ...(i < slots.length - 1 ? [btn("Down", `Move step ${i + 1} down`, () => { [slots[i + 1], slots[i]] = [slots[i], slots[i + 1]]; sel = i + 1; paint(); })] : []),
-      btn("Remove", `Remove step ${i + 1}`, () => { slots.splice(i, 1); if (i < sel) sel--; else sel = Math.min(sel, slots.length - 1); paint(); }, `wfc-remove-${i}`))));
+      btn("Remove", `Remove step ${i + 1}`, () => { slots.splice(i, 1); if (i < sel) sel--; else sel = Math.min(sel, slots.length - 1); paint(); }, `wfc-remove-${i}`)))));
     panel.replaceChildren(...(sel >= 0 ? [h("h3", { text: `Settings for ${slots[sel].tool.title}` }), slots[sel].root] : [h("p", { class: "field__hint", text: "Add a step, then pick it to set it up." })]));
     if (live) ctx.refresh();
   }

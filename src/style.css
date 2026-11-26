@@ -33,6 +33,7 @@ a { color: var(--accent); text-underline-offset: 0.2em; }
 .seal[data-state="failed"] .ico { stroke: var(--danger); }
 .top .hs-btn { min-height: 48px; }
 main { min-height: 60vh; padding-bottom: var(--s6); outline: none; }
+#app:empty { min-height: 100vh; } /* before the first view renders: keeps the footer below the fold, so it doesn't jump (CLS) */
 .appfoot { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s5); align-items: center; color: var(--fg-muted); font-size: 0.9rem; margin-bottom: var(--s4); }
 .appfoot button { all: unset; cursor: pointer; text-decoration: underline; display: inline-flex; align-items: center; min-height: 48px; }
 .appfoot button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -50,7 +51,7 @@ body.is-dropping::after { content: "Drop to add"; position: fixed; inset: var(--
 .pv__tablewrap { max-height: 14rem; overflow: auto; box-shadow: var(--pix); }
 .pv__table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
 .pv__table :is(th, td) { text-align: left; padding: 0.35rem 0.6rem; vertical-align: top; overflow-wrap: anywhere; }
-.pv__table th { position: sticky; top: 0; background: var(--bg-elev); border-bottom: 2px solid var(--border-soft); }
+.pv__table th { white-space: nowrap; overflow-wrap: normal; position: sticky; top: 0; background: var(--bg-elev); border-bottom: 2px solid var(--border-soft); }
 .pv__table tr.is-after td { color: var(--warn); font-weight: 600; }
 .pv__when { display: block; color: var(--fg-muted); }
 .pv__table tr.is-after .pv__when { color: inherit; }
@@ -210,6 +211,7 @@ div.pg__thumb { cursor: default; }
   .dz .hs-btn { width: 100%; justify-content: center; }
   .file { flex-wrap: wrap; }
   .file__acts { width: 100%; justify-content: flex-start; }
+  .file__acts:not(:has(> :nth-child(2))) { width: auto; margin-left: auto; } /* a lone remove button stays on the file's row */
   .actionbar__btns .hs-btn:first-child { flex: 1; justify-content: center; }
 }
 @media (prefers-reduced-motion: no-preference) {
@@ -424,6 +426,10 @@ div.pg__thumb { cursor: default; }
 .steps__detail { grid-column: 1 / -1; color: var(--fg-muted); font-size: 0.9rem; overflow-wrap: anywhere; }
 .steps__row[data-state="running"] .steps__state, .steps__row[data-state="done"] .steps__state { color: var(--accent); }
 .steps__row[data-state="stopped"] .steps__state { color: var(--warn); }
+/* My workflows editor: step name grows, the move/remove controls stay together on the right (they wrap below it on phones). */
+.wfc__row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2); padding: var(--s2); background: var(--bg-elev); box-shadow: var(--pix); }
+.wfc__step { flex: 1 1 14rem; justify-content: flex-start; text-align: left; }
+.wfc__ctl { display: flex; gap: var(--s2); margin-left: auto; }
 .a11y { border-left: 4px solid var(--border-strong); padding-left: var(--s3); }
 .a11y--pass { border-color: var(--accent); }
 .a11y--warn { border-color: var(--warn); }
@@ -583,7 +589,7 @@ kbd { font: 600 0.85rem var(--font-mono); padding: 0.1rem 0.4rem; background: va
 
 /* File tray: what is held in memory, shared by home and the tool pages. */
 .tray { display: grid; gap: var(--s2); padding: var(--s3); border: 1px solid var(--border); background: var(--bg-elev); }
-.tray[hidden] { display: none; }
+.tray[hidden], .tray__list[hidden] { display: none; }
 .tray__head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2) var(--s3); }
 .tray__count { font-weight: 600; }
 .tray__note { color: var(--fg-muted); font-size: 0.875rem; flex: 1 1 12rem; }
